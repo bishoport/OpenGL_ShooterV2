@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Core\EBO.h" />
+    <ClInclude Include="src\Core\EngineOpenGL.h" />
+    <ClInclude Include="src\Core\GBO.hpp" />
+    <ClInclude Include="src\Core\Itc_matrix.hpp" />
+    <ClInclude Include="src\Core\Light.hpp" />
+    <ClInclude Include="src\Core\Material.h" />
+    <ClInclude Include="src\Core\Mesh.h" />
+    <ClInclude Include="src\Core\Model.h" />
+    <ClInclude Include="src\Core\Renderer.hpp" />
+    <ClInclude Include="src\Core\skeletal\animation.h" />
+    <ClInclude Include="src\Core\skeletal\animator.h" />
+    <ClInclude Include="src\Core\skeletal\AnimData.h" />
+    <ClInclude Include="src\Core\skeletal\bone.h" />
+    <ClInclude Include="src\Core\Texture.h" />
+    <ClInclude Include="src\Core\VAO.h" />
+    <ClInclude Include="src\Core\VBO.h" />
+    <ClInclude Include="src\Core\Viewport.hpp" />
+    <ClInclude Include="src\Core\ViewportManager.hpp" />
+    <ClInclude Include="src\ECS\ECS.h" />
+    <ClInclude Include="src\Core\GuiLayer.h" />
+    <ClInclude Include="src\input\InputManager.h" />
+    <ClInclude Include="src\input\KeyCodes.h" />
+    <ClInclude Include="src\input\MouseButtonCodes.h" />
+    <ClInclude Include="src\LibCore.h" />
+    <ClInclude Include="src\LibCoreHeaders.h" />
+    <ClInclude Include="src\StraightSkeleton\CircularList.h" />
+    <ClInclude Include="src\StraightSkeleton\CircularNode.h" />
+    <ClInclude Include="src\StraightSkeleton\EChainType.h" />
+    <ClInclude Include="src\StraightSkeleton\Edge.h" />
+    <ClInclude Include="src\StraightSkeleton\EdgeChain.h" />
+    <ClInclude Include="src\StraightSkeleton\EdgeEvent.h" />
+    <ClInclude Include="src\StraightSkeleton\EdgeResult.h" />
+    <ClInclude Include="src\StraightSkeleton\FaceNode.h" />
+    <ClInclude Include="src\StraightSkeleton\FaceQueue.h" />
+    <ClInclude Include="src\StraightSkeleton\FaceQueueUtil.h" />
+    <ClInclude Include="src\StraightSkeleton\IChain.h" />
+    <ClInclude Include="src\StraightSkeleton\LavUtil.h" />
+    <ClInclude Include="src\StraightSkeleton\LineLinear2d.h" />
+    <ClInclude Include="src\StraightSkeleton\LineParametric2d.h" />
+    <ClInclude Include="src\StraightSkeleton\MultiEdgeEvent.h" />
+    <ClInclude Include="src\StraightSkeleton\MultiSplitEvent.h" />
+    <ClInclude Include="src\StraightSkeleton\PickEvent.h" />
+    <ClInclude Include="src\StraightSkeleton\PrimitiveUtils.h" />
+    <ClInclude Include="src\StraightSkeleton\SingleEdgeChain.h" />
+    <ClInclude Include="src\StraightSkeleton\Skeleton.h" />
+    <ClInclude Include="src\StraightSkeleton\SkeletonBuilder.h" />
+    <ClInclude Include="src\StraightSkeleton\SkeletonEvent.h" />
+    <ClInclude Include="src\StraightSkeleton\SplitChain.h" />
+    <ClInclude Include="src\StraightSkeleton\SplitEvent.h" />
+    <ClInclude Include="src\StraightSkeleton\Vector2d.h" />
+    <ClInclude Include="src\StraightSkeleton\Vertex.h" />
+    <ClInclude Include="src\StraightSkeleton\VertexSplitEvent.h" />
+    <ClInclude Include="src\Timestep.h" />
+    <ClInclude Include="src\tools\AssetsManager.h" />
+    <ClInclude Include="src\tools\AssimpGlmHelpers.h" />
+    <ClInclude Include="src\tools\Camera.h" />
+    <ClInclude Include="src\Core\FBO.hpp" />
+    <ClInclude Include="src\tools\EventManager.h" />
+    <ClInclude Include="src\tools\FreeTypeManager.h" />
+    <ClInclude Include="src\tools\LightsManager.hpp" />
+    <ClInclude Include="src\tools\ModelLoader.h" />
+    <ClInclude Include="src\tools\PrimitivesHelper.h" />
+    <ClInclude Include="src\tools\RoofGenerator.hpp" />
+    <ClInclude Include="src\tools\Shader.h" />
+    <ClInclude Include="src\tools\ShaderManager.h" />
+    <ClInclude Include="src\tools\SkeletalModelLoader.h" />
+    <ClInclude Include="src\tools\SkyBox.hpp" />
+    <ClInclude Include="src\tools\TextureManager.h" />
+    <ClInclude Include="vendor\earcut\include\mapbox\earcut.hpp" />
+    <ClInclude Include="vendor\ft\ft2build.h" />
+    <ClInclude Include="vendor\imgui\imconfig.h" />
+    <ClInclude Include="vendor\imgui\imgui.h" />
+    <ClInclude Include="vendor\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="vendor\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="vendor\imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="vendor\imgui\imgui_internal.h" />
+    <ClInclude Include="vendor\imgui\imstb_rectpack.h" />
+    <ClInclude Include="vendor\imgui\imstb_textedit.h" />
+    <ClInclude Include="vendor\imgui\imstb_truetype.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Core\EBO.cpp" />
+    <ClCompile Include="src\Core\EngineOpenGL.cpp" />
+    <ClCompile Include="src\Core\Mesh.cpp" />
+    <ClCompile Include="src\Core\Model.cpp" />
+    <ClCompile Include="src\Core\Texture.cpp" />
+    <ClCompile Include="src\Core\VAO.cpp" />
+    <ClCompile Include="src\Core\VBO.cpp" />
+    <ClCompile Include="src\Core\GuiLayer.cpp" />
+    <ClCompile Include="src\input\InputManager.cpp" />
+    <ClCompile Include="src\StraightSkeleton\CircularList.cpp" />
+    <ClCompile Include="src\StraightSkeleton\CircularNode.cpp" />
+    <ClCompile Include="src\StraightSkeleton\EChainType.cpp" />
+    <ClCompile Include="src\StraightSkeleton\Edge.cpp" />
+    <ClCompile Include="src\StraightSkeleton\EdgeChain.cpp" />
+    <ClCompile Include="src\StraightSkeleton\EdgeEvent.cpp" />
+    <ClCompile Include="src\StraightSkeleton\EdgeResult.cpp" />
+    <ClCompile Include="src\StraightSkeleton\FaceNode.cpp" />
+    <ClCompile Include="src\StraightSkeleton\FaceQueue.cpp" />
+    <ClCompile Include="src\StraightSkeleton\FaceQueueUtil.cpp" />
+    <ClCompile Include="src\StraightSkeleton\IChain.cpp" />
+    <ClCompile Include="src\StraightSkeleton\LavUtil.cpp" />
+    <ClCompile Include="src\StraightSkeleton\LineLinear2d.cpp" />
+    <ClCompile Include="src\StraightSkeleton\LineParametric2d.cpp" />
+    <ClCompile Include="src\StraightSkeleton\MultiEdgeEvent.cpp" />
+    <ClCompile Include="src\StraightSkeleton\MultiSplitEvent.cpp" />
+    <ClCompile Include="src\StraightSkeleton\PickEvent.cpp" />
+    <ClCompile Include="src\StraightSkeleton\PrimitiveUtils.cpp" />
+    <ClCompile Include="src\StraightSkeleton\SingleEdgeChain.cpp" />
+    <ClCompile Include="src\StraightSkeleton\Skeleton.cpp" />
+    <ClCompile Include="src\StraightSkeleton\SkeletonBuilder.cpp" />
+    <ClCompile Include="src\StraightSkeleton\SkeletonEvent.cpp" />
+    <ClCompile Include="src\StraightSkeleton\SplitChain.cpp" />
+    <ClCompile Include="src\StraightSkeleton\SplitEvent.cpp" />
+    <ClCompile Include="src\StraightSkeleton\Vector2d.cpp" />
+    <ClCompile Include="src\StraightSkeleton\Vertex.cpp" />
+    <ClCompile Include="src\StraightSkeleton\VertexSplitEvent.cpp" />
+    <ClCompile Include="src\tools\AssetsManager.cpp" />
+    <ClCompile Include="src\tools\Camera.cpp" />
+    <ClCompile Include="src\tools\ModelLoader.cpp" />
+    <ClCompile Include="src\tools\PrimitivesHelper.cpp" />
+    <ClCompile Include="src\tools\ShaderManager.cpp" />
+    <ClCompile Include="src\tools\SkeletalModelLoader.cpp" />
+    <ClCompile Include="src\tools\TextureManager.cpp" />
+    <ClCompile Include="vendor\glad\glad.c" />
+    <ClCompile Include="vendor\imgui\imgui.cpp" />
+    <ClCompile Include="vendor\imgui\imgui_demo.cpp" />
+    <ClCompile Include="vendor\imgui\imgui_draw.cpp" />
+    <ClCompile Include="vendor\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="vendor\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="vendor\imgui\imgui_tables.cpp" />
+    <ClCompile Include="vendor\imgui\imgui_widgets.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{5748ca62-055b-4d1e-829a-afeb04da882e}</ProjectGuid>
+    <RootNamespace>Core</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)vendor\earcut\include;$(ProjectDir)vendor;$(ProjectDir)vendor\imgui;$(ProjectDir)vendor\freetype-2.13.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;freetype.lib;assimp-vc143-mtd.lib;</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>$(ProjectDir)libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
