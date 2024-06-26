@@ -252,6 +252,9 @@
     <ClInclude Include="src\Core\Itc_matrix.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\IBL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\input\InputManager.cpp">
@@ -405,6 +408,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\StraightSkeleton\VertexSplitEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\IBL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

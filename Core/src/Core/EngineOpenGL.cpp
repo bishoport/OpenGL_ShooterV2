@@ -82,15 +82,15 @@ namespace libCore
 
 		// -- SHADERS
 		std::string shadersDirectory = "assets/shaders/";
-		shaderManager.setShaderDataLoad("basic", shadersDirectory + "basic.vert", shadersDirectory + "basic.frag");
+		shaderManager.setShaderDataLoad("basic",        shadersDirectory + "basic.vert",    shadersDirectory + "basic.frag");
 		shaderManager.setShaderDataLoad("colorQuadFBO", shadersDirectory + "quad_fbo.vert", shadersDirectory + "color_quad_fbo.frag");
 		
 		//-DEBUG & TEXT
 		shaderManager.setShaderDataLoad("debug", shadersDirectory + "debug.vert", shadersDirectory + "debug.frag");
-		shaderManager.setShaderDataLoad("text", shadersDirectory + "text.vert", shadersDirectory + "text.frag");
+		shaderManager.setShaderDataLoad("text",  shadersDirectory + "text.vert",  shadersDirectory + "text.frag");
 
 		//-SSAO
-		shaderManager.setShaderDataLoad("ssao", shadersDirectory + "ssao.vert", shadersDirectory + "ssao.frag");
+		shaderManager.setShaderDataLoad("ssao",     shadersDirectory + "ssao.vert", shadersDirectory + "ssao.frag");
 		shaderManager.setShaderDataLoad("ssaoBlur", shadersDirectory + "ssao.vert", shadersDirectory + "ssao_blur.frag");
 
 		//-SKYBOX
@@ -99,7 +99,14 @@ namespace libCore
 		//-G_Buffer
 		shaderManager.setShaderDataLoad("geometryPass", shadersDirectory + "deferred/geometryPass.vert", shadersDirectory + "deferred/geometryPass.frag");
 		shaderManager.setShaderDataLoad("lightingPass", shadersDirectory + "deferred/lightingPass.vert", shadersDirectory + "deferred/lightingPass.frag");
-		shaderManager.setShaderDataLoad("combinePass", shadersDirectory + "combine.vert", shadersDirectory + "combine.frag");
+		shaderManager.setShaderDataLoad("combinePass",  shadersDirectory + "combine.vert",               shadersDirectory + "combine.frag");
+
+		//-IBL
+		shaderManager.setShaderDataLoad("equirectangularToCubemap", shadersDirectory + "IBL/cubemap.vs"   , shadersDirectory + "IBL/equirectangular_to_cubemap.fs");
+		shaderManager.setShaderDataLoad("irradiance",               shadersDirectory + "IBL/cubemap.vs"   , shadersDirectory + "IBL/irradiance_convolution.fs");
+		shaderManager.setShaderDataLoad("prefilter",                shadersDirectory + "IBL/cubemap.vs"   , shadersDirectory + "IBL/prefilter.fs");
+		shaderManager.setShaderDataLoad("brdf",                     shadersDirectory + "IBL/brdf.vs"      , shadersDirectory + "IBL/brdf.fs");
+		shaderManager.setShaderDataLoad("background",               shadersDirectory + "IBL/background.vs", shadersDirectory + "IBL/background.fs");
 
 		shaderManager.LoadAllShaders();
 		//-----------------------------------------------------------------

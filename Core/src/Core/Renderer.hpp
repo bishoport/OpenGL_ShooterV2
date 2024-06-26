@@ -5,6 +5,7 @@
 #include "Viewport.hpp"
 #include "../tools/LightsManager.hpp"
 #include "../tools/SkyBox.hpp"
+#include "IBL.h"
 #include <random>
 #include <vector>
 #include <glm/glm.hpp>
@@ -14,6 +15,7 @@ namespace libCore {
     class Renderer {
     public:
         Scope<DynamicSkybox> dynamicSkybox = nullptr;
+        Scope<IBL> ibl = nullptr;
 
         bool m_wireframe = false;
         bool ssaoEnabled = true; // Variable para activar/desactivar SSAO
@@ -27,6 +29,7 @@ namespace libCore {
         float hdrExposure = 1.0f;
 
         Renderer() {
+
             //--SKYBOX
             std::vector<const char*> faces {
                 "assets/Skybox/right.jpg",
@@ -37,17 +40,26 @@ namespace libCore {
                 "assets/Skybox/back.jpg"
             };
             dynamicSkybox = CreateScope<DynamicSkybox>(faces);
+            //-------------------------------------------------------
+             
 
-            // Configuración del quad para SSAO
-            setupQuad();
+            //--IBL
+            ibl = CreateScope<IBL>();
+            ibl->prepare_PBR_IBL(1920, 1080);
+            //-------------------------------------------------------
 
-            // Generar el kernel y la textura de ruido SSAO
-            ssaoKernel = generateSSAOKernel();
-            noiseTexture = generateSSAONoiseTexture();
 
-            //Area Light Config
+            //--SSAO
+            setupQuad();// Configuración del quad para SSAO
+            ssaoKernel = generateSSAOKernel();         // Genera el kernel
+            noiseTexture = generateSSAONoiseTexture(); // Genera textura de ruido SSAO
+            //-------------------------------------------------------
+ 
+
+            //--AREA LIGHT
             mLTC.mat1 = loadMTexture();
             mLTC.mat2 = loadLUTTexture();
+            //-------------------------------------------------------
         }
 
 

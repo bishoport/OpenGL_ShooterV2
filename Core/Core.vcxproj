@@ -22,6 +22,7 @@
     <ClInclude Include="src\Core\EBO.h" />
     <ClInclude Include="src\Core\EngineOpenGL.h" />
     <ClInclude Include="src\Core\GBO.hpp" />
+    <ClInclude Include="src\Core\IBL.h" />
     <ClInclude Include="src\Core\Itc_matrix.hpp" />
     <ClInclude Include="src\Core\Light.hpp" />
     <ClInclude Include="src\Core\Material.h" />
@@ -102,6 +103,7 @@
   <ItemGroup>
     <ClCompile Include="src\Core\EBO.cpp" />
     <ClCompile Include="src\Core\EngineOpenGL.cpp" />
+    <ClCompile Include="src\Core\IBL.cpp" />
     <ClCompile Include="src\Core\Mesh.cpp" />
     <ClCompile Include="src\Core\Model.cpp" />
     <ClCompile Include="src\Core\Texture.cpp" />
