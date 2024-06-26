@@ -5,6 +5,7 @@
 
 void MapEditor::Init()
 {
+    // -- PREPARE ENGINE
     bool ok = libCore::EngineOpenGL::GetInstance().InitializeEngine("MAP EDITOR", screenWidth, screenHeight,
         std::bind(&MapEditor::LoopOpenGL, this, std::placeholders::_1),
         std::bind(&MapEditor::OnCloseOpenGL, this),
@@ -88,22 +89,28 @@ void MapEditor::Init()
     //libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData4);
 
 
-    
-     //libCore::LightsManager::CreateLight(true, libCore::LightType::POINT, glm::vec3(0.0f, 15.0f, 0.0f));
-     libCore::LightsManager::CreateLight(true, libCore::LightType::AREA, glm::vec3(5.0f, 15.0f, 0.0f));
-
     //libCore::EngineOpenGL::GetInstance().CreateTriangle(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec3(1.0f, -1.0f, 0.0f));
     //libCore::EngineOpenGL::GetInstance().CreateTriangle(glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(-1.0f, -1.0f, 0.0f));
+    //------------------------------------------------------------------
+    
+
+    // -- EXTRA LIGHTS
+    //libCore::LightsManager::CreateLight(true, libCore::LightType::POINT, glm::vec3(0.0f, 15.0f, 0.0f));
+    libCore::LightsManager::CreateLight(true, libCore::LightType::AREA, glm::vec3(5.0f, 15.0f, 0.0f));
+    //------------------------------------------------------------------
 
 
     // -- VIEWPORTS
     libCore::EngineOpenGL::GetInstance().CreateViewport("VIEWPORT_1", glm::vec3(0.0f, 0.0f, 5.0f));
     //------------------------------------------------------------------
 
+
     // -- START LOOP OpenGL
     libCore::EngineOpenGL::GetInstance().InitializeMainLoop();
     //------------------------------------------------------------------
 }
+
+
 
 
 void MapEditor::LoopOpenGL(libCore::Timestep deltaTime){}

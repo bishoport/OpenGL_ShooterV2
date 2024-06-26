@@ -46,7 +46,7 @@ namespace libCore
     }
 
 
-    //------------------------------------STANDARD MODELS
+    //------------------------------------STANDARD MODELS---------------------------
     void ModelLoader::processNode(aiNode* node, const aiScene* scene, Ref<ModelContainer> modelContainer, aiMatrix4x4 _nodeTransform, ImportModelData importOptions)
     {
         glm::mat4 glmNodeTransform = aiMatrix4x4ToGlm(_nodeTransform);
@@ -82,8 +82,6 @@ namespace libCore
             ModelLoader::processNode(node->mChildren[i], scene, modelContainer, finalTransform, importOptions); // Asegúrate de pasar `finalTransform`
         }
     }
-
-
     void ModelLoader::processMesh(aiMesh* mesh, const aiScene* scene, Ref<Model> modelBuild, aiMatrix4x4 finalTransform, ImportModelData importOptions, int meshIndex)
     {
         auto meshBuild = CreateRef<Mesh>();
@@ -364,7 +362,7 @@ namespace libCore
     //-----------------------------------------------------------------------
  
 
-    //-----------------------------------FEATURES PROCESS
+    //-----------------------------------FEATURES PROCESS---------------------------
     void ModelLoader::processLights(const aiScene* scene, Ref<ModelContainer> modelContainer)
     {
         for (unsigned int i = 0; i < scene->mNumLights; i++) {
@@ -415,7 +413,7 @@ namespace libCore
     }
 
 
-    //------------------------------------SKELETAL MODELS
+    //------------------------------------SKELETAL MODELS---------------------------
     void ModelLoader::processSkeletalMesh(aiMesh* mesh, const aiScene* scene, Ref<Model> modelBuild, aiMatrix4x4 finalTransform, ImportModelData importOptions, int meshIndex)
     {
         auto meshBuild = CreateRef<Mesh>();
@@ -604,7 +602,7 @@ namespace libCore
     //-----------------------------------------------------------------------
 
 
-    //-------------------------------------TOOLS
+    //-------------------------------------TOOLS---------------------------
     glm::mat4 ModelLoader::aiMatrix4x4ToGlm(const aiMatrix4x4& from)
     {
         glm::mat4 to;
