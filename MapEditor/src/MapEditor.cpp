@@ -67,15 +67,16 @@ void MapEditor::Init()
     //importModelData4.globalScaleFactor = 1.0f;
     //libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData4);
 
-    //libCore::ImportModelData importModelData4;
-    //importModelData4.filePath = "assets/models/Scenario_1/";
-    //importModelData4.fileName = "CorridorModule_1.fbx";
-    //importModelData4.invertUV = false;
-    //importModelData4.rotate90 = false;
-    //importModelData4.useCustomTransform = true;
-    //importModelData4.modelID = 1;
-    //importModelData4.globalScaleFactor = 1.0f;
-    //libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData4);
+    libCore::ImportModelData importModelData4;
+    importModelData4.filePath = "assets/models/Scenario_1/";
+    importModelData4.fileName = "CorridorModule_1.fbx";
+    importModelData4.invertUV = false;
+    importModelData4.rotate90 = false;
+    importModelData4.useCustomTransform = true;
+    importModelData4.modelID = 1;
+    importModelData4.globalScaleFactor = 1.0f;
+    importModelData4.processLights = true;
+    libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData4);
 
     //libCore::ImportModelData importModelData4;
     //importModelData4.filePath = "assets/models/";
@@ -96,7 +97,7 @@ void MapEditor::Init()
 
     // -- EXTRA LIGHTS
     //libCore::LightsManager::CreateLight(true, libCore::LightType::POINT, glm::vec3(0.0f, 15.0f, 0.0f));
-    libCore::LightsManager::CreateLight(true, libCore::LightType::AREA, glm::vec3(5.0f, 15.0f, 0.0f));
+    //libCore::LightsManager::CreateLight(true, libCore::LightType::AREA, glm::vec3(5.0f, 15.0f, 0.0f));
     //------------------------------------------------------------------
 
 

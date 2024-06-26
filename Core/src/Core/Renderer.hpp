@@ -19,6 +19,8 @@ namespace libCore {
 
         bool m_wireframe = false;
         bool ssaoEnabled = true; // Variable para activar/desactivar SSAO
+        bool iblEnabled = true; // Variable para activar/desactivar SSAO
+        float iblIntensity = 0.0f;
         float ssaoRadius = 0.5f;
         float ssaoBias = 0.025f;
         float ssaoIntensity = 1.0f;
@@ -212,6 +214,20 @@ namespace libCore {
             glActiveTexture(GL_TEXTURE7);
             glBindTexture(GL_TEXTURE_2D, mLTC.mat2);
 
+            // IBL textures
+            libCore::ShaderManager::Get("lightingPass")->setBool("useIBL", iblEnabled);
+            libCore::ShaderManager::Get("lightingPass")->setFloat("iblIntensity", iblIntensity);
+            libCore::ShaderManager::Get("lightingPass")->setInt("irradianceMap", 8);
+            libCore::ShaderManager::Get("lightingPass")->setInt("prefilterMap", 9);
+            libCore::ShaderManager::Get("lightingPass")->setInt("brdfLUT", 10);
+
+            glActiveTexture(GL_TEXTURE8);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, ibl->irradianceMap);
+            glActiveTexture(GL_TEXTURE9);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, ibl->prefilterMap);
+            glActiveTexture(GL_TEXTURE10);
+            glBindTexture(GL_TEXTURE_2D, ibl->brdfLUTTexture);
+
             renderQuad();
 
             // Desvincula el FBO deferred
@@ -305,6 +321,11 @@ namespace libCore {
             ImGui::Text("Global Light");
             ImGui::SliderFloat("Ambient Light", &ambientLight, 0.0f, 10.0f);
             ImGui::SliderFloat("HDR Exposure", &hdrExposure, 0.1f, 10.0f);
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+            ImGui::Text("IBL");
+            ImGui::Checkbox("Enable IBL", &iblEnabled); // Checkbox para activar/desactivar IBL
+            ImGui::SliderFloat("Intensity", &iblIntensity, 0.0f, 10.0f, "%.2f");
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
             ImGui::Text("SSAO");

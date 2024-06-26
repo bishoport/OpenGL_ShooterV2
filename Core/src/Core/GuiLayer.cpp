@@ -181,9 +181,6 @@ namespace libCore
         }
     }
 
-
-
-
     //PANELES PRINCIPALES
     void GuiLayer::DrawHierarchyPanel(const std::vector<Ref<libCore::ModelContainer>>& modelsInScene)
     {
@@ -255,8 +252,6 @@ namespace libCore
         }
         ImGui::End();
     }
-    
-
     void GuiLayer::DrawLightsPanel(const std::vector<Ref<libCore::Light>>& lightsInScene)
     {
         ImGui::Begin("Lights");
@@ -341,11 +336,6 @@ namespace libCore
 
         ImGui::End();
     }
-
-
-
-
-
 
 
 
@@ -486,8 +476,6 @@ namespace libCore
 
         ImGui::End();
     }
-
-
     void GuiLayer::end()
     {
         ImGui::End(); // End of Docking Example window
