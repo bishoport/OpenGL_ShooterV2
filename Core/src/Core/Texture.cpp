@@ -6,9 +6,6 @@ namespace libCore
 {
     Texture::Texture(const char* image, TEXTURE_TYPES type, GLuint slot)
     {
-
-        
-
         m_type = type;
         // Stores the width, height, and the number of color channels of the image
         int widthImg, heightImg, numColCh;
@@ -52,26 +49,41 @@ namespace libCore
         stbi_image_free(bytes);
     }
 
-	void Texture::Bind(const std::string& shader)
-	{
-		glActiveTexture(GL_TEXTURE0 + m_unit);
-		glBindTexture(GL_TEXTURE_2D, ID);
+    void Texture::Bind(const std::string& shader)
+    {
+        GLenum error;
 
-		if(m_type == TEXTURE_TYPES::ALBEDO)
-			libCore::ShaderManager::Get(shader)->setInt("albedoTexture", m_unit);
+        // Active the texture unit first
+        glActiveTexture(GL_TEXTURE0 + m_unit);
+        error = glGetError();
+        if (error != GL_NO_ERROR) {
+            std::cerr << "OpenGL Error in glActiveTexture: " << error << std::endl;
+        }
 
-		if (m_type == TEXTURE_TYPES::NORMAL)
-			libCore::ShaderManager::Get(shader)->setInt("normalTexture", m_unit);
-		
-		if (m_type == TEXTURE_TYPES::METALLIC)
-			libCore::ShaderManager::Get(shader)->setInt("metallicTexture", m_unit);
-		
-		if (m_type == TEXTURE_TYPES::ROUGHNESS)
-			libCore::ShaderManager::Get(shader)->setInt("roughnessTexture", m_unit);
+        // Bind the texture to the active unit
+        glBindTexture(GL_TEXTURE_2D, ID);
+        error = glGetError();
+        if (error != GL_NO_ERROR) {
+            std::cerr << "OpenGL Error in glBindTexture: " << error << std::endl;
+        }
 
-		if (m_type == TEXTURE_TYPES::AO)
-			libCore::ShaderManager::Get(shader)->setInt("aoTexture", m_unit);
-	}
+        // Set the appropriate uniform based on the texture type
+        if (m_type == TEXTURE_TYPES::ALBEDO)
+            libCore::ShaderManager::Get(shader)->setInt("albedoTexture", m_unit);
+
+        if (m_type == TEXTURE_TYPES::NORMAL)
+            libCore::ShaderManager::Get(shader)->setInt("normalTexture", m_unit);
+
+        if (m_type == TEXTURE_TYPES::METALLIC)
+            libCore::ShaderManager::Get(shader)->setInt("metallicTexture", m_unit);
+
+        if (m_type == TEXTURE_TYPES::ROUGHNESS)
+            libCore::ShaderManager::Get(shader)->setInt("roughnessTexture", m_unit);
+
+        // Uncomment if using AO textures
+        // if (m_type == TEXTURE_TYPES::AO)
+        //     libCore::ShaderManager::Get(shader)->setInt("aoTexture", m_unit);
+    }
 
 	void Texture::Unbind()
 	{

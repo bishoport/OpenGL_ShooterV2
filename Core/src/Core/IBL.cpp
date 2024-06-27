@@ -7,14 +7,15 @@ namespace libCore
 	void IBL::prepare_PBR_IBL(int screenWidth, int screenHeight)
 	{
 
-		m_hdrTexture = libCore::TextureManager::loadHDR("assets/HDR/newport_loft.hdr");
+		m_hdrTexture = libCore::TextureManager::loadHDR("assets/HDR/Cargo_Studio.hdr");
+		//m_hdrTexture = libCore::TextureManager::loadHDR("assets/HDR/newport_loft.hdr");
 
 		glGenFramebuffers(1, &IBL_FBO);
 		glGenRenderbuffers(1, &IBL_RBO);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, IBL_FBO);
 		glBindRenderbuffer(GL_RENDERBUFFER, IBL_RBO);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 1024, 1024);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 2048, 2048);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, IBL_RBO);
 
 
@@ -25,7 +26,7 @@ namespace libCore
 
 		for (unsigned int i = 0; i < 6; ++i)
 		{
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 1024, 1024, 0, GL_RGB, GL_FLOAT, nullptr);
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 2048, 2048, 0, GL_RGB, GL_FLOAT, nullptr);
 		}
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -60,7 +61,7 @@ namespace libCore
 		libCore::ShaderManager::Get("equirectangularToCubemap")->setMat4("projection", captureProjection);
 
 
-		glViewport(0, 0, 1024, 1024); // don't forget to configure the viewport to the capture dimensions.
+		glViewport(0, 0, 2048, 2048); // don't forget to configure the viewport to the capture dimensions.
 		glBindFramebuffer(GL_FRAMEBUFFER, IBL_FBO);
 		for (unsigned int i = 0; i < 6; ++i)
 		{
@@ -122,7 +123,7 @@ namespace libCore
 		glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
 		for (unsigned int i = 0; i < 6; ++i)
 		{
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 128, 128, 0, GL_RGB, GL_FLOAT, nullptr);
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 256, 256, 0, GL_RGB, GL_FLOAT, nullptr);
 		}
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -146,8 +147,8 @@ namespace libCore
 		for (unsigned int mip = 0; mip < maxMipLevels; ++mip)
 		{
 			// reisze framebuffer according to mip-level size.
-			unsigned int mipWidth = static_cast<unsigned int>(128 * std::pow(0.5, mip));
-			unsigned int mipHeight = static_cast<unsigned int>(128 * std::pow(0.5, mip));
+			unsigned int mipWidth = static_cast<unsigned int>(256 * std::pow(0.5, mip));
+			unsigned int mipHeight = static_cast<unsigned int>(256 * std::pow(0.5, mip));
 			glBindRenderbuffer(GL_RENDERBUFFER, IBL_RBO);
 			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipWidth, mipHeight);
 			glViewport(0, 0, mipWidth, mipHeight);

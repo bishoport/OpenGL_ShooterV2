@@ -4,7 +4,7 @@ out float FragColor;
 in vec2 TexCoords;
 
 uniform sampler2D gPosition;
-uniform sampler2D gPositionView; // Para SSAO
+uniform sampler2D gPositionView;
 uniform sampler2D gNormal;
 uniform sampler2D texNoise;
 

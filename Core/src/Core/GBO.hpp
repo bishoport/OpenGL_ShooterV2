@@ -20,8 +20,6 @@ namespace libCore {
             bufferWidth = width;
             bufferHeight = height;
             setupGBuffer();
-            checkGBufferStatus();
-            checkTextures();
         }
 
         void bindGBuffer() {
@@ -96,7 +94,6 @@ namespace libCore {
         int bufferWidth, bufferHeight;
 
         void setupGBuffer() {
-
             glGenFramebuffers(1, &gBuffer);
             glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
 
@@ -117,7 +114,7 @@ namespace libCore {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, albedoTexture, 0);
 
             // Metallic-Roughness attachment
-            GLuint metallicRoughnessTexture = createTexture(GL_RGB16F, GL_RGB, GL_FLOAT);
+            GLuint metallicRoughnessTexture = createTexture(GL_RGB16F, GL_RGBA, GL_FLOAT);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, metallicRoughnessTexture, 0);
 
             // Specular attachment
@@ -143,6 +140,7 @@ namespace libCore {
             checkGBufferStatus();
             unbindGBuffer();
         }
+
 
 
         GLuint createTexture(GLenum internalFormat, GLenum format, GLenum type) {

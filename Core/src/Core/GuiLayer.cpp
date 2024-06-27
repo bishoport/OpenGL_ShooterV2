@@ -1,6 +1,7 @@
 ﻿#include "GuiLayer.h"
 #include "../tools/ShaderManager.h"
 #include <imgui_internal.h>
+#include "../tools/LightsManager.hpp"
 
 namespace libCore
 {
@@ -257,78 +258,175 @@ namespace libCore
         ImGui::Begin("Lights");
 
         for (size_t i = 0; i < lightsInScene.size(); ++i) {
+
             auto& light = lightsInScene[i];
 
             // Push a unique identifier onto the ID stack
             ImGui::PushID(static_cast<int>(i));
 
-            ImGui::BulletText("Light: %d", light->id);
-            ImGui::Separator();
-
-            // Common Controls
-            ImGui::BulletText("Transform:");
-            if (ImGui::DragFloat3("Position", &light->transform.position[0], 0.1f)) {
-                light->UpdateVertices(); // Actualiza los vértices cuando se cambie la posición
+            std::string lightTypeStr;
+            switch (light->type) {
+            case LightType::POINT:       lightTypeStr = "Point"; break;
+            case LightType::SPOT:        lightTypeStr = "Spot"; break;
+            case LightType::AREA:        lightTypeStr = "Area"; break;
+            case LightType::DIRECTIONAL: lightTypeStr = "Directional"; break;
             }
-            ImGui::DragFloat3("Rotation", &light->transform.rotation[0], 0.01f, -3.14159f, 3.14159f, "%.3f rad");
-            ImGui::DragFloat3("Scale", &light->transform.scale[0], 0.1f, 0.01f, 100.0f, "%.3f");
-            ImGui::Separator();
 
-            // Attenuation parameters
-            ImGui::DragFloat("Intensity", &light->intensity, 0.1f, 0.0f, 1000.0f, "%.2f");
+            std::string headerLabel = lightTypeStr + " Light: " + std::to_string(light->id);
 
-            // Color Picker
-            ImGui::ColorEdit3("Color", &light->color[0]);
+            if (ImGui::CollapsingHeader(headerLabel.c_str())) {
+                ImGui::Separator();
 
-            // Draw Debug
-            ImGui::Checkbox("Debug", &light->showDebug);
-
-            // Light Type
-            static const char* lightTypes[] = { "Point", "Spot", "Area" };
-            ImGui::Combo("Type", reinterpret_cast<int*>(&light->type), lightTypes, IM_ARRAYSIZE(lightTypes));
-
-            ImGui::Separator();
-
-            // Specific Controls based on Light Type
-            if (light->type == LightType::POINT) 
-            {
-                ImGui::DragFloat("Linear", &light->Linear, 0.01f, 0.0f, 10.0f, "%.2f");
-                ImGui::DragFloat("Quadratic", &light->Quadratic, 0.01f, 0.0f, 10.0f, "%.2f");
-                ImGui::DragFloat("Radius", &light->Radius, 0.01f, 0.0f, 100.0f, "%.2f");
-                ImGui::DragFloat("Border Smoothness", &light->LightSmoothness, 0.01f, 0.0f, 100.0f, "%.2f");
-            }
-            else if (light->type == LightType::SPOT) 
-            {
-                ImGui::BulletText("Spot Light Specifics:");
-                ImGui::DragFloat("Inner Cutoff", &light->innerCutoff, 0.01f, 0.0f, 1.0f, "%.2f");
-                ImGui::DragFloat("Outer Cutoff", &light->outerCutoff, 0.01f, 0.0f, 1.0f, "%.2f");
-                ImGui::DragFloat3("Direction", glm::value_ptr(light->transform.rotation), 0.01f, -1.0f, 1.0f, "%.2f");
-            }
-            else if (light->type == LightType::AREA) 
-            {
-                ImGui::BulletText("Area Light Specifics:");
-                ImGui::Checkbox("Two Sided", &light->twoSided);
-
-                for (size_t j = 0; j < light->areaLightpoints.size(); ++j) {
-                    std::string pointLabel = "Point " + std::to_string(j);
-                    if (ImGui::DragFloat3(pointLabel.c_str(), glm::value_ptr(light->areaLightpoints[j]), 0.1f)) {
-                        light->UpdateVertices(); // Actualiza los vértices cuando se cambien los puntos del área
-                    }
+                // Common Controls
+                ImGui::BulletText("Transform:");
+                if (ImGui::DragFloat3("Position", &light->transform.position[0], 0.1f)) {
+                    light->UpdateVertices(); // Actualiza los vértices cuando se cambie la posición
                 }
+                ImGui::DragFloat3("Rotation", &light->transform.rotation[0], 0.01f, -3.14159f, 3.14159f, "%.3f rad");
+                ImGui::DragFloat3("Scale", &light->transform.scale[0], 0.1f, 0.01f, 100.0f, "%.3f");
+                ImGui::Separator();
+
+                // Attenuation parameters
+                ImGui::DragFloat("Intensity", &light->intensity, 0.1f, 0.0f, 1000.0f, "%.2f");
+
+                // Color Picker
+                ImGui::ColorEdit3("Color", &light->color[0]);
+
+                // Draw Debug
+                ImGui::Checkbox("Debug", &light->showDebug);
+
+                // Light Type
+                static const char* lightTypes[] = { "Point", "Spot", "Area", "Directional" };
+                ImGui::Combo("Type", reinterpret_cast<int*>(&light->type), lightTypes, IM_ARRAYSIZE(lightTypes));
 
                 ImGui::Separator();
 
-                // LTC Parameters
-                ImGui::BulletText("LTC Parameters:");
-                if (ImGui::DragFloat("LUT_SIZE", &light->LUT_SIZE, 0.1f, 1.0f, 128.0f, "%.2f")) {
-                    light->LUT_SCALE = (light->LUT_SIZE - 1.0f) / light->LUT_SIZE;
-                    light->LUT_BIAS = 0.5f / light->LUT_SIZE;
+                // Specific Controls based on Light Type
+                if (light->type == LightType::POINT)
+                {
+                    ImGui::DragFloat("Linear", &light->Linear, 0.01f, 0.0f, 10.0f, "%.2f");
+                    ImGui::DragFloat("Quadratic", &light->Quadratic, 0.01f, 0.0f, 10.0f, "%.2f");
+                    ImGui::DragFloat("Radius", &light->Radius, 0.01f, 0.0f, 100.0f, "%.2f");
+                    ImGui::DragFloat("Border Smoothness", &light->LightSmoothness, 0.01f, 0.0f, 100.0f, "%.2f");
                 }
-                ImGui::DragFloat("LUT_SCALE", &light->LUT_SCALE, 0.01f, 0.0f, 1.0f, "%.4f", ImGuiSliderFlags_ReadOnly);
-                ImGui::DragFloat("LUT_BIAS", &light->LUT_BIAS, 0.01f, 0.0f, 1.0f, "%.4f", ImGuiSliderFlags_ReadOnly);
-            }
+                else if (light->type == LightType::SPOT)
+                {
+                    ImGui::BulletText("Spot Light Specifics:");
+                    ImGui::DragFloat("Inner Cutoff", &light->innerCutoff, 0.01f, 0.0f, 1.0f, "%.2f");
+                    ImGui::DragFloat("Outer Cutoff", &light->outerCutoff, 0.01f, 0.0f, 1.0f, "%.2f");
+                    ImGui::DragFloat3("Direction", glm::value_ptr(light->transform.rotation), 0.01f, -1.0f, 1.0f, "%.2f");
+                }
+                else if (light->type == LightType::AREA)
+                {
+                    ImGui::BulletText("Area Light Specifics:");
+                    ImGui::Checkbox("Two Sided", &light->twoSided);
 
-            ImGui::Separator();
+                    for (size_t j = 0; j < light->areaLightpoints.size(); ++j) {
+                        std::string pointLabel = "Point " + std::to_string(j);
+                        if (ImGui::DragFloat3(pointLabel.c_str(), glm::value_ptr(light->areaLightpoints[j]), 0.1f)) {
+                            light->UpdateVertices(); // Actualiza los vértices cuando se cambien los puntos del área
+                        }
+                    }
+
+                    ImGui::Separator();
+
+                    // LTC Parameters
+                    ImGui::BulletText("LTC Parameters:");
+                    if (ImGui::DragFloat("LUT_SIZE", &light->LUT_SIZE, 0.1f, 1.0f, 128.0f, "%.2f")) {
+                        light->LUT_SCALE = (light->LUT_SIZE - 1.0f) / light->LUT_SIZE;
+                        light->LUT_BIAS = 0.5f / light->LUT_SIZE;
+                    }
+                    ImGui::DragFloat("LUT_SCALE", &light->LUT_SCALE, 0.01f, 0.0f, 1.0f, "%.4f", ImGuiSliderFlags_ReadOnly);
+                    ImGui::DragFloat("LUT_BIAS", &light->LUT_BIAS, 0.01f, 0.0f, 1.0f, "%.4f", ImGuiSliderFlags_ReadOnly);
+                }
+                else if (light->type == LightType::DIRECTIONAL)
+                {
+                    ImGui::Text("Directional Light");
+                    ImGui::Dummy(ImVec2(0.0f, 5.0f));
+                    ImGui::Checkbox("Debug", &light->showDebug);
+                    ImGui::Separator();
+                    ImGui::DragFloat("Intensity", &light->intensity, 0.1f, 0.0f, 1000.0f, "%.2f");
+                    ImGui::Separator();
+                    // Common Controls
+                    ImGui::BulletText("Transform:");
+                    if (ImGui::DragFloat3("Position", &light->transform.position[0], 0.1f)) {
+                        light->UpdateVertices(); // Actualiza los vértices cuando se cambie la posición
+                    }
+                    ImGui::DragFloat3("Rotation", &light->transform.rotation[0], 0.01f, -3.14159f, 3.14159f, "%.3f rad");
+                    ImGui::DragFloat3("Scale", &light->transform.scale[0], 0.1f, 0.01f, 100.0f, "%.3f");
+                    ImGui::Separator();
+
+                    ImGui::Dummy(ImVec2(0.0f, 5.0f));
+                    ImGui::SliderFloat("Orbit X", &light->angleX, 0.0f, 6.28319f);
+                    ImGui::SliderFloat("Orbit Y", &light->angleY, 0.0f, 6.28319f);
+                    ImGui::SliderFloat("sceneRadiusOffset", &light->sceneRadiusOffset, 0.0f, 100.0f, "%.1f");
+                    ImGui::SliderFloat("currentSceneRadius", &light->currentSceneRadius, 0.0f, 100.0f, "%.1f");
+
+                    ImGui::Dummy(ImVec2(0.0f, 5.0f));
+                    ImGui::ColorEdit3("Ambient", glm::value_ptr(light->ambient));
+                    ImGui::ColorEdit3("Diffuse", glm::value_ptr(light->diffuse));
+                    ImGui::ColorEdit3("Specular", glm::value_ptr(light->specular));
+
+                    ImGui::Dummy(ImVec2(0.0f, 5.0f));
+                    ImGui::Checkbox("Draw Shadows", &light->drawShadows);
+
+                    if (light->drawShadows) {
+                        ImGui::SliderFloat("Shadow Intensity", &light->shadowIntensity, 0.0f, 1.0f);
+                        ImGui::Checkbox("Use Poison Disk", &light->usePoisonDisk);
+
+                        ImGui::Dummy(ImVec2(0.0f, 20.0f));
+                        ImGui::Image((void*)(intptr_t)light->shadowTex, ImVec2(512, 512), ImVec2(0, 1), ImVec2(1, 0), ImColor(255, 255, 255, 255));
+
+                        ImGui::Dummy(ImVec2(0.0f, 20.0f));
+                        ImGui::SliderFloat("Left", &light->orthoLeft, -100.0f, 100.0f);
+                        ImGui::SliderFloat("Right", &light->orthoRight, -100.0f, 100.0f);
+                        ImGui::SliderFloat("Top", &light->orthoTop, -100.0f, 100.0f);
+                        ImGui::SliderFloat("Bottom", &light->orthoBottom, -100.0f, 100.0f);
+
+                        ImGui::SliderFloat("Near", &light->orthoNear, 0.0f, 100.0f);
+                        ImGui::SliderFloat("Near Offset", &light->orthoNearOffset, -100.0f, 100.0f);
+                        ImGui::SliderFloat("Far", &light->orthoFar, 0.0f, 500.0f);
+                        ImGui::SliderFloat("Far Offset", &light->orthoFarOffset, -100.0f, 100.0f);
+
+                        ImGui::Dummy(ImVec2(0.0f, 20.0f));
+                        if (ImGui::CollapsingHeader("Shadow Bias")) {
+                            ImGui::InputFloat("00", &light->shadowBias[0][0], 0.001f);
+                            ImGui::InputFloat("01", &light->shadowBias[0][1], 0.001f);
+                            ImGui::InputFloat("02", &light->shadowBias[0][2], 0.001f);
+                            ImGui::InputFloat("03", &light->shadowBias[0][3], 0.001f);
+
+                            ImGui::InputFloat("10", &light->shadowBias[1][0], 0.001f);
+                            ImGui::InputFloat("11", &light->shadowBias[1][1], 0.001f);
+                            ImGui::InputFloat("12", &light->shadowBias[1][2], 0.001f);
+                            ImGui::InputFloat("13", &light->shadowBias[1][3], 0.001f);
+
+                            ImGui::InputFloat("20", &light->shadowBias[2][0], 0.001f);
+                            ImGui::InputFloat("21", &light->shadowBias[2][1], 0.001f);
+                            ImGui::InputFloat("22", &light->shadowBias[2][2], 0.001f);
+                            ImGui::InputFloat("23", &light->shadowBias[2][3], 0.001f);
+
+                            ImGui::InputFloat("30", &light->shadowBias[3][0], 0.001f);
+                            ImGui::InputFloat("31", &light->shadowBias[3][1], 0.001f);
+                            ImGui::InputFloat("32", &light->shadowBias[3][2], 0.001f);
+                            ImGui::InputFloat("33", &light->shadowBias[3][3], 0.001f);
+
+                            if (ImGui::Button("Reset")) {
+                                light->shadowBias = glm::mat4(
+                                    0.5, 0.0, 0.0, 0.0,
+                                    0.0, 0.5, 0.0, 0.0,
+                                    0.0, 0.0, 0.5, 0.0,
+                                    0.5, 0.5, 0.5, 1.0
+                                );
+                            }
+                        }
+                    }
+
+                    ImGui::Separator();
+                    ImGui::Dummy(ImVec2(0.0f, 5.0f));
+                }
+
+                ImGui::Separator();
+            }
 
             // Pop the identifier off the ID stack
             ImGui::PopID();
@@ -336,6 +434,7 @@ namespace libCore
 
         ImGui::End();
     }
+
 
 
 

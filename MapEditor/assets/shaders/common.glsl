@@ -28,3 +28,22 @@ struct AreaLight {
 
 
 
+struct DirectionalLight {
+    bool isActive;
+
+    vec3 direction;
+    vec3 position;
+
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+
+    //SHADOWS
+    bool drawShadows;
+    float shadowIntensity;
+    bool usePoisonDisk;
+    sampler2D shadowMap;
+    mat4 shadowBiasMVP;
+};
+
+

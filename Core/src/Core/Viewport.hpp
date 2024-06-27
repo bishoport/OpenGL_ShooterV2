@@ -10,12 +10,13 @@ namespace libCore
         std::string viewportName = "no_name_viewport";
 
         Scope<libCore::Camera> camera;
+        //Scope<libCore::FBO> framebuffer_shadowmap = nullptr;
         Scope<libCore::FBO> framebuffer_deferred = nullptr;
         Scope<libCore::FBO> framebuffer_forward = nullptr;
         Scope<libCore::FBO> framebuffer_final = nullptr;
         Scope<libCore::FBO> framebuffer_HDR = nullptr;
         Scope<libCore::FBO> framebuffer_SSAO = nullptr;
-        Scope<libCore::FBO> framebuffer_SSAOBlur = nullptr;  // Añadido para SSAO Blur
+        Scope<libCore::FBO> framebuffer_SSAOBlur = nullptr;
 
         Scope<libCore::GBO> gBuffer = nullptr;
 

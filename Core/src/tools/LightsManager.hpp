@@ -8,6 +8,7 @@ namespace libCore
 	class LightsManager
 	{
 	public:
+
 		// Método para obtener la instancia de la clase
 		static LightsManager& GetInstance() {
 			static LightsManager instance;
@@ -16,10 +17,10 @@ namespace libCore
 
 		static Ref<Light> CreateLight(bool randomColor, LightType lightType, glm::vec3 position)
 		{
-			auto modelLight = CreateRef<Light>(lightType);
+			auto light = CreateRef<Light>(lightType);
 
             // Position
-            modelLight->transform.position = position;
+			light->transform.position = position;
 
             float minColorValue = 0.5f;
             float maxColorValue = 1.0f;
@@ -27,21 +28,28 @@ namespace libCore
 			if (randomColor)
 			{
 				//Genera valores aleatorios para los componentes de color dentro del rango especificado
-				modelLight->color.r = static_cast<float>(minColorValue + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (maxColorValue - minColorValue))));
-				modelLight->color.g = static_cast<float>(minColorValue + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (maxColorValue - minColorValue))));
-				modelLight->color.b = static_cast<float>(minColorValue + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (maxColorValue - minColorValue))));
+				light->color.r = static_cast<float>(minColorValue + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (maxColorValue - minColorValue))));
+				light->color.g = static_cast<float>(minColorValue + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (maxColorValue - minColorValue))));
+				light->color.b = static_cast<float>(minColorValue + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (maxColorValue - minColorValue))));
 			}
 
             // Add the light to the global LightsManager
-            libCore::LightsManager::AddLight(modelLight);
+            libCore::LightsManager::AddLight(light);
 
-			return modelLight;
+			return light;
 		}
 
-		// Método estático para agregar una luz
-		static void AddLight(const Ref<Light>& light) {
-			light->id = GetInstance().lights.size();
-			GetInstance().lights.push_back(light);
+		
+
+		static void CreateDirectionalLight()
+		{
+			GetInstance().directionalLight = CreateRef<Light>(LightType::DIRECTIONAL);
+			libCore::LightsManager::AddLight(GetInstance().directionalLight);
+		}
+
+		static const Ref<Light>& GetDirectionalLight()
+		{
+			return  GetInstance().directionalLight;
 		}
 
 		// Método estático para obtener la lista de luces
@@ -91,14 +99,19 @@ namespace libCore
 
 
 	private:
-		// Constructor privado
-		LightsManager() {}
-
-		std::vector<Ref<Light>> lights;
-
+		LightsManager() {}// Constructor privado
 		// Eliminar la posibilidad de copiar o asignar instancias
 		LightsManager(const LightsManager&) = delete;
 		LightsManager& operator=(const LightsManager&) = delete;
+
+		// Método estático para agregar una luz
+		static void AddLight(const Ref<Light>& light) {
+			light->id = GetInstance().lights.size();
+			GetInstance().lights.push_back(light);
+		}
+
+		std::vector<Ref<Light>> lights;
+		Ref<Light> directionalLight;
 	};
 
 	// Declaración externa de una referencia a LightsManager

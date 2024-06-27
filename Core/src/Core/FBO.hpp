@@ -40,7 +40,7 @@ namespace libCore {
         void closeSetup()
         {
             setupFBO();
-            checkFBOStatus();
+            //checkFBOStatus();
         }
 
         void bindFBO() const {

@@ -22,6 +22,29 @@ namespace libCore
 		EventManager::OnWindowResizeEvent().trigger(width, height);
 	}
 
+	// Message callback function
+	void GLAPIENTRY MessageCallback(GLenum source,
+		GLenum type,
+		GLuint id,
+		GLenum severity,
+		GLsizei length,
+		const GLchar* message,
+		const void* userParam)
+	{
+		// Print the message based on the severity
+		if (severity == GL_DEBUG_SEVERITY_HIGH) {
+			std::cerr << "GL HIGH SEVERITY: " << message << std::endl;
+		}
+		else if (severity == GL_DEBUG_SEVERITY_MEDIUM) {
+			std::cerr << "GL MEDIUM SEVERITY: " << message << std::endl;
+		}
+		else if (severity == GL_DEBUG_SEVERITY_LOW) {
+			std::cerr << "GL LOW SEVERITY: " << message << std::endl;
+		}
+		else if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) {
+			std::cout << "GL NOTIFICATION: " << message << std::endl;
+		}
+	}
 
 	//--INIT & LIFE CYCLE
 	bool EngineOpenGL::InitializeEngine(const std::string& windowTitle,
@@ -46,8 +69,8 @@ namespace libCore
 		//--GLFW: initialize and configure 
 		glfwInit();
 		const char* glsl_version = "#version 460";
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 		// ------------------------------
@@ -75,9 +98,31 @@ namespace libCore
 		}
 		//-------------------------------------------------
 
+
+		//--GL debug output
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glDebugMessageCallback(MessageCallback, 0);
+
+		// Filter out notification messages
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
+
+		// Optionally, you can further filter by source and type
+		// Example: Ignore performance warnings
+		// glDebugMessageControl(GL_DEBUG_SOURCE_API, GL_DEBUG_TYPE_PERFORMANCE, GL_DEBUG_SEVERITY_LOW, 0, nullptr, GL_FALSE);
+
+		// Example: Ignore all messages except for high severity errors
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH, 0, nullptr, GL_TRUE);
+
+		
+		//-----------------------------
+
+
 		// -- OPENGL FLAGS
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
+		glfwWindowHint(GLFW_SAMPLES, 4);
+		glEnable(GL_MULTISAMPLE); // enabled by default on some drivers, but not all so always enable to make sure
 		//-----------------------------
 
 		// -- SHADERS
@@ -107,6 +152,9 @@ namespace libCore
 		shaderManager.setShaderDataLoad("prefilter",                shadersDirectory + "IBL/cubemap.vs"   , shadersDirectory + "IBL/prefilter.fs");
 		shaderManager.setShaderDataLoad("brdf",                     shadersDirectory + "IBL/brdf.vs"      , shadersDirectory + "IBL/brdf.fs");
 		shaderManager.setShaderDataLoad("background",               shadersDirectory + "IBL/background.vs", shadersDirectory + "IBL/background.fs");
+
+		//-SHADOWS
+		shaderManager.setShaderDataLoad("direct_light_depth_shadows", shadersDirectory + "shadows/directLight_shadow_mapping_depth_shader.vs", shadersDirectory + "shadows/directLight_shadow_mapping_depth_shader.fs");
 
 		shaderManager.LoadAllShaders();
 		//-----------------------------------------------------------------
@@ -207,10 +255,16 @@ namespace libCore
 			//WINDOW SIZE
 			GLint windowWidth, windowHeight;
 			glfwGetWindowSize(window, &windowWidth, &windowHeight);
-			glViewport(0, 0, windowWidth, windowHeight);
+			
 
 			//START INPUT UPDATE
 			InputManager::Instance().Update();
+
+			if (LightsManager::GetInstance().GetDirectionalLight() != nullptr)
+			{
+				LightsManager::GetInstance().GetDirectionalLight()->UpdateLightPosition();
+			}
+			
 
 			//MAIN LOOP FUNCTION CALL
 			RenderViewports();
@@ -278,7 +332,7 @@ namespace libCore
 
 
 	//--CREADOR DE PREFABS
-	void libCore::EngineOpenGL::CreatePrefabExternalModel(ImportModelData importModelData)
+	void EngineOpenGL::CreatePrefabExternalModel(ImportModelData importModelData)
 	{
 		modelsInScene.push_back(libCore::ModelLoader::LoadModel(importModelData));
 	}
@@ -341,7 +395,7 @@ namespace libCore
 
 		modelsInScene.push_back(modelContainer);
 	}
-	void libCore::EngineOpenGL::CreateTriangle(const glm::vec3& pos1, const glm::vec3& pos2, const glm::vec3& pos3)
+	void EngineOpenGL::CreateTriangle(const glm::vec3& pos1, const glm::vec3& pos2, const glm::vec3& pos3)
 	{
 		auto modelContainer = CreateRef<ModelContainer>();
 		modelContainer->skeletal = false;
@@ -443,7 +497,7 @@ namespace libCore
 
 
 	//--PANELS
-	void libCore::EngineOpenGL::DrawHierarchyPanel()
+	void EngineOpenGL::DrawHierarchyPanel()
 	{
 		if (useImGUI)
 		{

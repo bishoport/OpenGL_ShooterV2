@@ -234,8 +234,7 @@ namespace libCore
         //--ALBEDO
         if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
         {
-
-            material->albedoMap = assetsManager.GetTexture("default_albedo");
+            //material->albedoMap = assetsManager.GetTexture("default_albedo");
             std::string completePathTexture = importOptions.filePath + texturePath.C_Str();
             //std::cout << "Loading Texture " << completePathTexture << std::endl;
             Ref<Texture> texture = libCore::TextureManager::LoadTexture(completePathTexture.c_str(), TEXTURE_TYPES::ALBEDO, 0);
@@ -334,27 +333,27 @@ namespace libCore
 
 
         //--AO
-        if (mat->GetTexture(aiTextureType_AMBIENT_OCCLUSION, 0, &texturePath) == AI_SUCCESS)
-        {
-            std::string completePathTexture = importOptions.filePath + texturePath.C_Str();
+        //if (mat->GetTexture(aiTextureType_AMBIENT_OCCLUSION, 0, &texturePath) == AI_SUCCESS)
+        //{
+        //    std::string completePathTexture = importOptions.filePath + texturePath.C_Str();
 
-            Ref<Texture> texture = libCore::TextureManager::LoadTexture(completePathTexture.c_str(), TEXTURE_TYPES::AO, 4);
+        //    Ref<Texture> texture = libCore::TextureManager::LoadTexture(completePathTexture.c_str(), TEXTURE_TYPES::AO, 4);
 
-            if (texture != nullptr)
-            {
-                material->aOMap = texture;
-            }
-            else
-            {
-                //std::cout << "Error cargando mapa AO, ponemos default_withe" << std::endl;
-                material->aOMap = assetsManager.GetTexture("default_ao");
-            }
-        }
-        else
-        {
-            //std::cout << "No hay mapa AO, ponemos default_withe" << std::endl;
-            material->aOMap = assetsManager.GetTexture("default_ao");
-        }
+        //    if (texture != nullptr)
+        //    {
+        //        material->aOMap = texture;
+        //    }
+        //    else
+        //    {
+        //        //std::cout << "Error cargando mapa AO, ponemos default_withe" << std::endl;
+        //        material->aOMap = assetsManager.GetTexture("default_ao");
+        //    }
+        //}
+        //else
+        //{
+        //    //std::cout << "No hay mapa AO, ponemos default_withe" << std::endl;
+        //    material->aOMap = assetsManager.GetTexture("default_ao");
+        //}
         //-------------------
 
         modelBuild->materials.push_back(material);

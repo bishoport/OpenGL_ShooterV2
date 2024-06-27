@@ -86,6 +86,16 @@ namespace libCore
             viewport->framebuffer_SSAOBlur = std::move(fbo5);
             //----------------------------------------------------------
 
+
+            //// Directional Light ShadowMap
+            //auto fbo6 = CreateScope<FBO>();
+            //fbo6->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RGB16F, "Directional Light ShadowMap");
+            //fbo6->addAttachment("color", GL_RGB16F, GL_RGB, GL_FLOAT);
+            //fbo6->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT);
+            //fbo6->closeSetup();
+            //viewport->framebuffer_shadowmap = std::move(fbo6);
+            ////----------------------------------------------------------
+
             // Add Viewport to collection
             viewports.push_back(std::move(viewport));
    
@@ -121,11 +131,11 @@ namespace libCore
                 ImGui::Image((void*)(intptr_t)gSpecularTexture, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
             }
 
-            if (ImGui::CollapsingHeader("Framebuffers")) {
-
-                //GLuint ssaoTexture = viewports[0]->framebuffer_SSAO->getTexture("color");
-                //ImGui::Text("SSAO Texture");
-                //ImGui::Image((void*)(intptr_t)ssaoTexture, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
+            if (ImGui::CollapsingHeader("Framebuffers")) 
+            {
+                //GLuint shadowMapTexture = viewports[0]->framebuffer_shadowmap->getTexture("color");
+                //ImGui::Text("ShadowMap Texture");
+                //ImGui::Image((void*)(intptr_t)shadowMapTexture, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
 
                 GLuint ssaoBlurTexture = viewports[0]->framebuffer_SSAOBlur->getTexture("color");
                 ImGui::Text("SSAO Blur Texture");

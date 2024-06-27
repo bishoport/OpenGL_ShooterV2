@@ -39,6 +39,7 @@ namespace libCore
 		{
 			for (auto& model : models)
 			{
+				
 				model->Draw(shader);
 			}
 		}
