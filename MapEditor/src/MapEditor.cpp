@@ -115,7 +115,7 @@ void MapEditor::Init()
 
     // -- VIEWPORTS
     libCore::EngineOpenGL::GetInstance().CreateViewport("EDITOR CAMERA", glm::vec3(0.0f, 20.0f, 0.0f), CAMERA_CONTROLLERS::EDITOR);
-    libCore::EngineOpenGL::GetInstance().CreateViewport("GAME CAMERA", glm::vec3(0.0f, 10.0f, 0.0f), CAMERA_CONTROLLERS::FPS);
+    libCore::EngineOpenGL::GetInstance().CreateViewport("GAME CAMERA", glm::vec3(0.0f, 15.0f, 0.0f), CAMERA_CONTROLLERS::FPS);
     //------------------------------------------------------------------
 
 
