@@ -77,7 +77,9 @@
     <ClInclude Include="src\tools\AssimpGlmHelpers.h" />
     <ClInclude Include="src\tools\Camera.h" />
     <ClInclude Include="src\Core\FBO.hpp" />
+    <ClInclude Include="src\tools\EditorCamera.h" />
     <ClInclude Include="src\tools\EventManager.h" />
+    <ClInclude Include="src\tools\FPSCamera.h" />
     <ClInclude Include="src\tools\FreeTypeManager.h" />
     <ClInclude Include="src\tools\LightsManager.hpp" />
     <ClInclude Include="src\tools\ModelLoader.h" />
@@ -140,6 +142,8 @@
     <ClCompile Include="src\StraightSkeleton\VertexSplitEvent.cpp" />
     <ClCompile Include="src\tools\AssetsManager.cpp" />
     <ClCompile Include="src\tools\Camera.cpp" />
+    <ClCompile Include="src\tools\EditorCamera.cpp" />
+    <ClCompile Include="src\tools\FPSCamera.cpp" />
     <ClCompile Include="src\tools\ModelLoader.cpp" />
     <ClCompile Include="src\tools\PrimitivesHelper.cpp" />
     <ClCompile Include="src\tools\ShaderManager.cpp" />

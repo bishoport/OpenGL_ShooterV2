@@ -30,8 +30,6 @@ namespace libCore
         GLuint quadVAO = 0;
         GLuint quadVBO = 0;
 
-
-
         void renderCube();
         void renderQuad();
     };

@@ -42,7 +42,7 @@ namespace libCore {
                 "assets/Skybox/front.jpg",
                 "assets/Skybox/back.jpg"
             };
-            //dynamicSkybox = CreateScope<DynamicSkybox>(faces);
+            dynamicSkybox = CreateScope<DynamicSkybox>(faces);
             //-------------------------------------------------------
              
 
@@ -280,20 +280,22 @@ namespace libCore {
             viewport->gBuffer->bindTexture("specular", 4);
             viewport->framebuffer_SSAO->bindTexture("color", 5);
 
-            // Lights
+            //ALL Lights
             LightsManager::GetInstance().SetLightDataInShader("lightingPass");
 
-            // Global Scene, CameraView, SSAO
+            //DIRECTIONAL Light
             if (LightsManager::GetInstance().GetDirectionalLight() != nullptr)
             {
                 libCore::ShaderManager::Get("lightingPass")->setMat4("lightSpaceMatrix", directionalLight->shadowMVP);
             }
+
             libCore::ShaderManager::Get("lightingPass")->setBool("useSSAO", ssaoEnabled);
             libCore::ShaderManager::Get("lightingPass")->setFloat("exposure", hdrExposure);
             libCore::ShaderManager::Get("lightingPass")->setFloat("ambientLight", ambientLight);
             libCore::ShaderManager::Get("lightingPass")->setVec3("viewPos", viewport->camera->Position);
             libCore::ShaderManager::Get("lightingPass")->setFloat("F0Factor", F0Factor);
 
+            //AREA LIGHT
             libCore::ShaderManager::Get("lightingPass")->setInt("LTC1", 6);
             libCore::ShaderManager::Get("lightingPass")->setInt("LTC2", 7);
 
@@ -315,7 +317,7 @@ namespace libCore {
             glActiveTexture(GL_TEXTURE9);
             glBindTexture(GL_TEXTURE_CUBE_MAP, ibl->prefilterMap);
             glActiveTexture(GL_TEXTURE10);
-            glBindTexture(GL_TEXTURE_2D, ibl->brdfLUTTexture);
+            glBindTexture(GL_TEXTURE_2D,       ibl->brdfLUTTexture);
             //----------------------------------------------------------------------------------------------
 
             // SHADOW MAP
@@ -330,7 +332,6 @@ namespace libCore {
                     glBindTexture(GL_TEXTURE_2D, LightsManager::GetInstance().GetDirectionalLight()->shadowTex);
                 }
             }
-
             renderQuad();
 
             // Desvincula el FBO deferred
@@ -338,6 +339,7 @@ namespace libCore {
             PopDebugGroup();
             //--------------------------------------------------------------------------------
             //--------------------------------------------------------------------------------
+
 
 
 
@@ -350,22 +352,22 @@ namespace libCore {
             glBlitFramebuffer(0, 0, viewport->viewportSize.x, viewport->viewportSize.y, 0, 0, viewport->viewportSize.x, viewport->viewportSize.y, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
             glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind all
 
-            // 4. Renderizado de luces de depuración en el FBO forward
             viewport->framebuffer_forward->bindFBO();
             glClear(GL_COLOR_BUFFER_BIT); // No se limpia aquí el GL_DEPTH_BUFFER_BIT!!!!
-
             glDepthFunc(GL_LESS);
-
+            //------------------------------------------------------------------------------------------
 
 
             // PASADA SKYBOX
-            //dynamicSkybox->Render(viewport->camera->view, viewport->camera->projection);
-
+            dynamicSkybox->Render(viewport->camera->view, viewport->camera->projection);
+            //------------------------------------------------------------------------------------------
+            
             // PASADA DE DEBUG
             libCore::ShaderManager::Get("debug")->use();
             libCore::ShaderManager::Get("debug")->setMat4("view", viewport->camera->view);
             libCore::ShaderManager::Get("debug")->setMat4("projection", viewport->camera->projection);
-
+            //------------------------------------------------------------------------------------------
+             
             //DEBUG de Luces
             LightsManager::GetInstance().DrawDebugLights("debug");
             //------------------------------------------------------------------------------------------
@@ -392,7 +394,7 @@ namespace libCore {
 
 
             //------------------------------------------------------------------------------------------------------
-            //------------COMBINE DEFERRED+FORWARD+SSAO-------------------------------------------------------------
+            //------------COMBINE DEFERRED+FORWARD+SSAO+SHADOWS-----------------------------------------------------
             //------------------------------------------------------------------------------------------------------
             // 5. Combinar los resultados en el FBO final
             PushDebugGroup("Combine Pass");
@@ -414,6 +416,7 @@ namespace libCore {
             libCore::ShaderManager::Get("combinePass")->setInt("forwardTexture", 1);
             libCore::ShaderManager::Get("combinePass")->setInt("ssaoTexture", 2);
             libCore::ShaderManager::Get("combinePass")->setInt("shadowTexture", 3);
+
             libCore::ShaderManager::Get("combinePass")->setBool("useSSAO", ssaoEnabled);
             if (LightsManager::GetInstance().GetDirectionalLight() != nullptr)
             {
@@ -427,13 +430,14 @@ namespace libCore {
         }
 
         void ShowViewportInQuad(Ref<Viewport> viewport) {
-            //-6. Renderizar el resultado final en pantalla
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             libCore::ShaderManager::Get("colorQuadFBO")->use();
             viewport->framebuffer_final->bindTexture("color", 0);
             libCore::ShaderManager::Get("colorQuadFBO")->setInt("screenTexture", 0);
             renderQuad();
         }
+
+
 
         void ShowControlsGUI() {
             // Global Ilumination Controls
@@ -458,37 +462,36 @@ namespace libCore {
             ImGui::SliderFloat("Base Reflectivity", &F0Factor, 0.1f, 5.0f, "%.2f");
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
             
-            //ImGui::Text("Dynamic Skybox");
-            //ImGui::Dummy(ImVec2(0.0f, 5.0f));
-            //ImGui::Checkbox("Use Skybox Texture", &dynamicSkybox->useTexture);
-            //ImGui::ColorEdit3("dayLightColor", (float*)&dynamicSkybox->dayLightColor);
-            //ImGui::ColorEdit3("sunsetColor", (float*)&dynamicSkybox->sunsetColor);
-            //ImGui::ColorEdit3("dayNightColor", (float*)&dynamicSkybox->dayNightColor);
-            //ImGui::ColorEdit3("groundColor", (float*)&dynamicSkybox->groundColor);
-            //ImGui::Dummy(ImVec2(0.0f, 5.0f));
-            //
-            //ImGui::Text("Sun");
-            //ImGui::DragFloat3("sunPosition", glm::value_ptr(dynamicSkybox->sunPosition), 0.001f);
-            //float sunDiskSizeValue = dynamicSkybox->m_sunDiskSize.x;  // Asumimos que todos los valores son iguales
-            //if (ImGui::SliderFloat("Sun disk size", &sunDiskSizeValue, 0.0f, 1.0f, "%.4f")) {
-            //    dynamicSkybox->m_sunDiskSize = glm::vec3(sunDiskSizeValue, sunDiskSizeValue, sunDiskSizeValue);
-            //}
-            //ImGui::SliderFloat("Sun disk m_gradientIntensity", &dynamicSkybox->m_gradientIntensity, 0.0f, 10.0f, "%.4f");
-            //ImGui::SliderFloat("Sun disk auraIntensity", &dynamicSkybox->auraIntensity, 0.0f, 1.0f, "%.4f");
-            //ImGui::SliderFloat("Sun disk auraSize", &dynamicSkybox->auraSize, 0.0f, 1.0f, "%.4f");
-            //ImGui::SliderFloat("Sun disk edgeSoftness", &dynamicSkybox->edgeSoftness, 0.0001f, 0.1f, "%.4f");
-            //ImGui::Dummy(ImVec2(0.0f, 3.0f));
-            //// ImGui::SliderFloat("Sun disk upperBound", &dynamicSkybox->upperBound, 0.00001f, 0.1f, "%.4f");
-            //// ImGui::SliderFloat("Sun disk lowerBound", &dynamicSkybox->lowerBound, 0.00001f, 0.1f, "%.4f");
-            //
-            //ImGui::Dummy(ImVec2(0.0f, 5.0f));
-            //ImGui::Text("Stars Settings");
-            //ImGui::SliderFloat("Star Density", &dynamicSkybox->starDensity, 0.0f, 0.01f, "%.5f");
-            //ImGui::SliderFloat("Star Size Min", &dynamicSkybox->starSizeMin, 0.0f, 1.0f, "%.4f");
-            //ImGui::SliderFloat("Star Size Max", &dynamicSkybox->starSizeMax, 0.0f, 2.0f, "%.4f");
-            //ImGui::SliderFloat("Star Brightness Min", &dynamicSkybox->starBrightnessMin, 0.0f, 1.0f, "%.4f");
-            //ImGui::SliderFloat("Star Brightness Max", &dynamicSkybox->starBrightnessMax, 0.0f, 1.0f, "%.4f");
-            //ImGui::DragFloat2("Star Coord Scale", glm::value_ptr(dynamicSkybox->starCoordScale), 0.1f, 0.0f, 200.0f, "%.4f");
+            ImGui::Text("Dynamic Skybox");
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+            ImGui::Checkbox("Use Skybox Texture", &dynamicSkybox->useTexture);
+            ImGui::ColorEdit3("dayLightColor", (float*)&dynamicSkybox->dayLightColor);
+            ImGui::ColorEdit3("sunsetColor", (float*)&dynamicSkybox->sunsetColor);
+            ImGui::ColorEdit3("dayNightColor", (float*)&dynamicSkybox->dayNightColor);
+            ImGui::ColorEdit3("groundColor", (float*)&dynamicSkybox->groundColor);
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+            
+
+
+            ImGui::Text("Sun");
+            ImGui::DragFloat3("sunPosition", glm::value_ptr(dynamicSkybox->sunPosition), 0.001f);
+            float sunDiskSizeValue = dynamicSkybox->m_sunDiskSize.x;  // Asumimos que todos los valores son iguales
+            if (ImGui::SliderFloat("Sun disk size", &sunDiskSizeValue, 0.0f, 1.0f, "%.4f")) {
+                dynamicSkybox->m_sunDiskSize = glm::vec3(sunDiskSizeValue, sunDiskSizeValue, sunDiskSizeValue);
+            }
+            ImGui::SliderFloat("Sun disk m_gradientIntensity", &dynamicSkybox->m_gradientIntensity, 0.0f, 10.0f, "%.4f");
+            ImGui::SliderFloat("Sun disk auraIntensity",       &dynamicSkybox->auraIntensity, 0.0f, 1.0f, "%.4f");
+            ImGui::SliderFloat("Sun disk auraSize",            &dynamicSkybox->auraSize, 0.0f, 1.0f, "%.4f");
+            ImGui::SliderFloat("Sun disk edgeSoftness",        &dynamicSkybox->edgeSoftness, 0.0001f, 0.1f, "%.4f");
+            ImGui::Dummy(ImVec2(0.0f, 3.0f));
+
+            ImGui::Text("Stars Settings");
+            ImGui::SliderFloat("Star Density", &dynamicSkybox->starDensity, 0.0f, 0.01f, "%.5f");
+            ImGui::SliderFloat("Star Size Min", &dynamicSkybox->starSizeMin, 0.0f, 1.0f, "%.4f");
+            ImGui::SliderFloat("Star Size Max", &dynamicSkybox->starSizeMax, 0.0f, 2.0f, "%.4f");
+            ImGui::SliderFloat("Star Brightness Min", &dynamicSkybox->starBrightnessMin, 0.0f, 1.0f, "%.4f");
+            ImGui::SliderFloat("Star Brightness Max", &dynamicSkybox->starBrightnessMax, 0.0f, 1.0f, "%.4f");
+            ImGui::DragFloat2("Star Coord Scale", glm::value_ptr(dynamicSkybox->starCoordScale), 0.1f, 0.0f, 200.0f, "%.4f");
             
             ImGui::End();
         }
@@ -571,8 +574,6 @@ namespace libCore {
         }
 
 
-
-
         //LTC´s
         struct LTC_matrices {
             GLuint mat1;
@@ -587,8 +588,7 @@ namespace libCore {
             glGenTextures(1, &texture);
             glBindTexture(GL_TEXTURE_2D, texture);
 
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64,
-                0, GL_RGBA, GL_FLOAT, LTC1);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_FLOAT, LTC1);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -605,8 +605,7 @@ namespace libCore {
             glGenTextures(1, &texture);
             glBindTexture(GL_TEXTURE_2D, texture);
 
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64,
-                0, GL_RGBA, GL_FLOAT, LTC2);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_FLOAT, LTC2);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

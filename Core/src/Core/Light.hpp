@@ -93,7 +93,7 @@ namespace libCore
         //---------------------------------------------------
 
 
-        Light(LightType lightType) : type(lightType), color(1.0f, 1.0f, 1.0f), intensity(1.0f)
+        Light(LightType lightType) : type(lightType), color(1.0f, 1.0f, 1.0f), intensity(2.0f)
         {
             // Inicializa puntos con un cuadrado por defecto
             areaLightpoints = {

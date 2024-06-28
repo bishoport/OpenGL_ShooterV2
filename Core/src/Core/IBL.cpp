@@ -6,9 +6,7 @@ namespace libCore
 {
 	void IBL::prepare_PBR_IBL(int screenWidth, int screenHeight)
 	{
-
-		m_hdrTexture = libCore::TextureManager::loadHDR("assets/HDR/Cargo_Studio.hdr");
-		//m_hdrTexture = libCore::TextureManager::loadHDR("assets/HDR/newport_loft.hdr");
+		m_hdrTexture = libCore::TextureManager::loadHDR("assets/HDR/newport_loft.hdr");
 
 		glGenFramebuffers(1, &IBL_FBO);
 		glGenRenderbuffers(1, &IBL_RBO);

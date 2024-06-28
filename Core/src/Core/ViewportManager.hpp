@@ -3,7 +3,9 @@
 #include "../LibCoreHeaders.h"
 #include "Viewport.hpp"
 #include "FBO.hpp"
-#include "../tools/Camera.h"
+//#include "../tools/Camera.h"
+#include "../tools/EditorCamera.h"
+#include "../tools/FPSCamera.h"
 
 namespace libCore
 {
@@ -13,7 +15,7 @@ namespace libCore
 
         std::vector<Ref<Viewport>> viewports;
 
-        void CreateViewport(std::string name, glm::vec3 cameraPosition, int viewportWidth, int viewportHeight)
+        void CreateViewport(std::string name, glm::vec3 cameraPosition, int viewportWidth, int viewportHeight, CAMERA_CONTROLLERS controller)
         {
             auto viewport = CreateRef<Viewport>();
             viewport->viewportName = name;
@@ -21,7 +23,15 @@ namespace libCore
             viewport->viewportSize.y = viewportHeight;
 
             // Camera
-            viewport->camera = CreateScope<libCore::Camera>(viewport->viewportSize.x, viewport->viewportSize.y, cameraPosition);
+            if (controller == CAMERA_CONTROLLERS::FPS)
+            {
+                viewport->camera = CreateScope<libCore::FPSCamera>(viewport->viewportSize.x, viewport->viewportSize.y, cameraPosition);
+            }
+            else if (controller == CAMERA_CONTROLLERS::EDITOR)
+            {
+                viewport->camera = CreateScope<libCore::EditorCamera>(viewport->viewportSize.x, viewport->viewportSize.y, cameraPosition);
+            }
+            
             //----------------------------------------------------------
 
 

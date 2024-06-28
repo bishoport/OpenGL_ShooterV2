@@ -46,6 +46,7 @@ namespace libCore
 		}
 	}
 
+
 	//--INIT & LIFE CYCLE
 	bool EngineOpenGL::InitializeEngine(const std::string& windowTitle,
 		int initialWindowWidth,
@@ -251,27 +252,41 @@ namespace libCore
 			Timestep currentFrameTime = glfwGetTime();
 			m_deltaTime = currentFrameTime - lastFrameTime;
 			lastFrameTime = currentFrameTime;
-
-			//WINDOW SIZE
+			//-------------------------------------------
+			
+			//--WINDOW SIZE
 			GLint windowWidth, windowHeight;
 			glfwGetWindowSize(window, &windowWidth, &windowHeight);
-			
+			//-------------------------------------------
 
-			//START INPUT UPDATE
+
+			//--START INPUT UPDATE
 			InputManager::Instance().Update();
-
 			if (LightsManager::GetInstance().GetDirectionalLight() != nullptr)
 			{
 				LightsManager::GetInstance().GetDirectionalLight()->UpdateLightPosition();
 			}
-			
+			//-------------------------------------------
+ 
 
-			//MAIN LOOP FUNCTION CALL
-			RenderViewports();
-			/*if (g_mainLoodFnc)
+			//--MAIN INPUTS
+			if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F1))
 			{
-				g_mainLoodFnc(m_deltaTime);
-			}*/
+				useImGUI = !useImGUI;
+			}
+			if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_1))
+			{
+				currentViewport = 0;
+			}
+			else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_2))
+			{
+				currentViewport = 1;
+			}
+			//-------------------------------------------
+
+
+			//--MAIN LOOP FUNCTION CALL
+			RenderViewports();
 			// -------------------------------------------
 
 			//-- ImGUI
@@ -280,14 +295,7 @@ namespace libCore
 				guiLayer->begin();
 				guiLayer->renderMainMenuBar();
 				guiLayer->renderDockers();
-
 				DrawHierarchyPanel();
-
-				//if (g_imGUILoopFnc)
-				//{
-				//	g_imGUILoopFnc();
-				//}
-
 				guiLayer->end();
 			}
 			// -------------------------------------------
@@ -314,18 +322,14 @@ namespace libCore
 
 
 	//--VIEWPORTS
-	void EngineOpenGL::CreateViewport(std::string name, glm::vec3 cameraPosition)
+	void EngineOpenGL::CreateViewport(std::string name, glm::vec3 cameraPosition, CAMERA_CONTROLLERS controller)
 	{
-		viewportManager->CreateViewport(name, cameraPosition, windowWidth, windowHeight);
+		viewportManager->CreateViewport(name, cameraPosition, windowWidth, windowHeight, controller);
 	}
 	void EngineOpenGL::RenderViewports()
 	{
-		for (auto& viewport : viewportManager->viewports)
-		{
-			//--RENDER PIPELINE
-			renderer->RenderViewport(viewport, m_deltaTime, modelsInScene);
-		}
-		renderer->ShowViewportInQuad(viewportManager->viewports[0]);
+		renderer->RenderViewport(viewportManager->viewports[currentViewport], m_deltaTime, modelsInScene);
+		renderer->ShowViewportInQuad(viewportManager->viewports[currentViewport]);
 	}
 	// -------------------------------------------------
 	// -------------------------------------------------

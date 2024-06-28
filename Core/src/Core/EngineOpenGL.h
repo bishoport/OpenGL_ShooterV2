@@ -30,7 +30,7 @@ namespace libCore
 
 
         //VIEWPORTS & RENDER
-        void CreateViewport(std::string name, glm::vec3 cameraPosition);
+        void CreateViewport(std::string name, glm::vec3 cameraPosition, CAMERA_CONTROLLERS controller);
         void RenderViewports();
 
 
@@ -64,6 +64,9 @@ namespace libCore
         FreeTypeManager* freeTypeManager = nullptr;
 
     private:
+
+        int currentViewport = 0; //Editor Camera by default
+
         std::vector<Ref<libCore::ModelContainer>> modelsInScene;
 
         GLFWwindow* window;

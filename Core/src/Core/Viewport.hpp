@@ -55,7 +55,6 @@ namespace libCore
                     camera->width = static_cast<int>(size.x);
                     camera->height = static_cast<int>(size.y);
                 });
-
             EventManager::OnWindowResizeEvent().subscribe([this](const int width, const int height)
                 {
                     //std::cout << "RESIZE WINDOW EVENT" << std::endl;
