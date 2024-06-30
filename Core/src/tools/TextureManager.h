@@ -8,7 +8,7 @@ namespace libCore
 	class TextureManager
 	{
 	public:
-		static Ref<Texture> LoadTexture(const char* imagePath, TEXTURE_TYPES type, GLuint slot);
+		static Ref<Texture> LoadTexture(const char* directoryPath, const char* fileName, TEXTURE_TYPES type, GLuint slot);
 		static GLuint LoadImagesForCubemap(std::vector<const char*> faces);
 		static GLuint loadHDR(const char* filepath);
 	};

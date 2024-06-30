@@ -23,6 +23,11 @@ namespace libCore
         // Deletes a texture
         void Delete();
 
+        bool IsValid() const 
+        {
+            return ID != 0;
+        }
+
         // Get the texture ID
         GLuint GetTextureID() const { return ID; }
     };

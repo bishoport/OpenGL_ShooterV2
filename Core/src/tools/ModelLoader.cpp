@@ -3,9 +3,12 @@
 #include "AssimpGlmHelpers.h"
 #include "../Core/Light.hpp"
 #include "LightsManager.hpp"
+#include "MaterialManager.hpp"
+#include <filesystem>
 
 namespace libCore
 {
+    namespace fs = std::filesystem;
 
     Ref<ModelContainer> ModelLoader::LoadModel(ImportModelData importOptions)
     {
@@ -45,6 +48,13 @@ namespace libCore
         return modelContainer;
     }
 
+    std::string getFileName(const std::string& path) {
+        size_t lastSlash = path.find_last_of("\\/");
+        if (lastSlash == std::string::npos) {
+            return path; // No hay ningún separador, toda la cadena es el nombre del archivo
+        }
+        return path.substr(lastSlash + 1);
+    }
 
     //------------------------------------STANDARD MODELS---------------------------
     void ModelLoader::processNode(aiNode* node, const aiScene* scene, Ref<ModelContainer> modelContainer, aiMatrix4x4 _nodeTransform, ImportModelData importOptions)
@@ -212,154 +222,123 @@ namespace libCore
     }
     void ModelLoader::processMaterials(aiMesh* mesh, const aiScene* scene, Ref<Model> modelBuild, ImportModelData importOptions)
     {
-        auto material = CreateRef<Material>();
-
-
-        //COLOR DIFUSSE
-        aiColor3D color(1.f, 1.f, 1.f);
+        // Obtener el material del mesh
         const aiMaterial* mat = scene->mMaterials[mesh->mMaterialIndex];
-        mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+        std::string materialName = mat->GetName().C_Str();
 
-        material->materialName = mat->GetName().C_Str();
+        // Verificar si el material ya existe en el MaterialManager
+        auto existingMaterial = MaterialManager::getInstance().getMaterial(materialName);
+        Ref<Material> material;
 
-        material->albedoColor.r = color.r;
-        material->albedoColor.g = color.g;
-        material->albedoColor.b = color.b;
-
-
-        // Agregamos la carga de la textura ALBEDO aquí
-        aiString texturePath;
-
-
-        //--ALBEDO
-        if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
-        {
-            //material->albedoMap = assetsManager.GetTexture("default_albedo");
-            std::string completePathTexture = importOptions.filePath + texturePath.C_Str();
-            //std::cout << "Loading Texture " << completePathTexture << std::endl;
-            Ref<Texture> texture = libCore::TextureManager::LoadTexture(completePathTexture.c_str(), TEXTURE_TYPES::ALBEDO, 0);
-
-            if (texture != nullptr) 
-            {
-                material->albedoMap = texture;
-            }
-            else
-            {
-                //std::cout << "Error cargando mapa diffuso, ponemos default_white" << std::endl;
-                material->albedoMap = assetsManager.GetTexture("default_albedo");
-            }
+        if (existingMaterial) {
+            std::cout << "Using existing material: " << materialName << std::endl;
+            material = existingMaterial;
         }
-        else
-        {
-            //std::cout << "No hay mapa diffuso, ponemos default_white" << std::endl;
-            material->albedoMap = assetsManager.GetTexture("default_albedo");
-        }
-        //-------------------
+        else {
+            // Crear un nuevo material
+            material = CreateRef<Material>();
+            material->materialName = materialName;
 
-        //--NORMAL
-        if (mat->GetTexture(aiTextureType_NORMALS, 0, &texturePath) == AI_SUCCESS)
-        {
-            std::string completePathTexture = importOptions.filePath + texturePath.C_Str();
+            // Obtener el color difuso del material
+            aiColor3D color(1.f, 1.f, 1.f);
+            mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+            material->albedoColor = { color.r, color.g, color.b };
 
-            Ref<Texture> texture = libCore::TextureManager::LoadTexture(completePathTexture.c_str(), TEXTURE_TYPES::NORMAL, 1);
+            aiString texturePath;
 
-            if (texture != nullptr)
-            {
-                material->normalMap = texture;
+            //--ALBEDO
+            if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS) {
+                std::string completePathTexture = texturePath.C_Str();
+                std::cout << "Loading Texture: " << completePathTexture << std::endl;
+
+                std::string directoryPath = fs::path(importOptions.filePath).parent_path().string();
+                std::string fileName = fs::path(completePathTexture).filename().string();
+
+                Ref<Texture> texture = libCore::TextureManager::LoadTexture(directoryPath.c_str(), fileName.c_str(), TEXTURE_TYPES::ALBEDO, 0);
+
+                if (texture != nullptr) {
+                    material->albedoMap = texture;
+                }
+                else {
+                    material->albedoMap = AssetsManager::GetInstance().GetTexture("default_albedo");
+                }
             }
-            else
-            {
-                //std::cout << "Error cargando mapa Normal, ponemos default_normal" << std::endl;
-                material->normalMap = assetsManager.GetTexture("default_normal");
+            else {
+                material->albedoMap = AssetsManager::GetInstance().GetTexture("default_albedo");
             }
-        }
-        else
-        {
-            //std::cout << "No hay mapa Normal, ponemos default_normal" << std::endl;
-            material->normalMap = assetsManager.GetTexture("default_normal");
-        }
-        //-------------------
 
+            //--NORMAL
+            if (mat->GetTexture(aiTextureType_NORMALS, 0, &texturePath) == AI_SUCCESS) {
+                std::string completePathTexture = texturePath.C_Str();
+                std::cout << "Loading Normal Map: " << completePathTexture << std::endl;
 
-        //--METALLIC
-        if (mat->GetTexture(aiTextureType_METALNESS, 0, &texturePath) == AI_SUCCESS)
-        {
-            std::string completePathTexture = importOptions.filePath + texturePath.C_Str();
+                std::string directoryPath = fs::path(importOptions.filePath).parent_path().string();
+                std::string fileName = fs::path(completePathTexture).filename().string();
 
-            Ref<Texture> texture = libCore::TextureManager::LoadTexture(completePathTexture.c_str(), TEXTURE_TYPES::METALLIC, 2);
+                Ref<Texture> texture = libCore::TextureManager::LoadTexture(directoryPath.c_str(), fileName.c_str(), TEXTURE_TYPES::NORMAL, 1);
 
-            if (texture != nullptr)
-            {
-                material->metallicMap = texture;
+                if (texture != nullptr) {
+                    material->normalMap = texture;
+                }
+                else {
+                    material->normalMap = AssetsManager::GetInstance().GetTexture("default_normal");
+                }
             }
-            else
-            {
-                //std::cout << "Error cargando mapa Metallic, ponemos default_black" << std::endl;
-                material->metallicMap = assetsManager.GetTexture("default_metallic");
+            else {
+                material->normalMap = AssetsManager::GetInstance().GetTexture("default_normal");
             }
-        }
-        else
-        {
-            //std::cout << "No hay mapa Metallic, ponemos default_black" << std::endl;
-            material->metallicMap = assetsManager.GetTexture("default_metallic");
-        }
-        //-------------------
 
+            //--METALLIC
+            if (mat->GetTexture(aiTextureType_METALNESS, 0, &texturePath) == AI_SUCCESS) {
+                std::string completePathTexture = texturePath.C_Str();
+                std::cout << "Loading Metallic Map: " << completePathTexture << std::endl;
 
-        //--ROUGHNESS
-        if (mat->GetTexture(aiTextureType_SHININESS, 0, &texturePath) == AI_SUCCESS)
-        {
-            std::string completePathTexture = importOptions.filePath + texturePath.C_Str();
+                std::string directoryPath = fs::path(importOptions.filePath).parent_path().string();
+                std::string fileName = fs::path(completePathTexture).filename().string();
 
-            Ref<Texture> texture = libCore::TextureManager::LoadTexture(completePathTexture.c_str(), TEXTURE_TYPES::ROUGHNESS, 3);
+                Ref<Texture> texture = libCore::TextureManager::LoadTexture(directoryPath.c_str(), fileName.c_str(), TEXTURE_TYPES::METALLIC, 2);
 
-            if (texture != nullptr)
-            {
-                material->roughnessMap = texture;
+                if (texture != nullptr) {
+                    material->metallicMap = texture;
+                }
+                else {
+                    material->metallicMap = AssetsManager::GetInstance().GetTexture("default_metallic");
+                }
             }
-            else
-            {
-                //std::cout << "Error cargando mapa ROUGHTNESS, ponemos default_black" << std::endl;
-                material->roughnessMap = assetsManager.GetTexture("default_roughness");
+            else {
+                material->metallicMap = AssetsManager::GetInstance().GetTexture("default_metallic");
             }
+
+            //--ROUGHNESS
+            if (mat->GetTexture(aiTextureType_SHININESS, 0, &texturePath) == AI_SUCCESS) {
+                std::string completePathTexture = texturePath.C_Str();
+                std::cout << "Loading Roughness Map: " << completePathTexture << std::endl;
+
+                std::string directoryPath = fs::path(importOptions.filePath).parent_path().string();
+                std::string fileName = fs::path(completePathTexture).filename().string();
+
+                Ref<Texture> texture = libCore::TextureManager::LoadTexture(directoryPath.c_str(), fileName.c_str(), TEXTURE_TYPES::ROUGHNESS, 3);
+
+                if (texture != nullptr) {
+                    material->roughnessMap = texture;
+                }
+                else {
+                    material->roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
+                }
+            }
+            else {
+                material->roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
+            }
+
+            // Añadir el material al MaterialManager
+            MaterialManager::getInstance().addMaterial(material);
+            std::cout << "Added new material: " << material->materialName << std::endl;
         }
-        else
-        {
-            //std::cout << "No hay mapa ROUGHTNESS, ponemos default_black" << std::endl;
-            material->roughnessMap = assetsManager.GetTexture("default_roughness");
-        }
-        //-------------------
 
-
-
-        //--AO
-        //if (mat->GetTexture(aiTextureType_AMBIENT_OCCLUSION, 0, &texturePath) == AI_SUCCESS)
-        //{
-        //    std::string completePathTexture = importOptions.filePath + texturePath.C_Str();
-
-        //    Ref<Texture> texture = libCore::TextureManager::LoadTexture(completePathTexture.c_str(), TEXTURE_TYPES::AO, 4);
-
-        //    if (texture != nullptr)
-        //    {
-        //        material->aOMap = texture;
-        //    }
-        //    else
-        //    {
-        //        //std::cout << "Error cargando mapa AO, ponemos default_withe" << std::endl;
-        //        material->aOMap = assetsManager.GetTexture("default_ao");
-        //    }
-        //}
-        //else
-        //{
-        //    //std::cout << "No hay mapa AO, ponemos default_withe" << std::endl;
-        //    material->aOMap = assetsManager.GetTexture("default_ao");
-        //}
-        //-------------------
-
+        // Añadir el material al modelo
         modelBuild->materials.push_back(material);
     }
-    //-----------------------------------------------------------------------
- 
+    //------------------------------------------------------------------------------
 
     //-----------------------------------FEATURES PROCESS---------------------------
     void ModelLoader::processLights(const aiScene* scene, Ref<ModelContainer> modelContainer)
@@ -410,7 +389,7 @@ namespace libCore
             }
         }
     }
-
+    //------------------------------------------------------------------------------
 
     //------------------------------------SKELETAL MODELS---------------------------
     void ModelLoader::processSkeletalMesh(aiMesh* mesh, const aiScene* scene, Ref<Model> modelBuild, aiMatrix4x4 finalTransform, ImportModelData importOptions, int meshIndex)

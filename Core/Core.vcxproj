@@ -82,6 +82,7 @@
     <ClInclude Include="src\tools\FPSCamera.h" />
     <ClInclude Include="src\tools\FreeTypeManager.h" />
     <ClInclude Include="src\tools\LightsManager.hpp" />
+    <ClInclude Include="src\tools\MaterialManager.hpp" />
     <ClInclude Include="src\tools\ModelLoader.h" />
     <ClInclude Include="src\tools\PrimitivesHelper.h" />
     <ClInclude Include="src\tools\RoofGenerator.hpp" />

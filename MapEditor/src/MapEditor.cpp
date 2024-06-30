@@ -101,6 +101,18 @@ void MapEditor::Init()
     libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData4);
 
 
+    //libCore::ImportModelData importModelData4;
+    //importModelData4.filePath = "assets/models/CyberpunkStreet/";
+    //importModelData4.fileName = "CyberpunkStreet.fbx";
+    //importModelData4.invertUV = false;
+    //importModelData4.rotate90 = false;
+    //importModelData4.useCustomTransform = true;
+    //importModelData4.modelID = 1;
+    //importModelData4.globalScaleFactor = 0.1f;
+    //importModelData4.processLights = true;
+    //libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData4);
+
+
     //libCore::EngineOpenGL::GetInstance().CreateTriangle(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec3(1.0f, -1.0f, 0.0f));
     //libCore::EngineOpenGL::GetInstance().CreateTriangle(glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(-1.0f, -1.0f, 0.0f));
     //------------------------------------------------------------------

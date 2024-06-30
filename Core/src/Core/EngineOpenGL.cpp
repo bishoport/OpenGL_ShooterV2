@@ -507,6 +507,7 @@ namespace libCore
 		{
 			guiLayer->DrawHierarchyPanel(modelsInScene);
 			guiLayer->DrawLightsPanel(LightsManager::GetLights());
+			guiLayer->DrawMaterialsPanel();
 			renderer->ShowControlsGUI();
 			viewportManager->DrawPanelGUI();
 			//guiLayer->RenderCheckerMatrix(); //Panel para el editor de roofs

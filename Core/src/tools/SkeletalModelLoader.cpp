@@ -174,45 +174,45 @@ namespace libCore
 
     void SkeletalModelLoader::processMaterials(aiMesh* mesh, const aiScene* scene, Ref<Model> modelBuild, ImportModelData importOptions)
     {
-        auto material = CreateRef<Material>();
+        //auto material = CreateRef<Material>();
 
-        //COLOR DIFUSSE
-        aiColor3D color(0.f, 0.f, 0.f);
-        const aiMaterial* mat = scene->mMaterials[mesh->mMaterialIndex];
-        mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+        ////COLOR DIFUSSE
+        //aiColor3D color(0.f, 0.f, 0.f);
+        //const aiMaterial* mat = scene->mMaterials[mesh->mMaterialIndex];
+        //mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
 
-        material->materialName = mat->GetName().C_Str();
+        //material->materialName = mat->GetName().C_Str();
 
-        material->albedoColor.r = color.r;
-        material->albedoColor.g = color.g;
-        material->albedoColor.b = color.b;
+        //material->albedoColor.r = color.r;
+        //material->albedoColor.g = color.g;
+        //material->albedoColor.b = color.b;
 
-        // Agregamos la carga de la textura ALBEDO aquí
-        aiString texturePath;
+        //// Agregamos la carga de la textura ALBEDO aquí
+        //aiString texturePath;
 
 
-        if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
-        {
-            std::string completePathTexture = importOptions.filePath + texturePath.C_Str();
+        //if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
+        //{
+        //    std::string completePathTexture = importOptions.filePath + texturePath.C_Str();
 
-            Ref<Texture> texture = libCore::TextureManager::LoadTexture(completePathTexture.c_str(), TEXTURE_TYPES::ALBEDO, 0);
+        //    Ref<Texture> texture = libCore::TextureManager::LoadTexture(completePathTexture.c_str(), TEXTURE_TYPES::ALBEDO, 0);
 
-            if (texture != nullptr)
-            {
-                material->albedoMap = texture;
-            }
-            else
-            {
-                std::cout << "Error cargando mapa diffuso, ponemos default_white" << std::endl;
-                material->albedoMap = assetsManager.GetTexture("default_albedo");
-            }
-        }
-        else
-        {
-            std::cout << "No hay mapa diffuso, ponemos default_white" << std::endl;
-            material->albedoMap = assetsManager.GetTexture("default_albedo");
-        }
+        //    if (texture != nullptr)
+        //    {
+        //        material->albedoMap = texture;
+        //    }
+        //    else
+        //    {
+        //        std::cout << "Error cargando mapa diffuso, ponemos default_white" << std::endl;
+        //        material->albedoMap = assetsManager.GetTexture("default_albedo");
+        //    }
+        //}
+        //else
+        //{
+        //    std::cout << "No hay mapa diffuso, ponemos default_white" << std::endl;
+        //    material->albedoMap = assetsManager.GetTexture("default_albedo");
+        //}
 
-        modelBuild->materials.push_back(material);
+        //modelBuild->materials.push_back(material);
     }
 }

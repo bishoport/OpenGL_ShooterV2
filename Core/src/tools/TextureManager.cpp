@@ -1,21 +1,56 @@
 #include "TextureManager.h"
 
+#include <filesystem> // Necesario para la navegación por directorios
+#include <iostream>
+
+namespace fs = std::filesystem;
+
 namespace libCore
 {
-    Ref<Texture> TextureManager::LoadTexture(const char* imagePath, TEXTURE_TYPES type, GLuint slot)
+    Ref<Texture> TextureManager::LoadTexture(const char* directoryPath, const char* fileName, TEXTURE_TYPES type, GLuint slot)
     {
-        // Intenta obtener la textura desde el AssetsManager
-        auto textureFromAssets = AssetsManager::GetInstance().GetTexture(imagePath);
-        if (textureFromAssets) 
+        // Función auxiliar para buscar la textura recursivamente en subcarpetas
+        auto findTextureInSubfolders = [](const fs::path& baseDir, const std::string& imageName) -> fs::path
         {
-            //std::cout << "LA TEXTURA " << imagePath << " YA EXISTE EN ASSETS" << std::endl;
+            for (auto& p : fs::recursive_directory_iterator(baseDir))
+            {
+                if (fs::is_regular_file(p) && p.path().filename() == imageName)
+                {
+                    return p.path();
+                }
+            }
+            return "";
+        };
+
+        fs::path imagePathFS = fs::path(directoryPath) / fileName;
+
+        // Intenta obtener la textura desde el AssetsManager usando solo el nombre del archivo
+        auto textureFromAssets = AssetsManager::GetInstance().GetTexture(fileName);
+        if (textureFromAssets)
+        {
+            //std::cout << "LA TEXTURA " << fileName << " YA EXISTE EN ASSETS" << std::endl;
             return textureFromAssets;  // Retorna la textura si ya está cargada
         }
 
-        //Cargamos la textura si no existe en la biblioteca:
-        //std::cout << "Loading Texture->" << imagePath << std::endl;
-        auto texture = CreateRef<Texture>(imagePath, type, slot);
-        AssetsManager::GetInstance().SetTexture(imagePath, texture);
+        // Cargamos la textura si no existe en la biblioteca:
+        if (!fs::exists(imagePathFS))
+        {
+            //std::cout << "Texture not found at initial path. Searching in subfolders..." << std::endl;
+            fs::path foundPath = findTextureInSubfolders(directoryPath, fileName);
+
+            if (foundPath.empty())
+            {
+                std::cerr << "Texture not found in any subfolder." << std::endl;
+                return nullptr;
+            }
+
+            imagePathFS = foundPath;
+            //std::cout << "Texture found at: " << imagePathFS << std::endl;
+        }
+
+        //std::cout << "Loading Texture->" << imagePathFS << std::endl;
+        auto texture = CreateRef<Texture>(imagePathFS.string().c_str(), type, slot);
+        AssetsManager::GetInstance().SetTexture(fileName, texture); // Usamos el nombre del archivo como clave
         return texture;
     }
 
@@ -54,7 +89,6 @@ namespace libCore
 
         return textureID;
     }
-
 
     GLuint libCore::TextureManager::loadHDR(const char* filepath)
     {

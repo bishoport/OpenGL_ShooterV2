@@ -38,7 +38,9 @@ namespace libCore
 		//Panels
 		void DrawHierarchyPanel(const std::vector<Ref<libCore::ModelContainer>>& modelsInScene);
         void DrawLightsPanel(const std::vector<Ref<libCore::Light>>& lightsInScene);
-
+        void DrawMaterialsPanel();
+        void DrawMaterial(const Ref<Material> materialData);
+        void ShowTexture(const char* label, Ref<Texture> texture);
         void RenderCheckerMatrix();
 
     private:
