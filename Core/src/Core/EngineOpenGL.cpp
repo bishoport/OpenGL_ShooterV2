@@ -6,6 +6,8 @@
 #include "../tools/RoofGenerator.hpp"
 #include "../tools/LightsManager.hpp"
 #include "../tools/SkyBox.hpp"
+#include "../tools/MousePicker.hpp"
+
 
 
 namespace libCore
@@ -110,12 +112,10 @@ namespace libCore
 
 		// Optionally, you can further filter by source and type
 		// Example: Ignore performance warnings
-		// glDebugMessageControl(GL_DEBUG_SOURCE_API, GL_DEBUG_TYPE_PERFORMANCE, GL_DEBUG_SEVERITY_LOW, 0, nullptr, GL_FALSE);
+		glDebugMessageControl(GL_DEBUG_SOURCE_API, GL_DEBUG_TYPE_PERFORMANCE, GL_DEBUG_SEVERITY_LOW, 0, nullptr, GL_FALSE);
 
 		// Example: Ignore all messages except for high severity errors
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH, 0, nullptr, GL_TRUE);
-
-		
 		//-----------------------------
 
 
@@ -157,6 +157,9 @@ namespace libCore
 		//-SHADOWS
 		shaderManager.setShaderDataLoad("direct_light_depth_shadows", shadersDirectory + "shadows/directLight_shadow_mapping_depth_shader.vs", shadersDirectory + "shadows/directLight_shadow_mapping_depth_shader.fs");
 
+		//-STENCIL MOUSE PICKING
+		shaderManager.setShaderDataLoad("stencil", shadersDirectory + "Stencil.vert", shadersDirectory + "Stencil.frag");
+		
 		shaderManager.LoadAllShaders();
 		//-----------------------------------------------------------------
 
@@ -174,6 +177,7 @@ namespace libCore
 
 		// --InputManager
 		//InputManager::Instance().subscribe();
+		//---------------------------------------------------------------------------
 
 		// -- ViewportManager
 		viewportManager = CreateScope<ViewportManager>();
@@ -194,6 +198,12 @@ namespace libCore
 		// -- RENDERER
 		renderer = CreateScope<Renderer>();
 		//---------------------------------------------------------------------------
+
+		// -- MOUSE PICKER
+		//MousePicker::getInstance().initialize(window);
+		//MousePicker::getInstance().setupStencilBuffer();
+		//---------------------------------------------------------------------------
+
 
 		return true;
 	}
@@ -223,7 +233,7 @@ namespace libCore
 
 		glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
 			InputManager::Instance().SetMousePosition(xpos, ypos);
-			});
+		});
 	}
 	void EngineOpenGL::StopMainLoop()
 	{
@@ -259,31 +269,10 @@ namespace libCore
 			glfwGetWindowSize(window, &windowWidth, &windowHeight);
 			//-------------------------------------------
 
-
-			//--START INPUT UPDATE
-			InputManager::Instance().Update();
-			if (LightsManager::GetInstance().GetDirectionalLight() != nullptr)
-			{
-				LightsManager::GetInstance().GetDirectionalLight()->UpdateLightPosition();
-			}
+			//--UPDATES
+			UpdateAfterRender();
 			//-------------------------------------------
- 
-
-			//--MAIN INPUTS
-			if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F1))
-			{
-				useImGUI = !useImGUI;
-			}
-			if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_1))
-			{
-				currentViewport = 0;
-			}
-			else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_2))
-			{
-				currentViewport = 1;
-			}
-			//-------------------------------------------
-
+			
 
 			//--MAIN LOOP FUNCTION CALL
 			RenderViewports();
@@ -320,19 +309,142 @@ namespace libCore
 	// -------------------------------------------------
 	// -------------------------------------------------
 
+	bool rayIntersectsBoundingBox(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, glm::vec3 boxMin, glm::vec3 boxMax)
+	{
+		float tMin = (boxMin.x - rayOrigin.x) / rayDirection.x;
+		float tMax = (boxMax.x - rayOrigin.x) / rayDirection.x;
+
+		if (tMin > tMax) std::swap(tMin, tMax);
+
+		float tyMin = (boxMin.y - rayOrigin.y) / rayDirection.y;
+		float tyMax = (boxMax.y - rayOrigin.y) / rayDirection.y;
+
+		if (tyMin > tyMax) std::swap(tyMin, tyMax);
+
+		if ((tMin > tyMax) || (tyMin > tMax))
+			return false;
+
+		if (tyMin > tMin)
+			tMin = tyMin;
+
+		if (tyMax < tMax)
+			tMax = tyMax;
+
+		float tzMin = (boxMin.z - rayOrigin.z) / rayDirection.z;
+		float tzMax = (boxMax.z - rayOrigin.z) / rayDirection.z;
+
+		if (tzMin > tzMax) std::swap(tzMin, tzMax);
+
+		if ((tMin > tzMax) || (tzMin > tMax))
+			return false;
+
+		if (tzMin > tMin)
+			tMin = tzMin;
+
+		if (tzMax < tMax)
+			tMax = tzMax;
+
+		return true;
+	}
+
 
 	//--VIEWPORTS
 	void EngineOpenGL::CreateViewport(std::string name, glm::vec3 cameraPosition, CAMERA_CONTROLLERS controller)
 	{
 		viewportManager->CreateViewport(name, cameraPosition, windowWidth, windowHeight, controller);
 	}
+	void EngineOpenGL::UpdateAfterRender()
+	{
+		//--INPUT UPDATE
+		InputManager::Instance().Update();
+
+		if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F1))
+		{
+			useImGUI = !useImGUI;
+		}
+		if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_1))
+		{
+			currentViewport = 0;
+		}
+		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_2))
+		{
+			currentViewport = 1;
+		}
+		//-------------------------------------------------------------------
+
+
+		//--DIRECTIONAL LIGHT UPDATE
+		if (LightsManager::GetInstance().GetDirectionalLight() != nullptr)
+		{
+			LightsManager::GetInstance().GetDirectionalLight()->UpdateLightPosition();
+		}
+		//-------------------------------------------------------------------
+
+
+		//--UPDATE AABB
+		for (const auto& modelContainer : modelsInScene) {
+			for (const auto& model : modelContainer->models) {
+				glm::mat4 modelMatrix = model->transform.getLocalModelMatrix();
+				for (const auto& mesh : model->meshes) {
+					mesh->UpdateAABB(modelMatrix);
+				}
+			}
+		}
+		//-------------------------------------------
+
+		//--MOUSE PICKING
+		float mouseX, mouseY;
+		std::tie(mouseX, mouseY) = InputManager::Instance().GetMousePosition();
+
+		// Aquí empieza el raycasting
+		if (InputManager::Instance().IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_LEFT))
+		{
+			// Llevar un punto 2D a un espacio 3D (mouse position -> escena)
+			float normalizedX = (2.0f * mouseX) / viewportManager->viewports[currentViewport]->viewportSize.x - 1.0f;
+			float normalizedY = ((2.0f * mouseY) / viewportManager->viewports[currentViewport]->viewportSize.y - 1.0f) * -1.0f;
+
+			glm::vec3 clipSpaceCoordinates(normalizedX, normalizedY, -1.0); // -1.0 para proyectar hacia adelante
+
+			glm::vec4 homogenousClipCoordinates = glm::vec4(clipSpaceCoordinates, 1.0);
+			glm::mat4 invProjView = glm::inverse(viewportManager->viewports[currentViewport]->camera->cameraMatrix); // Invertir solo la cameraMatrix que ya es projection * view
+			glm::vec4 homogenousWorldCoordinates = invProjView * homogenousClipCoordinates;
+			glm::vec3 worldCoordinates = glm::vec3(homogenousWorldCoordinates) / homogenousWorldCoordinates.w;
+
+			// Preparamos el rayo para lanzarlo desde la cámara hasta la posición del mouse ya convertido al espacio 3D
+			glm::vec3 rayOrigin = viewportManager->viewports[currentViewport]->camera->Position;
+			glm::vec3 rayDirection = glm::normalize(worldCoordinates - rayOrigin);
+			float rayLength = 1000.0f;  // Puedes ajustar esto según la escala de tu escena
+			glm::vec3 rayEnd = rayOrigin + rayDirection * rayLength;
+
+			//std::cout << "Camera Position: " << glm::to_string(rayOrigin) << std::endl;
+			//std::cout << "Camera Orientation: " << glm::to_string(viewportManager->viewports[currentViewport]->camera->Orientation) << std::endl;
+			//std::cout << "Ray Origin: " << glm::to_string(rayOrigin) << std::endl;
+			//std::cout << "Ray Direction: " << glm::to_string(rayDirection) << std::endl;
+			//CreatePrefabLine(rayOrigin, rayEnd);  // Dibuja el rayo para visualización
+
+			for (const auto& modelContainer : modelsInScene) {
+				for (const auto& model : modelContainer->models) {
+					for (const auto& mesh : model->meshes) {
+						// Verificar la intersección del rayo con la AABB transformada
+						if (rayIntersectsBoundingBox(rayOrigin, rayDirection, mesh->worldMinBounds, mesh->worldMaxBounds)) {
+							std::cout << "MESH " << mesh->meshName << std::endl;
+						}
+					}
+				}
+			}
+		}
+		//-------------------------------------------
+	}
 	void EngineOpenGL::RenderViewports()
 	{
+		//RENDERING
 		renderer->RenderViewport(viewportManager->viewports[currentViewport], m_deltaTime, modelsInScene);
 		renderer->ShowViewportInQuad(viewportManager->viewports[currentViewport]);
+		//-------------------------------------------
 	}
 	// -------------------------------------------------
 	// -------------------------------------------------
+
 
 
 	//--CREADOR DE PREFABS
@@ -461,7 +573,7 @@ namespace libCore
 
 		modelsInScene.push_back(modelContainer);
 	}
-	void EngineOpenGL::CreatePrefabCube()
+	void EngineOpenGL::CreatePrefabCube(glm::vec3 position)
 	{
 		auto modelContainer = CreateRef<ModelContainer>();
 		modelContainer->skeletal = false;
@@ -470,7 +582,7 @@ namespace libCore
 
 		modelContainer->name = "PRIMIVITE_CUBE";
 		modelBuild->meshes.push_back(PrimitivesHelper::CreateCube());
-		
+		modelBuild->transform.position = position;
 
 		//--DEFAULT_MATERIAL
 		auto material = CreateRef<Material>();

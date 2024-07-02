@@ -9,7 +9,7 @@
 #include <random>
 #include <vector>
 #include <glm/glm.hpp>
-#include "Itc_matrix.hpp"
+//#include "Itc_matrix.hpp"
 
 namespace libCore {
     class Renderer {
@@ -60,8 +60,8 @@ namespace libCore {
  
 
             //--AREA LIGHT
-            mLTC.mat1 = loadMTexture();
-            mLTC.mat2 = loadLUTTexture();
+            //mLTC.mat1 = loadMTexture();
+            //mLTC.mat2 = loadLUTTexture();
             //-------------------------------------------------------
         }
 
@@ -147,7 +147,6 @@ namespace libCore {
             }
 
             glViewport(0, 0, viewport->viewportSize.x, viewport->viewportSize.y);
-
             //--------------------------------------------------------------------------------
             //--------------------------------------------------------------------------------
 
@@ -372,6 +371,13 @@ namespace libCore {
             LightsManager::GetInstance().DrawDebugLights("debug");
             //------------------------------------------------------------------------------------------
 
+            //DEBUG AABB
+            for (auto& modelContainer : modelsInScene)
+            {
+                modelContainer->DrawAABB("debug");
+            }
+            //------------------------------------------------------------------------------------------
+            
             // PASADA DE TEXTOS
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -585,7 +591,7 @@ namespace libCore {
         GLuint loadMTexture()
         {
             GLuint texture = 0;
-            glGenTextures(1, &texture);
+            /*glGenTextures(1, &texture);
             glBindTexture(GL_TEXTURE_2D, texture);
 
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_FLOAT, LTC1);
@@ -595,14 +601,14 @@ namespace libCore {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-            glBindTexture(GL_TEXTURE_2D, 0);
+            glBindTexture(GL_TEXTURE_2D, 0);*/
             return texture;
         }
 
         GLuint loadLUTTexture()
         {
             GLuint texture = 0;
-            glGenTextures(1, &texture);
+            /*glGenTextures(1, &texture);
             glBindTexture(GL_TEXTURE_2D, texture);
 
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_FLOAT, LTC2);
@@ -612,7 +618,7 @@ namespace libCore {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-            glBindTexture(GL_TEXTURE_2D, 0);
+            glBindTexture(GL_TEXTURE_2D, 0);*/
             return texture;
         }
     };

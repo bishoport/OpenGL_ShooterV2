@@ -26,12 +26,12 @@ namespace libCore
         libCore::Transform transform;
 
         glm::vec3 color;
-        float intensity = 2.0f; // Añadido para controlar la intensidad de la luz
+        float intensity = 10.0f; // Añadido para controlar la intensidad de la luz
 
         //--POINT LIGHT--------------------------------------
         float Linear = 0.07f;
         float Quadratic = 0.01f;
-        float Radius = 90.0f;
+        float Radius = 150.0f;
         float LightSmoothness = 2.8f;
         //---------------------------------------------------
 
@@ -93,7 +93,7 @@ namespace libCore
         //---------------------------------------------------
 
 
-        Light(LightType lightType) : type(lightType), color(1.0f, 1.0f, 1.0f), intensity(2.0f)
+        Light(LightType lightType) : type(lightType), color(1.0f, 1.0f, 1.0f), intensity(10.0f)
         {
             // Inicializa puntos con un cuadrado por defecto
             areaLightpoints = {
@@ -299,7 +299,7 @@ namespace libCore
 
                 // Dibujar líneas entre los puntos para formar el polígono
                 std::vector<GLuint> indices;
-                for (size_t i = 0; i < vertices.size(); ++i)
+                for (GLsizei i = 0; i < vertices.size(); ++i)
                 {
                     indices.push_back(i);
                     indices.push_back((i + 1) % vertices.size());

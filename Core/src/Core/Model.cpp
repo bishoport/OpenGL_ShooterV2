@@ -30,4 +30,24 @@ namespace libCore
 			meshes[i]->Draw();
 		}
 	}
+
+	void Model::DrawAABB(const std::string& shader)
+	{
+		for (unsigned int i = 0; i < meshes.size(); i++)
+		{
+			libCore::ShaderManager::Get(shader)->setVec4("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+			libCore::ShaderManager::Get(shader)->setMat4("model", transform.getMatrix());
+
+			//meshes[i]->UpdateAABB(transform.getMatrix());
+			meshes[i]->DrawAABB();
+		}
+	}
+
+	void Model::UpdateAABB()
+	{
+		for (unsigned int i = 0; i < meshes.size(); i++)
+		{
+			meshes[i]->UpdateAABB(transform.getMatrix());
+		}
+	}
 }

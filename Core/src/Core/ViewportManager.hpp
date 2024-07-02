@@ -120,6 +120,10 @@ namespace libCore
                 ImGui::Text("Position");
                 ImGui::Image((void*)(intptr_t)gBufferPositionTexture, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
 
+                GLuint gBufferDepthTexture = viewports[0]->gBuffer->getTexture("depth");
+                ImGui::Text("depth");
+                ImGui::Image((void*)(intptr_t)gBufferDepthTexture, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
+
                 GLuint gBufferPositionViewTexture = viewports[0]->gBuffer->getTexture("positionView");
                 ImGui::Text("positionView");
                 ImGui::Image((void*)(intptr_t)gBufferPositionViewTexture, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));

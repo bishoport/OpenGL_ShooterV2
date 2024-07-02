@@ -249,9 +249,6 @@
     <ClInclude Include="src\tools\SkyBox.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Itc_matrix.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\IBL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -262,6 +259,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\tools\MaterialManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tools\DepthBufferPicking.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tools\MousePicker.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

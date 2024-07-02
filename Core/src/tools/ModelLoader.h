@@ -44,6 +44,15 @@ namespace libCore
 			}
 		}
 
+		void DrawAABB(const std::string& shader)
+		{
+			for (auto& model : models)
+			{
+
+				model->DrawAABB(shader);
+			}
+		}
+
 		Ref<Model> UnifyMeshes() {
 			auto unifiedModel = CreateRef<Model>();
 

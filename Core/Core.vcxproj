@@ -23,7 +23,6 @@
     <ClInclude Include="src\Core\EngineOpenGL.h" />
     <ClInclude Include="src\Core\GBO.hpp" />
     <ClInclude Include="src\Core\IBL.h" />
-    <ClInclude Include="src\Core\Itc_matrix.hpp" />
     <ClInclude Include="src\Core\Light.hpp" />
     <ClInclude Include="src\Core\Material.h" />
     <ClInclude Include="src\Core\Mesh.h" />
@@ -77,6 +76,7 @@
     <ClInclude Include="src\tools\AssimpGlmHelpers.h" />
     <ClInclude Include="src\tools\Camera.h" />
     <ClInclude Include="src\Core\FBO.hpp" />
+    <ClInclude Include="src\tools\DepthBufferPicking.hpp" />
     <ClInclude Include="src\tools\EditorCamera.h" />
     <ClInclude Include="src\tools\EventManager.h" />
     <ClInclude Include="src\tools\FPSCamera.h" />
@@ -84,6 +84,7 @@
     <ClInclude Include="src\tools\LightsManager.hpp" />
     <ClInclude Include="src\tools\MaterialManager.hpp" />
     <ClInclude Include="src\tools\ModelLoader.h" />
+    <ClInclude Include="src\tools\MousePicker.hpp" />
     <ClInclude Include="src\tools\PrimitivesHelper.h" />
     <ClInclude Include="src\tools\RoofGenerator.hpp" />
     <ClInclude Include="src\tools\Shader.h" />

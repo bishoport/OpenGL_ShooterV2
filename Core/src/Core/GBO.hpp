@@ -122,7 +122,7 @@ namespace libCore {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, specularTexture, 0);
 
             // Depth attachment
-            GLuint depthTexture = createTexture(GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT);
+            GLuint depthTexture = createTexture(GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
 
             // Attachments list

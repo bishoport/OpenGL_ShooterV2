@@ -150,6 +150,8 @@
     <None Include="assets\shaders\ssao.frag" />
     <None Include="assets\shaders\ssao.vert" />
     <None Include="assets\shaders\ssao_blur.frag" />
+    <None Include="assets\shaders\Stencil.frag" />
+    <None Include="assets\shaders\Stencil.vert" />
     <None Include="assets\shaders\tonemapping.frag" />
     <None Include="assets\shaders\tonemapping.vert" />
   </ItemGroup>

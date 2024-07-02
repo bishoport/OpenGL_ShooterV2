@@ -15,25 +15,25 @@ void MapEditor::Init()
 
 
     // -- PREPARE GEOMETRY
-    libCore::ImportModelData importModelData;
-    importModelData.filePath = "assets/models/Robot/";
-    importModelData.fileName = "Robot.fbx";
-    importModelData.invertUV = false;
-    importModelData.rotate90 = false;
-    importModelData.useCustomTransform = true;
-    importModelData.modelID = 1;
-    importModelData.globalScaleFactor = 1.0f;
-    libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData);
+    //libCore::ImportModelData importModelData;
+    //importModelData.filePath = "assets/models/Robot/";
+    //importModelData.fileName = "Robot.fbx";
+    //importModelData.invertUV = false;
+    //importModelData.rotate90 = false;
+    //importModelData.useCustomTransform = true;
+    //importModelData.modelID = 1;
+    //importModelData.globalScaleFactor = 1.0f;
+    //libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData);
 
-    libCore::ImportModelData importModelData2;
-    importModelData2.filePath = "assets/models/Turbina/";
-    importModelData2.fileName = "turbina.fbx";
-    importModelData2.invertUV = false;
-    importModelData2.rotate90 = false;
-    importModelData2.useCustomTransform = true;
-    importModelData2.modelID = 1;
-    importModelData2.globalScaleFactor = 0.3f;
-    libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData2);
+    //libCore::ImportModelData importModelData2;
+    //importModelData2.filePath = "assets/models/Turbina/";
+    //importModelData2.fileName = "turbina.fbx";
+    //importModelData2.invertUV = false;
+    //importModelData2.rotate90 = false;
+    //importModelData2.useCustomTransform = true;
+    //importModelData2.modelID = 1;
+    //importModelData2.globalScaleFactor = 0.3f;
+    //libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData2);
 
     //libCore::ImportModelData importModelData3;
     //importModelData3.filePath = "assets/models/Corridor/Pasillo1/";
@@ -67,16 +67,16 @@ void MapEditor::Init()
     //importModelData4.globalScaleFactor = 1.0f;
     //libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData4);
 
-    //libCore::ImportModelData importModelData4;
-    //importModelData4.filePath = "assets/models/Scenario_1/";
-    //importModelData4.fileName = "CorridorModule_1.fbx";
-    //importModelData4.invertUV = false;
-    //importModelData4.rotate90 = false;
-    //importModelData4.useCustomTransform = true;
-    //importModelData4.modelID = 1;
-    //importModelData4.globalScaleFactor = 1.0f;
-    //importModelData4.processLights = true;
-    //libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData4);
+    libCore::ImportModelData importModelData4;
+    importModelData4.filePath = "assets/models/Scenario_1/";
+    importModelData4.fileName = "CorridorModule_1.fbx";
+    importModelData4.invertUV = false;
+    importModelData4.rotate90 = false;
+    importModelData4.useCustomTransform = true;
+    importModelData4.modelID = 1;
+    importModelData4.globalScaleFactor = 1.0f;
+    importModelData4.processLights = false;
+    libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData4);
 
     //libCore::ImportModelData importModelData4;
     //importModelData4.filePath = "assets/models/";
@@ -89,16 +89,16 @@ void MapEditor::Init()
     //importModelData4.processLights = true;
     //libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData4);
 
-    libCore::ImportModelData importModelData4;
-    importModelData4.filePath = "assets/models/StarWars/";
-    importModelData4.fileName = "StarWarsCargo_Scene_AssetKit.fbx";
-    importModelData4.invertUV = false;
-    importModelData4.rotate90 = false;
-    importModelData4.useCustomTransform = true;
-    importModelData4.modelID = 1;
-    importModelData4.globalScaleFactor = 0.3f;
-    importModelData4.processLights = true;
-    libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData4);
+    //libCore::ImportModelData importModelData4;
+    //importModelData4.filePath = "assets/models/StarWars/";
+    //importModelData4.fileName = "StarWarsCargo_Scene_AssetKit.fbx";
+    //importModelData4.invertUV = false;
+    //importModelData4.rotate90 = false;
+    //importModelData4.useCustomTransform = true;
+    //importModelData4.modelID = 1;
+    //importModelData4.globalScaleFactor = 0.3f;
+    //importModelData4.processLights = true;
+    //libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData4);
 
 
     //libCore::ImportModelData importModelData4;
@@ -108,10 +108,11 @@ void MapEditor::Init()
     //importModelData4.rotate90 = false;
     //importModelData4.useCustomTransform = true;
     //importModelData4.modelID = 1;
-    //importModelData4.globalScaleFactor = 0.1f;
+    //importModelData4.globalScaleFactor = 0.3f;
     //importModelData4.processLights = true;
     //libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData4);
 
+    libCore::EngineOpenGL::GetInstance().CreatePrefabCube(glm::vec3(0.0f, 0.0f, 0.0f));
 
     //libCore::EngineOpenGL::GetInstance().CreateTriangle(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec3(1.0f, -1.0f, 0.0f));
     //libCore::EngineOpenGL::GetInstance().CreateTriangle(glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(-1.0f, -1.0f, 0.0f));
@@ -119,7 +120,7 @@ void MapEditor::Init()
     
 
     // -- EXTRA LIGHTS
-    libCore::LightsManager::CreateDirectionalLight();
+    //libCore::LightsManager::CreateDirectionalLight();
     //libCore::LightsManager::CreateLight(true, libCore::LightType::POINT, glm::vec3(0.0f, 15.0f, 0.0f));
     //libCore::LightsManager::CreateLight(true, libCore::LightType::AREA, glm::vec3(5.0f, 15.0f, 0.0f));
     //------------------------------------------------------------------

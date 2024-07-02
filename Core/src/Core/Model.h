@@ -28,5 +28,7 @@ namespace libCore
 
         //--METHODS
         void Draw(const std::string& shader);
+        void DrawAABB(const std::string& shader);
+        void UpdateAABB();
     };
 }

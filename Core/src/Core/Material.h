@@ -46,7 +46,7 @@ namespace libCore
         glm::vec3 albedoColor = glm::vec3(1.0f, 1.0f, 1.0f);
         float normalStrength = 1.0f;
         float metallicValue = 0.0f;
-        float roughnessValue = 2.0f;
+        float roughnessValue = 8.0f;
         float aoValue = 1.0f;
 
         //TEXTURES
