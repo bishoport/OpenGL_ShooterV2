@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../LibCoreHeaders.h"
+#include "../tools/ModelLoader.h"
 
 namespace libCore
 {
@@ -21,10 +22,15 @@ namespace libCore
 
         void prepareIBL(int screenWidth, int screenHeight, bool dynamic);
 
-        void UpdateIBL();
+        void UpdateIBL(const glm::vec3& cameraPosition, const std::vector<Ref<libCore::ModelContainer>>& modelsInScene, float nearPlane, float farPlane);
         //----------------------------------------------------
 
         GLuint m_hdrTexture;
+
+        // Variables para manipulación desde ImGUI
+        float ambientStrength = 0.1f;
+        float specularStrength = 0.5f;
+        float shininess = 32.0f;
 
        
 

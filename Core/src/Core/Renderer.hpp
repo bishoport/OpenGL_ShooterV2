@@ -26,8 +26,10 @@ namespace libCore {
         //IBL
         Scope<IBL> ibl = nullptr;
         bool iblEnabled = true; // Variable para activar/desactivar IBL
-        bool dynamicIBL = false;  // Cambia esto a `false` para IBL estático
+        bool dynamicIBL = true;  // Cambia esto a `false` para IBL estático
         float iblIntensity = 0.0f;
+        float nearPlane = 0.1f;
+        float farPlane = 10.0f;
         
         //SSAO
         bool ssaoEnabled = true; // Variable para activar/desactivar SSAO
@@ -63,7 +65,7 @@ namespace libCore {
                     "assets/Skybox/front.jpg",
                     "assets/Skybox/back.jpg"
             };
-            dynamicSkybox = CreateScope<DynamicSkybox>(faces);
+            //dynamicSkybox = CreateScope<DynamicSkybox>(faces);
             //-------------------------------------------------------
 
 
@@ -133,15 +135,12 @@ namespace libCore {
             //--------------------------------------------------------------------------------
             //------------------------GEOMETRY PASS PARA IBL DINAMICO-------------------------
             //--------------------------------------------------------------------------------
-            //if (iblEnabled && dynamicIBL)
-            //{
-            //    // Captura del entorno dinámico
-            //    glViewport(0, 0, 2048, 2048);
-            //    ibl->updateDynamicIBL(viewport->camera->Position, 2048, modelsInScene);
-            //
-            //    // Restaurar el viewport a su tamaño original después de la captura del IBL dinámico
-            //    glViewport(0, 0, viewport->viewportSize.x, viewport->viewportSize.y);
-            //}
+            if (iblEnabled && dynamicIBL)
+            {
+                PushDebugGroup("GEOMETRY PASS PARA IBL DINAMICO");
+                ibl->UpdateIBL(viewport->camera->Position, modelsInScene,nearPlane,farPlane);
+                PopDebugGroup();
+            }
             //--------------------------------------------------------------------------------
             //--------------------------------------------------------------------------------
 
@@ -398,7 +397,7 @@ namespace libCore {
 
 
             // PASADA SKYBOX
-            dynamicSkybox->Render(viewport->camera->view, viewport->camera->projection);
+            //dynamicSkybox->Render(viewport->camera->view, viewport->camera->projection);
             //------------------------------------------------------------------------------------------
             
             // PASADA DE DEBUG
@@ -495,6 +494,15 @@ namespace libCore {
             ImGui::Text("IBL");
             ImGui::Checkbox("Enable IBL", &iblEnabled); // Checkbox para activar/desactivar IBL
             ImGui::SliderFloat("Intensity", &iblIntensity, 0.0f, 10.0f, "%.2f");
+            ImGui::SliderFloat("nearPlane ", &nearPlane, 0.0f, 1000.0f, "%.2f");
+            ImGui::SliderFloat("farPlane ", &farPlane, 0.0f, 1000.0f, "%.2f");
+
+            ImGui::SliderFloat("ambientStrength  ", &ibl->ambientStrength, 0.0f, 10.0f, "%.2f");
+            ImGui::SliderFloat("specularStrength  ", &ibl->specularStrength, 0.0f, 100.0f, "%.2f");
+            ImGui::SliderFloat("shininess  ", &ibl->shininess, 0.0f, 1000.0f, "%.2f");
+
+
+
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
             
             ImGui::Text("SSAO");
@@ -506,36 +514,36 @@ namespace libCore {
             ImGui::SliderFloat("Base Reflectivity", &F0Factor, 0.1f, 5.0f, "%.2f");
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
             
-            ImGui::Text("Dynamic Skybox");
-            ImGui::Dummy(ImVec2(0.0f, 5.0f));
-            ImGui::Checkbox("Use Skybox Texture", &dynamicSkybox->useTexture);
-            ImGui::ColorEdit3("dayLightColor", (float*)&dynamicSkybox->dayLightColor);
-            ImGui::ColorEdit3("sunsetColor", (float*)&dynamicSkybox->sunsetColor);
-            ImGui::ColorEdit3("dayNightColor", (float*)&dynamicSkybox->dayNightColor);
-            ImGui::ColorEdit3("groundColor", (float*)&dynamicSkybox->groundColor);
-            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+            //ImGui::Text("Dynamic Skybox");
+            //ImGui::Dummy(ImVec2(0.0f, 5.0f));
+            //ImGui::Checkbox("Use Skybox Texture", &dynamicSkybox->useTexture);
+            //ImGui::ColorEdit3("dayLightColor", (float*)&dynamicSkybox->dayLightColor);
+            //ImGui::ColorEdit3("sunsetColor", (float*)&dynamicSkybox->sunsetColor);
+            //ImGui::ColorEdit3("dayNightColor", (float*)&dynamicSkybox->dayNightColor);
+            //ImGui::ColorEdit3("groundColor", (float*)&dynamicSkybox->groundColor);
+            //ImGui::Dummy(ImVec2(0.0f, 5.0f));
             
 
 
-            ImGui::Text("Sun");
-            ImGui::DragFloat3("sunPosition", glm::value_ptr(dynamicSkybox->sunPosition), 0.001f);
-            float sunDiskSizeValue = dynamicSkybox->m_sunDiskSize.x;  // Asumimos que todos los valores son iguales
-            if (ImGui::SliderFloat("Sun disk size", &sunDiskSizeValue, 0.0f, 1.0f, "%.4f")) {
-                dynamicSkybox->m_sunDiskSize = glm::vec3(sunDiskSizeValue, sunDiskSizeValue, sunDiskSizeValue);
-            }
-            ImGui::SliderFloat("Sun disk m_gradientIntensity", &dynamicSkybox->m_gradientIntensity, 0.0f, 10.0f, "%.4f");
-            ImGui::SliderFloat("Sun disk auraIntensity",       &dynamicSkybox->auraIntensity, 0.0f, 1.0f, "%.4f");
-            ImGui::SliderFloat("Sun disk auraSize",            &dynamicSkybox->auraSize, 0.0f, 1.0f, "%.4f");
-            ImGui::SliderFloat("Sun disk edgeSoftness",        &dynamicSkybox->edgeSoftness, 0.0001f, 0.1f, "%.4f");
-            ImGui::Dummy(ImVec2(0.0f, 3.0f));
+            //ImGui::Text("Sun");
+            //ImGui::DragFloat3("sunPosition", glm::value_ptr(dynamicSkybox->sunPosition), 0.001f);
+            //float sunDiskSizeValue = dynamicSkybox->m_sunDiskSize.x;  // Asumimos que todos los valores son iguales
+            //if (ImGui::SliderFloat("Sun disk size", &sunDiskSizeValue, 0.0f, 1.0f, "%.4f")) {
+            //    dynamicSkybox->m_sunDiskSize = glm::vec3(sunDiskSizeValue, sunDiskSizeValue, sunDiskSizeValue);
+            //}
+            //ImGui::SliderFloat("Sun disk m_gradientIntensity", &dynamicSkybox->m_gradientIntensity, 0.0f, 10.0f, "%.4f");
+            //ImGui::SliderFloat("Sun disk auraIntensity",       &dynamicSkybox->auraIntensity, 0.0f, 1.0f, "%.4f");
+            //ImGui::SliderFloat("Sun disk auraSize",            &dynamicSkybox->auraSize, 0.0f, 1.0f, "%.4f");
+            //ImGui::SliderFloat("Sun disk edgeSoftness",        &dynamicSkybox->edgeSoftness, 0.0001f, 0.1f, "%.4f");
+            //ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
-            ImGui::Text("Stars Settings");
-            ImGui::SliderFloat("Star Density", &dynamicSkybox->starDensity, 0.0f, 0.01f, "%.5f");
-            ImGui::SliderFloat("Star Size Min", &dynamicSkybox->starSizeMin, 0.0f, 1.0f, "%.4f");
-            ImGui::SliderFloat("Star Size Max", &dynamicSkybox->starSizeMax, 0.0f, 2.0f, "%.4f");
-            ImGui::SliderFloat("Star Brightness Min", &dynamicSkybox->starBrightnessMin, 0.0f, 1.0f, "%.4f");
-            ImGui::SliderFloat("Star Brightness Max", &dynamicSkybox->starBrightnessMax, 0.0f, 1.0f, "%.4f");
-            ImGui::DragFloat2("Star Coord Scale", glm::value_ptr(dynamicSkybox->starCoordScale), 0.1f, 0.0f, 200.0f, "%.4f");
+            //ImGui::Text("Stars Settings");
+            //ImGui::SliderFloat("Star Density", &dynamicSkybox->starDensity, 0.0f, 0.01f, "%.5f");
+            //ImGui::SliderFloat("Star Size Min", &dynamicSkybox->starSizeMin, 0.0f, 1.0f, "%.4f");
+            //ImGui::SliderFloat("Star Size Max", &dynamicSkybox->starSizeMax, 0.0f, 2.0f, "%.4f");
+            //ImGui::SliderFloat("Star Brightness Min", &dynamicSkybox->starBrightnessMin, 0.0f, 1.0f, "%.4f");
+            //ImGui::SliderFloat("Star Brightness Max", &dynamicSkybox->starBrightnessMax, 0.0f, 1.0f, "%.4f");
+            //ImGui::DragFloat2("Star Coord Scale", glm::value_ptr(dynamicSkybox->starCoordScale), 0.1f, 0.0f, 200.0f, "%.4f");
             
             ImGui::End();
         }
