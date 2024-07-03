@@ -372,15 +372,12 @@ namespace libCore
 
             if (lightName.find("Point") != std::string::npos) {
                 libCore::LightsManager::CreateLight(true, libCore::LightType::POINT, glm::vec3(position.x, position.z, position.y));
-                //lightType = POINT;
             }
             else if (lightName.find("Spot") != std::string::npos) {
                 libCore::LightsManager::CreateLight(true, libCore::LightType::SPOT, glm::vec3(position.x, position.y, position.z));
-                //lightType = SPOT;
             }
             else if (lightName.find("Area") != std::string::npos) {
                 libCore::LightsManager::CreateLight(true, libCore::LightType::AREA, glm::vec3(position.x, position.y, position.z));
-                //lightType = AREA;
             }
             else
             {

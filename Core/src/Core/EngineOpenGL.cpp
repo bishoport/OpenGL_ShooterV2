@@ -16,7 +16,7 @@ namespace libCore
 	Scope<GuiLayer> guiLayer = nullptr; //esto se declara en el cpp porque si se pone en el h, hay errores de includes cíclicos
 	Scope<ViewportManager> viewportManager = nullptr; //esto se declara en el cpp porque si se pone en el h, hay errores de includes cíclicos
 	Scope<RoofGenerator> roofGenerator = nullptr;
-	Scope<Renderer> renderer = nullptr;
+	//Scope<Renderer> renderer = nullptr;
 	
 
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -128,7 +128,7 @@ namespace libCore
 
 		// -- SHADERS
 		std::string shadersDirectory = "assets/shaders/";
-		shaderManager.setShaderDataLoad("basic",        shadersDirectory + "basic.vert",    shadersDirectory + "basic.frag");
+		//shaderManager.setShaderDataLoad("basic",        shadersDirectory + "basic.vert",    shadersDirectory + "basic.frag");
 		shaderManager.setShaderDataLoad("colorQuadFBO", shadersDirectory + "quad_fbo.vert", shadersDirectory + "color_quad_fbo.frag");
 		
 		//-DEBUG & TEXT
@@ -148,11 +148,12 @@ namespace libCore
 		shaderManager.setShaderDataLoad("combinePass",  shadersDirectory + "combine.vert",               shadersDirectory + "combine.frag");
 
 		//-IBL
-		shaderManager.setShaderDataLoad("equirectangularToCubemap", shadersDirectory + "IBL/cubemap.vs"   , shadersDirectory + "IBL/equirectangular_to_cubemap.fs");
-		shaderManager.setShaderDataLoad("irradiance",               shadersDirectory + "IBL/cubemap.vs"   , shadersDirectory + "IBL/irradiance_convolution.fs");
-		shaderManager.setShaderDataLoad("prefilter",                shadersDirectory + "IBL/cubemap.vs"   , shadersDirectory + "IBL/prefilter.fs");
-		shaderManager.setShaderDataLoad("brdf",                     shadersDirectory + "IBL/brdf.vs"      , shadersDirectory + "IBL/brdf.fs");
-		shaderManager.setShaderDataLoad("background",               shadersDirectory + "IBL/background.vs", shadersDirectory + "IBL/background.fs");
+		shaderManager.setShaderDataLoad("equirectangularToCubemap", shadersDirectory + "IBL/cubemap.vs"             , shadersDirectory + "IBL/equirectangular_to_cubemap.fs");
+		shaderManager.setShaderDataLoad("irradiance",               shadersDirectory + "IBL/cubemap.vs"             , shadersDirectory + "IBL/irradiance_convolution.fs");
+		shaderManager.setShaderDataLoad("prefilter",                shadersDirectory + "IBL/cubemap.vs"             , shadersDirectory + "IBL/prefilter.fs");
+		shaderManager.setShaderDataLoad("brdf",                     shadersDirectory + "IBL/brdf.vs"                , shadersDirectory + "IBL/brdf.fs");
+		shaderManager.setShaderDataLoad("background",               shadersDirectory + "IBL/background.vs"          , shadersDirectory + "IBL/background.fs");
+		shaderManager.setShaderDataLoad("captureEnv",               shadersDirectory + "IBL/capture_enviroment.vert", shadersDirectory + "IBL/capture_enviroment.frag");
 
 		//-SHADOWS
 		shaderManager.setShaderDataLoad("direct_light_depth_shadows", shadersDirectory + "shadows/directLight_shadow_mapping_depth_shader.vs", shadersDirectory + "shadows/directLight_shadow_mapping_depth_shader.fs");
@@ -196,7 +197,7 @@ namespace libCore
 		//---------------------------------------------------------------------------
 
 		// -- RENDERER
-		renderer = CreateScope<Renderer>();
+		Renderer::getInstance().initialize();
 		//---------------------------------------------------------------------------
 
 		// -- MOUSE PICKER
@@ -438,8 +439,8 @@ namespace libCore
 	void EngineOpenGL::RenderViewports()
 	{
 		//RENDERING
-		renderer->RenderViewport(viewportManager->viewports[currentViewport], m_deltaTime, modelsInScene);
-		renderer->ShowViewportInQuad(viewportManager->viewports[currentViewport]);
+		Renderer::getInstance().RenderViewport(viewportManager->viewports[currentViewport], m_deltaTime, modelsInScene);
+		Renderer::getInstance().ShowViewportInQuad(viewportManager->viewports[currentViewport]);
 		//-------------------------------------------
 	}
 	// -------------------------------------------------
@@ -620,7 +621,7 @@ namespace libCore
 			guiLayer->DrawHierarchyPanel(modelsInScene);
 			guiLayer->DrawLightsPanel(LightsManager::GetLights());
 			guiLayer->DrawMaterialsPanel();
-			renderer->ShowControlsGUI();
+			Renderer::getInstance().ShowControlsGUI();
 			viewportManager->DrawPanelGUI();
 			//guiLayer->RenderCheckerMatrix(); //Panel para el editor de roofs
 		}

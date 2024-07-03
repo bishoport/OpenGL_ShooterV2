@@ -9,11 +9,8 @@
 #include "../StraightSkeleton/Vector2d.h"
 #include "../tools/FreeTypeManager.h"
 
-
 namespace libCore
 {
-    //class GuiLayer;
-
     class EngineOpenGL
     {
         using MainLoopFnc = std::function<void(Timestep)>;
@@ -22,6 +19,7 @@ namespace libCore
         using ImGUILoopFnc = std::function<void()>;
 
     public:
+        //LIFE CYCLE
         bool InitializeEngine(const std::string& windowTitle, int initialWindowWidth, int initialWindowHeight, MainLoopFnc mainLoopFnc, CloseGlFnc closeGlFnc, ImGUILoopFnc imGUILoopFnc = [] {});
         void InitializeMainLoop();
         void begin();

@@ -27,6 +27,7 @@
     <ClInclude Include="src\Core\Material.h" />
     <ClInclude Include="src\Core\Mesh.h" />
     <ClInclude Include="src\Core\Model.h" />
+    <ClInclude Include="src\Core\OBB.hpp" />
     <ClInclude Include="src\Core\Renderer.hpp" />
     <ClInclude Include="src\Core\skeletal\animation.h" />
     <ClInclude Include="src\Core\skeletal\animator.h" />
@@ -92,6 +93,9 @@
     <ClInclude Include="src\tools\SkeletalModelLoader.h" />
     <ClInclude Include="src\tools\SkyBox.hpp" />
     <ClInclude Include="src\tools\TextureManager.h" />
+    <ClInclude Include="vendor\ApproxMVBB\Config\Config.hpp" />
+    <ClInclude Include="vendor\ApproxMVBB\Diameter\EstimateDiameter.hpp" />
+    <ClInclude Include="vendor\ApproxMVBB\GeometryPredicates\Predicates.hpp" />
     <ClInclude Include="vendor\earcut\include\mapbox\earcut.hpp" />
     <ClInclude Include="vendor\ft\ft2build.h" />
     <ClInclude Include="vendor\imgui\imconfig.h" />

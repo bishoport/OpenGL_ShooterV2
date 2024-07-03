@@ -44,5 +44,7 @@
     <None Include="assets\shaders\ssao_blur.frag" />
     <None Include="assets\shaders\Stencil.vert" />
     <None Include="assets\shaders\Stencil.frag" />
+    <None Include="assets\shaders\IBL\capture_enviroment.vert" />
+    <None Include="assets\shaders\IBL\capture_enviroment.frag" />
   </ItemGroup>
 </Project>

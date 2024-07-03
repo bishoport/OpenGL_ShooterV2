@@ -3,10 +3,9 @@
 #include "../LibCoreHeaders.h"
 #include "Viewport.hpp"
 #include "FBO.hpp"
-//#include "../tools/Camera.h"
 #include "../tools/EditorCamera.h"
 #include "../tools/FPSCamera.h"
-
+#include "Renderer.hpp"
 namespace libCore
 {
     class ViewportManager {
@@ -111,6 +110,25 @@ namespace libCore
    
         }
 
+        GLuint CubemapFaceTo2DTexture(GLuint cubemap, GLenum face, int width, int height, GLuint captureFBO)
+        {
+            GLuint texture2D;
+            glGenTextures(1, &texture2D);
+            glBindTexture(GL_TEXTURE_2D, texture2D);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, face, cubemap, 0);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+            return texture2D;
+        }
+
+
         void DrawPanelGUI()
         {
             ImGui::Begin("Framebuffers");
@@ -145,12 +163,61 @@ namespace libCore
                 ImGui::Image((void*)(intptr_t)gSpecularTexture, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
             }
 
+            if (ImGui::CollapsingHeader("IBL"))
+            {
+                ImGui::Text("envCubemapTexture");
+                ImGui::Image((void*)(intptr_t)Renderer::getInstance().ibl->envCubemap, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
+
+                ImGui::Text("irradianceMap");
+                ImGui::Image((void*)(intptr_t)Renderer::getInstance().ibl->irradianceMap, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
+
+                ImGui::Text("prefilterMap");
+                ImGui::Image((void*)(intptr_t)Renderer::getInstance().ibl->prefilterMap, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
+
+                ImGui::Text("brdfLUTTexture");
+                ImGui::Image((void*)(intptr_t)Renderer::getInstance().ibl->brdfLUTTexture, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
+            }
+
+
+            //if (ImGui::CollapsingHeader("IBL"))
+            //{
+            //    // Crear un framebuffer de captura si no existe
+            //    static GLuint captureFBO = 0;
+            //    if (captureFBO == 0) {
+            //        glGenFramebuffers(1, &captureFBO);
+            //    }
+
+            //    // Mostrar las caras de las texturas cúbicas
+            //    for (int i = 0; i < 6; ++i) {
+            //        std::string label = "envCubemap Face " + std::to_string(i);
+            //        GLuint envCubemap2D = CubemapFaceTo2DTexture(Renderer::getInstance().ibl->envCubemap, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 256, 256, captureFBO);
+            //        ImGui::Text(label.c_str());
+            //        ImGui::Image((void*)(intptr_t)envCubemap2D, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
+            //    }
+
+            //    for (int i = 0; i < 6; ++i) {
+            //        std::string label = "irradianceMap Face " + std::to_string(i);
+            //        GLuint irradianceMap2D = CubemapFaceTo2DTexture(Renderer::getInstance().ibl->irradianceMap, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 256, 256, captureFBO);
+            //        ImGui::Text(label.c_str());
+            //        ImGui::Image((void*)(intptr_t)irradianceMap2D, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
+            //    }
+
+            //    for (int i = 0; i < 6; ++i) {
+            //        std::string label = "prefilterMap Face " + std::to_string(i);
+            //        GLuint prefilterMap2D = CubemapFaceTo2DTexture(Renderer::getInstance().ibl->prefilterMap, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 256, 256, captureFBO);
+            //        ImGui::Text(label.c_str());
+            //        ImGui::Image((void*)(intptr_t)prefilterMap2D, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
+            //    }
+
+            //    ImGui::Text("brdfLUTTexture");
+            //    ImGui::Image((void*)(intptr_t)Renderer::getInstance().ibl->brdfLUTTexture, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
+            //}
+
+
+
+
             if (ImGui::CollapsingHeader("Framebuffers")) 
             {
-                //GLuint shadowMapTexture = viewports[0]->framebuffer_shadowmap->getTexture("color");
-                //ImGui::Text("ShadowMap Texture");
-                //ImGui::Image((void*)(intptr_t)shadowMapTexture, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
-
                 GLuint ssaoBlurTexture = viewports[0]->framebuffer_SSAOBlur->getTexture("color");
                 ImGui::Text("SSAO Blur Texture");
                 ImGui::Image((void*)(intptr_t)ssaoBlurTexture, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
@@ -162,8 +229,6 @@ namespace libCore
                 GLuint forwardTexture = viewports[0]->framebuffer_forward->getTexture("color");
                 ImGui::Text("Forward FBO");
                 ImGui::Image((void*)(intptr_t)forwardTexture, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
-
-
             }
             ImGui::End();
         }

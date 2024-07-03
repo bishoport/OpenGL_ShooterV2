@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /MapEditor/assets/models/StarWars
 /MapEditor/assets/models/CyberpunkStreet
+*.env

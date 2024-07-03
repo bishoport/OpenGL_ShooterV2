@@ -19,11 +19,23 @@ namespace libCore
         GLuint brdfLUTTexture = 0;
 
 
-        void prepare_PBR_IBL(int screenWidth, int screenHeight);
+        void prepareIBL(int screenWidth, int screenHeight, bool dynamic);
+
+        void UpdateIBL();
         //----------------------------------------------------
 
         GLuint m_hdrTexture;
+
+       
+
     private:
+
+        int  m_screenWidth = 0;
+        int  m_screenHeight = 0;
+        bool m_dynamic = false;
+
+        void configureStaticIBL();
+        void configureDynamicIBL();
 
         GLuint cubeVAO = 0;
         GLuint cubeVBO = 0;

@@ -26,7 +26,7 @@ namespace libCore
         libCore::Transform transform;
 
         glm::vec3 color;
-        float intensity = 10.0f; // Añadido para controlar la intensidad de la luz
+        float intensity = 2.0f; // Añadido para controlar la intensidad de la luz
 
         //--POINT LIGHT--------------------------------------
         float Linear = 0.07f;
@@ -93,7 +93,7 @@ namespace libCore
         //---------------------------------------------------
 
 
-        Light(LightType lightType) : type(lightType), color(1.0f, 1.0f, 1.0f), intensity(10.0f)
+        Light(LightType lightType) : type(lightType), color(1.0f, 1.0f, 1.0f), intensity(2.0f)
         {
             // Inicializa puntos con un cuadrado por defecto
             areaLightpoints = {

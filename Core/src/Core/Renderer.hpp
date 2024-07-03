@@ -12,43 +12,65 @@
 //#include "Itc_matrix.hpp"
 
 namespace libCore {
-    class Renderer {
-    public:
-        Scope<DynamicSkybox> dynamicSkybox = nullptr;
-        Scope<IBL> ibl = nullptr;
 
+    class Renderer {
+
+    public:
+        //SKYBOX
+        Scope<DynamicSkybox> dynamicSkybox = nullptr;
+        
+        //MISC
         bool m_wireframe = false;
         bool enableMultisample = true;
-        bool ssaoEnabled = true; // Variable para activar/desactivar SSAO
-        bool iblEnabled = true; // Variable para activar/desactivar SSAO
+        
+        //IBL
+        Scope<IBL> ibl = nullptr;
+        bool iblEnabled = true; // Variable para activar/desactivar IBL
+        bool dynamicIBL = false;  // Cambia esto a `false` para IBL estático
         float iblIntensity = 0.0f;
+        
+        //SSAO
+        bool ssaoEnabled = true; // Variable para activar/desactivar SSAO
         float ssaoRadius =2.0f;
         float ssaoBias = 0.5f;
         float ssaoIntensity = 1.8f;
         float ssaoPower = 1.8f;
         float F0Factor = 0.04f;
+        
+        //GLOBAL LIGHT
         float ambientLight = 1.0f;
+        
+        //HDR
         bool hdrEnabled = false;
         float hdrExposure = 1.0f;
 
-        Renderer() {
 
+
+        static Renderer& getInstance() {
+            static Renderer instance;
+            return instance;
+        }
+
+
+
+        void initialize() {
             //--SKYBOX
             std::vector<const char*> faces {
                 "assets/Skybox/right.jpg",
-                "assets/Skybox/left.jpg",
-                "assets/Skybox/top.jpg",
-                "assets/Skybox/bottom.jpg",
-                "assets/Skybox/front.jpg",
-                "assets/Skybox/back.jpg"
+                    "assets/Skybox/left.jpg",
+                    "assets/Skybox/top.jpg",
+                    "assets/Skybox/bottom.jpg",
+                    "assets/Skybox/front.jpg",
+                    "assets/Skybox/back.jpg"
             };
             dynamicSkybox = CreateScope<DynamicSkybox>(faces);
             //-------------------------------------------------------
-             
+
 
             //--IBL
             ibl = CreateScope<IBL>();
-            ibl->prepare_PBR_IBL(1920, 1080);
+            ibl->prepareIBL(1080, 720,dynamicIBL);
+            
             //-------------------------------------------------------
 
 
@@ -57,13 +79,14 @@ namespace libCore {
             ssaoKernel = generateSSAOKernel();         // Genera el kernel
             noiseTexture = generateSSAONoiseTexture(); // Genera textura de ruido SSAO
             //-------------------------------------------------------
- 
+
 
             //--AREA LIGHT
             //mLTC.mat1 = loadMTexture();
             //mLTC.mat2 = loadLUTTexture();
             //-------------------------------------------------------
         }
+        
 
 
         void PushDebugGroup(const std::string& name) {
@@ -105,6 +128,22 @@ namespace libCore {
             viewport->camera->updateMatrix(45.0f, 0.1f, 1000.0f);
 
             glEnable(GL_DEPTH_TEST); // Habilitar el test de profundidad
+
+
+            //--------------------------------------------------------------------------------
+            //------------------------GEOMETRY PASS PARA IBL DINAMICO-------------------------
+            //--------------------------------------------------------------------------------
+            //if (iblEnabled && dynamicIBL)
+            //{
+            //    // Captura del entorno dinámico
+            //    glViewport(0, 0, 2048, 2048);
+            //    ibl->updateDynamicIBL(viewport->camera->Position, 2048, modelsInScene);
+            //
+            //    // Restaurar el viewport a su tamaño original después de la captura del IBL dinámico
+            //    glViewport(0, 0, viewport->viewportSize.x, viewport->viewportSize.y);
+            //}
+            //--------------------------------------------------------------------------------
+            //--------------------------------------------------------------------------------
 
 
             //--------------------------------------------------------------------------------
@@ -304,7 +343,8 @@ namespace libCore {
             glBindTexture(GL_TEXTURE_2D, mLTC.mat2);
             //----------------------------------------------------------------------------------------------
 
-            // IBL textures
+            
+
             libCore::ShaderManager::Get("lightingPass")->setBool("useIBL", iblEnabled);
             libCore::ShaderManager::Get("lightingPass")->setFloat("iblIntensity", iblIntensity);
             libCore::ShaderManager::Get("lightingPass")->setInt("irradianceMap", 8);
@@ -374,7 +414,7 @@ namespace libCore {
             //DEBUG AABB
             for (auto& modelContainer : modelsInScene)
             {
-                modelContainer->DrawAABB("debug");
+               // modelContainer->DrawAABB("debug");
             }
             //------------------------------------------------------------------------------------------
             
@@ -443,8 +483,6 @@ namespace libCore {
             renderQuad();
         }
 
-
-
         void ShowControlsGUI() {
             // Global Ilumination Controls
             ImGui::Begin("Ilumination Controls");
@@ -503,6 +541,8 @@ namespace libCore {
         }
 
     private:
+        Renderer() {} // Constructor privado
+
         std::vector<glm::vec3> ssaoKernel;
         GLuint noiseTexture;
         const unsigned int NR_LIGHTS = 1;
@@ -591,17 +631,17 @@ namespace libCore {
         GLuint loadMTexture()
         {
             GLuint texture = 0;
-            /*glGenTextures(1, &texture);
-            glBindTexture(GL_TEXTURE_2D, texture);
+            //glGenTextures(1, &texture);
+            //glBindTexture(GL_TEXTURE_2D, texture);
 
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_FLOAT, LTC1);
+            //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_FLOAT, LTC1);
 
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-            glBindTexture(GL_TEXTURE_2D, 0);*/
+            //glBindTexture(GL_TEXTURE_2D, 0);
             return texture;
         }
 

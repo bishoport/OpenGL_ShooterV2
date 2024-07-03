@@ -4,7 +4,25 @@
 
 namespace libCore
 {
-	void IBL::prepare_PBR_IBL(int screenWidth, int screenHeight)
+	void IBL::prepareIBL(int screenWidth, int screenHeight, bool dynamic)
+	{
+		m_screenWidth = screenWidth;
+		m_screenHeight = screenHeight;
+		m_dynamic = dynamic;
+
+		if (m_dynamic == false)
+		{
+			configureStaticIBL();
+		}
+		else
+		{
+			configureDynamicIBL();
+		}
+	}
+
+	
+
+	void IBL::configureStaticIBL()
 	{
 		m_hdrTexture = libCore::TextureManager::loadHDR("assets/HDR/newport_loft.hdr");
 
@@ -13,7 +31,7 @@ namespace libCore
 
 		glBindFramebuffer(GL_FRAMEBUFFER, IBL_FBO);
 		glBindRenderbuffer(GL_RENDERBUFFER, IBL_RBO);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 2048, 2048);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_screenWidth, m_screenWidth);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, IBL_RBO);
 
 
@@ -24,7 +42,7 @@ namespace libCore
 
 		for (unsigned int i = 0; i < 6; ++i)
 		{
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 2048, 2048, 0, GL_RGB, GL_FLOAT, nullptr);
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, m_screenWidth, m_screenWidth, 0, GL_RGB, GL_FLOAT, nullptr);
 		}
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -59,7 +77,7 @@ namespace libCore
 		libCore::ShaderManager::Get("equirectangularToCubemap")->setMat4("projection", captureProjection);
 
 
-		glViewport(0, 0, 2048, 2048); // don't forget to configure the viewport to the capture dimensions.
+		glViewport(0, 0, m_screenWidth, m_screenHeight); // don't forget to configure the viewport to the capture dimensions.
 		glBindFramebuffer(GL_FRAMEBUFFER, IBL_FBO);
 		for (unsigned int i = 0; i < 6; ++i)
 		{
@@ -102,7 +120,7 @@ namespace libCore
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
-		glViewport(0, 0, 32, 32); // don't forget to configure the viewport to the capture dimensions.
+		glViewport(0, 0, m_screenWidth, m_screenHeight); // don't forget to configure the viewport to the capture dimensions.
 		glBindFramebuffer(GL_FRAMEBUFFER, IBL_FBO);
 		for (unsigned int i = 0; i < 6; ++i)
 		{
@@ -174,7 +192,7 @@ namespace libCore
 
 		// pre-allocate enough memory for the LUT texture.
 		glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, screenWidth, screenHeight, 0, GL_RG, GL_FLOAT, 0);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, m_screenWidth, m_screenHeight, 0, GL_RG, GL_FLOAT, 0);
 		// be sure to set wrapping mode to GL_CLAMP_TO_EDGE
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -184,10 +202,10 @@ namespace libCore
 		// then re-configure capture framebuffer object and render screen-space quad with BRDF shader.
 		glBindFramebuffer(GL_FRAMEBUFFER, IBL_FBO);
 		glBindRenderbuffer(GL_RENDERBUFFER, IBL_RBO);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, screenWidth, screenHeight);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_screenWidth, m_screenHeight);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTTexture, 0);
 
-		glViewport(0, 0, screenWidth, screenHeight);
+		glViewport(0, 0, m_screenWidth, m_screenHeight);
 		libCore::ShaderManager::Get("brdf")->use();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		renderQuad();
@@ -195,6 +213,13 @@ namespace libCore
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
+	void IBL::configureDynamicIBL()
+	{
+	}
+
+	void IBL::UpdateIBL()
+	{
+	}
 
 	void IBL::renderQuad()
 	{
