@@ -348,6 +348,7 @@ namespace libCore
                     ImGui::Separator();
                     ImGui::DragFloat("Intensity", &light->intensity, 0.1f, 0.0f, 1000.0f, "%.2f");
                     ImGui::Separator();
+                   
                     // Common Controls
                     ImGui::BulletText("Transform:");
                     if (ImGui::DragFloat3("Position", &light->transform.position[0], 0.1f)) {
@@ -375,8 +376,8 @@ namespace libCore
                         ImGui::SliderFloat("Shadow Intensity", &light->shadowIntensity, 0.0f, 1.0f);
                         ImGui::Checkbox("Use Poison Disk", &light->usePoisonDisk);
 
-                        ImGui::Dummy(ImVec2(0.0f, 20.0f));
-                        ImGui::Image((void*)(intptr_t)light->shadowTex, ImVec2(512, 512), ImVec2(0, 1), ImVec2(1, 0), ImColor(255, 255, 255, 255));
+                        //ImGui::Dummy(ImVec2(0.0f, 20.0f));
+                        //ImGui::Image((void*)(intptr_t)light->shadowTex, ImVec2(512, 512), ImVec2(0, 1), ImVec2(1, 0), ImColor(255, 255, 255, 255));
 
                         ImGui::Dummy(ImVec2(0.0f, 20.0f));
                         ImGui::SliderFloat("Left", &light->orthoLeft, -100.0f, 100.0f);

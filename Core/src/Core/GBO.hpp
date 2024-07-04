@@ -9,7 +9,9 @@
 namespace libCore {
 
     class GBO {
+
     public:
+
         GBO() : gBuffer(0), bufferWidth(0), bufferHeight(0) {}
 
         ~GBO() {
@@ -52,6 +54,10 @@ namespace libCore {
             }
         }
 
+
+
+
+
         void resize(int width, int height) {
             bufferWidth = width;
             bufferHeight = height;
@@ -89,9 +95,11 @@ namespace libCore {
 
         GLuint gBuffer;
 
+        int bufferWidth, bufferHeight;
+
     private:
         std::map<std::string, GLuint> attachments;
-        int bufferWidth, bufferHeight;
+        
 
         void setupGBuffer() {
             glGenFramebuffers(1, &gBuffer);
