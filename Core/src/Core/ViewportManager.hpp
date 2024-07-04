@@ -98,7 +98,7 @@ namespace libCore
 
             // F-Buffer ShadowMap
             auto fbo6 = CreateRef<FBO>();
-            fbo6->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_DEPTH_COMPONENT, "Directional Light ShadowMap", true, false, false);
+            fbo6->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_DEPTH_COMPONENT, "F-Buffer ShadowMap", true, false, false);
             fbo6->addAttachment("depth", GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_ATTACHMENT);
             fbo6->closeSetup();
             viewport->framebuffer_shadowmap = std::move(fbo6);

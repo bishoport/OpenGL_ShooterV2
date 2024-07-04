@@ -26,10 +26,8 @@ namespace libCore {
         //IBL
         Scope<IBL> ibl = nullptr;
         bool iblEnabled = true; // Variable para activar/desactivar IBL
-        bool dynamicIBL = true;  // Cambia esto a `false` para IBL estático
+        bool dynamicIBL = false;  // Cambia esto a `false` para IBL estático
         float iblIntensity = 0.0f;
-        float nearPlane = 0.1f;
-        float farPlane = 10.0f;
         
         //SSAO
         bool ssaoEnabled = true; // Variable para activar/desactivar SSAO
@@ -65,7 +63,7 @@ namespace libCore {
                     "assets/Skybox/front.jpg",
                     "assets/Skybox/back.jpg"
             };
-            //dynamicSkybox = CreateScope<DynamicSkybox>(faces);
+            dynamicSkybox = CreateScope<DynamicSkybox>(faces);
             //-------------------------------------------------------
 
 
@@ -100,6 +98,8 @@ namespace libCore {
         }
 
 
+
+
         void RenderViewport(const Ref<Viewport>& viewport, const Timestep& m_deltaTime, const std::vector<Ref<libCore::ModelContainer>>& modelsInScene) {
 
             if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_P)) 
@@ -130,6 +130,9 @@ namespace libCore {
             viewport->camera->updateMatrix(45.0f, 0.1f, 1000.0f);
 
             glEnable(GL_DEPTH_TEST); // Habilitar el test de profundidad
+
+
+
 
 
             //--------------------------------------------------------------------------------
@@ -177,6 +180,8 @@ namespace libCore {
 
 
 
+
+
             //------------------------------------------------------------------------------------------------------
             //---------------------------------------------DEFERRED-------------------------------------------------
             //------------------------------------------------------------------------------------------------------
@@ -211,18 +216,21 @@ namespace libCore {
             //--------------------------------------------------------------------------------
 
 
+
+
+
             ////--------------------------------------------------------------------------------
             ////-----------------------SSAO-----------------------------------------------------
             ////--------------------------------------------------------------------------------
-            if (ssaoEnabled) {
+            if (ssaoEnabled) 
+            {
+
                 // Renderizado SSAO
                 PushDebugGroup("SSAO Pass");
 
-                // 1.2 Copiar el buffer de profundidad del GBuffer al FBO SSAO
-                glBindFramebuffer(GL_READ_FRAMEBUFFER, viewport->gBuffer->gBuffer);
-                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, viewport->framebuffer_SSAO->getFramebuffer());
-                glBlitFramebuffer(0, 0, viewport->viewportSize.x, viewport->viewportSize.y, 0, 0, viewport->viewportSize.x, viewport->viewportSize.y, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-                glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind all
+                //Copiar el buffer de profundidad del GBuffer al FBO SSAO
+                viewport->blitGBO2FBO(viewport->gBuffer, viewport->framebuffer_SSAO, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
 
                 viewport->framebuffer_SSAO->bindFBO();
                 glClear(GL_COLOR_BUFFER_BIT); // No se limpia aquí el GL_DEPTH_BUFFER_BIT!!!!
@@ -260,11 +268,9 @@ namespace libCore {
 
                 //---Renderizado SSAO_BLUR
                 PushDebugGroup("SSAO Blur Pass");
-                // 1.3 Copiar el buffer de profundidad del GBuffer al FBO SSAOBlur
-                glBindFramebuffer(GL_READ_FRAMEBUFFER, viewport->gBuffer->gBuffer);
-                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, viewport->framebuffer_SSAOBlur->getFramebuffer());
-                glBlitFramebuffer(0, 0, viewport->viewportSize.x, viewport->viewportSize.y, 0, 0, viewport->viewportSize.x, viewport->viewportSize.y, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-                glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind all
+                
+                //Copiar el buffer de profundidad del GBuffer al FBO SSAOBlur
+                viewport->blitGBO2FBO(viewport->gBuffer, viewport->framebuffer_SSAOBlur, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
                 viewport->framebuffer_SSAOBlur->bindFBO();
                 glClear(GL_COLOR_BUFFER_BIT);
@@ -372,10 +378,8 @@ namespace libCore {
             //---------------------------------------------FORWARD--------------------------------------------------
             //------------------------------------------------------------------------------------------------------
             PushDebugGroup("Forward Pass");
-            glBindFramebuffer(GL_READ_FRAMEBUFFER, viewport->gBuffer->gBuffer);// 3. Copiar el buffer de profundidad del GBuffer al FBO forward
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, viewport->framebuffer_forward->getFramebuffer());
-            glBlitFramebuffer(0, 0, viewport->viewportSize.x, viewport->viewportSize.y, 0, 0, viewport->viewportSize.x, viewport->viewportSize.y, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-            glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind all
+
+            viewport->blitGBO2FBO(viewport->gBuffer, viewport->framebuffer_forward, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
             viewport->framebuffer_forward->bindFBO();
             glClear(GL_COLOR_BUFFER_BIT); // No se limpia aquí el GL_DEPTH_BUFFER_BIT!!!!
@@ -384,7 +388,7 @@ namespace libCore {
 
 
             // PASADA SKYBOX
-            //dynamicSkybox->Render(viewport->camera->view, viewport->camera->projection);
+            dynamicSkybox->Render(viewport->camera->view, viewport->camera->projection);
             //------------------------------------------------------------------------------------------
             
             // PASADA DE DEBUG
@@ -437,10 +441,14 @@ namespace libCore {
             viewport->framebuffer_forward->bindTexture("color", 1);
             viewport->framebuffer_SSAOBlur->bindTexture("color", 2);
 
+            viewport->framebuffer_shadowmap->bindTexture("depth", 3);
+
             if (LightsManager::GetInstance().GetDirectionalLight() != nullptr)
             {
                 if (directionalLight->drawShadows) {
                     viewport->framebuffer_shadowmap->bindTexture("depth", 3);
+                    //glActiveTexture(GL_TEXTURE3);
+                    //glBindTexture(GL_TEXTURE_2D, directionalLight->shadowTex);
                 }
             }
             libCore::ShaderManager::Get("combinePass")->setInt("deferredTexture", 0);
@@ -480,15 +488,6 @@ namespace libCore {
             ImGui::Text("IBL");
             ImGui::Checkbox("Enable IBL", &iblEnabled); // Checkbox para activar/desactivar IBL
             ImGui::SliderFloat("Intensity", &iblIntensity, 0.0f, 10.0f, "%.2f");
-            ImGui::SliderFloat("nearPlane ", &nearPlane, 0.0f, 1000.0f, "%.2f");
-            ImGui::SliderFloat("farPlane ", &farPlane, 0.0f, 1000.0f, "%.2f");
-
-            ImGui::SliderFloat("ambientStrength  ", &ibl->ambientStrength, 0.0f, 10.0f, "%.2f");
-            ImGui::SliderFloat("specularStrength  ", &ibl->specularStrength, 0.0f, 100.0f, "%.2f");
-            ImGui::SliderFloat("shininess  ", &ibl->shininess, 0.0f, 1000.0f, "%.2f");
-
-
-
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
             
             ImGui::Text("SSAO");
@@ -500,36 +499,36 @@ namespace libCore {
             ImGui::SliderFloat("Base Reflectivity", &F0Factor, 0.1f, 5.0f, "%.2f");
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
             
-            //ImGui::Text("Dynamic Skybox");
-            //ImGui::Dummy(ImVec2(0.0f, 5.0f));
-            //ImGui::Checkbox("Use Skybox Texture", &dynamicSkybox->useTexture);
-            //ImGui::ColorEdit3("dayLightColor", (float*)&dynamicSkybox->dayLightColor);
-            //ImGui::ColorEdit3("sunsetColor", (float*)&dynamicSkybox->sunsetColor);
-            //ImGui::ColorEdit3("dayNightColor", (float*)&dynamicSkybox->dayNightColor);
-            //ImGui::ColorEdit3("groundColor", (float*)&dynamicSkybox->groundColor);
-            //ImGui::Dummy(ImVec2(0.0f, 5.0f));
+            ImGui::Text("Dynamic Skybox");
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+            ImGui::Checkbox("Use Skybox Texture", &dynamicSkybox->useTexture);
+            ImGui::ColorEdit3("dayLightColor", (float*)&dynamicSkybox->dayLightColor);
+            ImGui::ColorEdit3("sunsetColor", (float*)&dynamicSkybox->sunsetColor);
+            ImGui::ColorEdit3("dayNightColor", (float*)&dynamicSkybox->dayNightColor);
+            ImGui::ColorEdit3("groundColor", (float*)&dynamicSkybox->groundColor);
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
             
 
 
-            //ImGui::Text("Sun");
-            //ImGui::DragFloat3("sunPosition", glm::value_ptr(dynamicSkybox->sunPosition), 0.001f);
-            //float sunDiskSizeValue = dynamicSkybox->m_sunDiskSize.x;  // Asumimos que todos los valores son iguales
-            //if (ImGui::SliderFloat("Sun disk size", &sunDiskSizeValue, 0.0f, 1.0f, "%.4f")) {
-            //    dynamicSkybox->m_sunDiskSize = glm::vec3(sunDiskSizeValue, sunDiskSizeValue, sunDiskSizeValue);
-            //}
-            //ImGui::SliderFloat("Sun disk m_gradientIntensity", &dynamicSkybox->m_gradientIntensity, 0.0f, 10.0f, "%.4f");
-            //ImGui::SliderFloat("Sun disk auraIntensity",       &dynamicSkybox->auraIntensity, 0.0f, 1.0f, "%.4f");
-            //ImGui::SliderFloat("Sun disk auraSize",            &dynamicSkybox->auraSize, 0.0f, 1.0f, "%.4f");
-            //ImGui::SliderFloat("Sun disk edgeSoftness",        &dynamicSkybox->edgeSoftness, 0.0001f, 0.1f, "%.4f");
-            //ImGui::Dummy(ImVec2(0.0f, 3.0f));
+            ImGui::Text("Sun");
+            ImGui::DragFloat3("sunPosition", glm::value_ptr(dynamicSkybox->sunPosition), 0.001f);
+            float sunDiskSizeValue = dynamicSkybox->m_sunDiskSize.x;  // Asumimos que todos los valores son iguales
+            if (ImGui::SliderFloat("Sun disk size", &sunDiskSizeValue, 0.0f, 1.0f, "%.4f")) {
+                dynamicSkybox->m_sunDiskSize = glm::vec3(sunDiskSizeValue, sunDiskSizeValue, sunDiskSizeValue);
+            }
+            ImGui::SliderFloat("Sun disk m_gradientIntensity", &dynamicSkybox->m_gradientIntensity, 0.0f, 10.0f, "%.4f");
+            ImGui::SliderFloat("Sun disk auraIntensity",       &dynamicSkybox->auraIntensity, 0.0f, 1.0f, "%.4f");
+            ImGui::SliderFloat("Sun disk auraSize",            &dynamicSkybox->auraSize, 0.0f, 1.0f, "%.4f");
+            ImGui::SliderFloat("Sun disk edgeSoftness",        &dynamicSkybox->edgeSoftness, 0.0001f, 0.1f, "%.4f");
+            ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
-            //ImGui::Text("Stars Settings");
-            //ImGui::SliderFloat("Star Density", &dynamicSkybox->starDensity, 0.0f, 0.01f, "%.5f");
-            //ImGui::SliderFloat("Star Size Min", &dynamicSkybox->starSizeMin, 0.0f, 1.0f, "%.4f");
-            //ImGui::SliderFloat("Star Size Max", &dynamicSkybox->starSizeMax, 0.0f, 2.0f, "%.4f");
-            //ImGui::SliderFloat("Star Brightness Min", &dynamicSkybox->starBrightnessMin, 0.0f, 1.0f, "%.4f");
-            //ImGui::SliderFloat("Star Brightness Max", &dynamicSkybox->starBrightnessMax, 0.0f, 1.0f, "%.4f");
-            //ImGui::DragFloat2("Star Coord Scale", glm::value_ptr(dynamicSkybox->starCoordScale), 0.1f, 0.0f, 200.0f, "%.4f");
+            ImGui::Text("Stars Settings");
+            ImGui::SliderFloat("Star Density", &dynamicSkybox->starDensity, 0.0f, 0.01f, "%.5f");
+            ImGui::SliderFloat("Star Size Min", &dynamicSkybox->starSizeMin, 0.0f, 1.0f, "%.4f");
+            ImGui::SliderFloat("Star Size Max", &dynamicSkybox->starSizeMax, 0.0f, 2.0f, "%.4f");
+            ImGui::SliderFloat("Star Brightness Min", &dynamicSkybox->starBrightnessMin, 0.0f, 1.0f, "%.4f");
+            ImGui::SliderFloat("Star Brightness Max", &dynamicSkybox->starBrightnessMax, 0.0f, 1.0f, "%.4f");
+            ImGui::DragFloat2("Star Coord Scale", glm::value_ptr(dynamicSkybox->starCoordScale), 0.1f, 0.0f, 200.0f, "%.4f");
             
             ImGui::End();
         }

@@ -60,6 +60,8 @@ namespace libCore
 
         // Shadow values
         int shadowMapResolution = 1024;
+/*        GLuint shadowFBO = 0;
+        GLuint shadowTex = 0*/;
 
         glm::mat4 shadowMVP = glm::mat4(1.0f);
         bool drawShadows = true;
