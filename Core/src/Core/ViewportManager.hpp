@@ -6,6 +6,7 @@
 #include "../tools/EditorCamera.h"
 #include "../tools/FPSCamera.h"
 #include "Renderer.hpp"
+
 namespace libCore
 {
     class ViewportManager {
@@ -30,84 +31,81 @@ namespace libCore
             {
                 viewport->camera = CreateScope<libCore::EditorCamera>(viewport->viewportSize.x, viewport->viewportSize.y, cameraPosition);
             }
-            
             //----------------------------------------------------------
 
 
             // G-Buffer
-            auto gbo = CreateScope<GBO>();
+            auto gbo = CreateRef<GBO>();
             gbo->init(viewport->viewportSize.x, viewport->viewportSize.y);
             viewport->gBuffer = std::move(gbo);
             //----------------------------------------------------------
 
 
+
             // F-Buffer Deferred + lighting
-            auto fbo0 = CreateScope<FBO>();
-            fbo0->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RGB16, "F-Buffer Deferred-lighting");
-            fbo0->addAttachment("color", GL_RGB16F, GL_RGB, GL_FLOAT);
-            fbo0->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT);
+            auto fbo0 = CreateRef<FBO>();
+            fbo0->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RGB16, "F-Buffer Deferred-lighting", true, false, false);
+            fbo0->addAttachment("color", GL_RGB16F, GL_RGB, GL_FLOAT, GL_COLOR_ATTACHMENT0);
+            fbo0->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_ATTACHMENT);
             fbo0->closeSetup();
             viewport->framebuffer_deferred = std::move(fbo0);
             //----------------------------------------------------------
 
             // F-Buffer Deferred + Forward 
-            auto fbo1 = CreateScope<FBO>();
-            fbo1->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RGB8, "F-Buffer Deferred-Forward");
-            fbo1->addAttachment("color", GL_RGB8, GL_RGB, GL_FLOAT);
-            fbo1->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT);
+            auto fbo1 = CreateRef<FBO>();
+            fbo1->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RGB8, "F-Buffer Deferred-Forward", true, false, false);
+            fbo1->addAttachment("color", GL_RGB8, GL_RGB, GL_FLOAT, GL_COLOR_ATTACHMENT0);
+            fbo1->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_ATTACHMENT);
             fbo1->closeSetup();
             viewport->framebuffer_forward = std::move(fbo1);
             //----------------------------------------------------------
 
             // F-Buffer Final
-            auto fbo2 = CreateScope<FBO>();
-            fbo2->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RGB8, "F-Buffer Final");
-            fbo2->addAttachment("color", GL_RGB8, GL_RGB, GL_FLOAT);
-            fbo2->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT);
+            auto fbo2 = CreateRef<FBO>();
+            fbo2->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RGB8, "F-Buffer Final", true, false, false);
+            fbo2->addAttachment("color", GL_RGB8, GL_RGB, GL_FLOAT, GL_COLOR_ATTACHMENT0);
+            fbo2->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_ATTACHMENT);
             fbo2->closeSetup();
             viewport->framebuffer_final = std::move(fbo2);
             //----------------------------------------------------------
 
             // F-Buffer HDR
-            auto fbo3 = CreateScope<FBO>();
-            fbo3->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RGB16F, "F-Buffer HDR"); // Este buffer tiene una coma flotante más grande porque es para HDR
-            fbo3->addAttachment("color", GL_RGB16F, GL_RGB, GL_FLOAT);
-            fbo3->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT);
+            auto fbo3 = CreateRef<FBO>();
+            fbo3->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RGB16F, "F-Buffer HDR", true, false, false); // Este buffer tiene una coma flotante más grande porque es para HDR
+            fbo3->addAttachment("color", GL_RGB16F, GL_RGB, GL_FLOAT, GL_COLOR_ATTACHMENT0);
+            fbo3->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_ATTACHMENT);
             fbo3->closeSetup();
             viewport->framebuffer_HDR = std::move(fbo3);
             //----------------------------------------------------------
 
             // F-Buffer SSAO
-            auto fbo4 = CreateScope<FBO>();
-            fbo4->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RED, "F-Buffer SSAO");
-            fbo4->addAttachment("color", GL_RED, GL_RED, GL_FLOAT);
-            fbo4->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT);
+            auto fbo4 = CreateRef<FBO>();
+            fbo4->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RED, "F-Buffer SSAO", true, false, false);
+            fbo4->addAttachment("color", GL_RED, GL_RED, GL_FLOAT, GL_COLOR_ATTACHMENT0);
+            fbo4->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_ATTACHMENT);
             fbo4->closeSetup();
             viewport->framebuffer_SSAO = std::move(fbo4);
             //----------------------------------------------------------
 
             // F-Buffer SSAO-BLUR
-            auto fbo5 = CreateScope<FBO>();
-            fbo5->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RED, "F-Buffer SSAO-BLUR");
-            fbo5->addAttachment("color", GL_RED, GL_RED, GL_FLOAT);
-            fbo5->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT);
+            auto fbo5 = CreateRef<FBO>();
+            fbo5->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RED, "F-Buffer SSAO-BLUR", true, false, false);
+            fbo5->addAttachment("color", GL_RED, GL_RED, GL_FLOAT, GL_COLOR_ATTACHMENT0);
+            fbo5->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_ATTACHMENT);
             fbo5->closeSetup();
             viewport->framebuffer_SSAOBlur = std::move(fbo5);
             //----------------------------------------------------------
 
-
-            //// Directional Light ShadowMap
-            //auto fbo6 = CreateScope<FBO>();
-            //fbo6->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RGB16F, "Directional Light ShadowMap");
-            //fbo6->addAttachment("color", GL_RGB16F, GL_RGB, GL_FLOAT);
-            //fbo6->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT);
-            //fbo6->closeSetup();
-            //viewport->framebuffer_shadowmap = std::move(fbo6);
-            ////----------------------------------------------------------
+            // F-Buffer ShadowMap
+            auto fbo6 = CreateRef<FBO>();
+            fbo6->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_DEPTH_COMPONENT, "Directional Light ShadowMap", true, false, false);
+            fbo6->addAttachment("depth", GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_ATTACHMENT);
+            fbo6->closeSetup();
+            viewport->framebuffer_shadowmap = std::move(fbo6);
+            //----------------------------------------------------------
 
             // Add Viewport to collection
             viewports.push_back(std::move(viewport));
-   
         }
 
         GLuint CubemapFaceTo2DTexture(GLuint cubemap, GLenum face, int width, int height, GLuint captureFBO)
@@ -163,61 +161,27 @@ namespace libCore
                 ImGui::Image((void*)(intptr_t)gSpecularTexture, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
             }
 
-            if (ImGui::CollapsingHeader("IBL"))
-            {
-                ImGui::Text("envCubemapTexture");
-                ImGui::Image((void*)(intptr_t)Renderer::getInstance().ibl->envCubemap, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
-
-                ImGui::Text("irradianceMap");
-                ImGui::Image((void*)(intptr_t)Renderer::getInstance().ibl->irradianceMap, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
-
-                ImGui::Text("prefilterMap");
-                ImGui::Image((void*)(intptr_t)Renderer::getInstance().ibl->prefilterMap, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
-
-                ImGui::Text("brdfLUTTexture");
-                ImGui::Image((void*)(intptr_t)Renderer::getInstance().ibl->brdfLUTTexture, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
-            }
-
-
             //if (ImGui::CollapsingHeader("IBL"))
             //{
-            //    // Crear un framebuffer de captura si no existe
-            //    static GLuint captureFBO = 0;
-            //    if (captureFBO == 0) {
-            //        glGenFramebuffers(1, &captureFBO);
-            //    }
+            //    ImGui::Text("envCubemapTexture");
+            //    ImGui::Image((void*)(intptr_t)Renderer::getInstance().ibl->envCubemap, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
 
-            //    // Mostrar las caras de las texturas cúbicas
-            //    for (int i = 0; i < 6; ++i) {
-            //        std::string label = "envCubemap Face " + std::to_string(i);
-            //        GLuint envCubemap2D = CubemapFaceTo2DTexture(Renderer::getInstance().ibl->envCubemap, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 256, 256, captureFBO);
-            //        ImGui::Text(label.c_str());
-            //        ImGui::Image((void*)(intptr_t)envCubemap2D, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
-            //    }
+            //    ImGui::Text("irradianceMap");
+            //    ImGui::Image((void*)(intptr_t)Renderer::getInstance().ibl->irradianceMap, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
 
-            //    for (int i = 0; i < 6; ++i) {
-            //        std::string label = "irradianceMap Face " + std::to_string(i);
-            //        GLuint irradianceMap2D = CubemapFaceTo2DTexture(Renderer::getInstance().ibl->irradianceMap, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 256, 256, captureFBO);
-            //        ImGui::Text(label.c_str());
-            //        ImGui::Image((void*)(intptr_t)irradianceMap2D, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
-            //    }
-
-            //    for (int i = 0; i < 6; ++i) {
-            //        std::string label = "prefilterMap Face " + std::to_string(i);
-            //        GLuint prefilterMap2D = CubemapFaceTo2DTexture(Renderer::getInstance().ibl->prefilterMap, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 256, 256, captureFBO);
-            //        ImGui::Text(label.c_str());
-            //        ImGui::Image((void*)(intptr_t)prefilterMap2D, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
-            //    }
+            //    ImGui::Text("prefilterMap");
+            //    ImGui::Image((void*)(intptr_t)Renderer::getInstance().ibl->prefilterMap, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
 
             //    ImGui::Text("brdfLUTTexture");
             //    ImGui::Image((void*)(intptr_t)Renderer::getInstance().ibl->brdfLUTTexture, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
             //}
 
-
-
-
             if (ImGui::CollapsingHeader("Framebuffers")) 
             {
+                GLuint shadowMapTexture = viewports[0]->framebuffer_shadowmap->getTexture("depth");
+                ImGui::Text("Shadow Map Texture");
+                ImGui::Image((void*)(intptr_t)shadowMapTexture, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));
+
                 GLuint ssaoBlurTexture = viewports[0]->framebuffer_SSAOBlur->getTexture("color");
                 ImGui::Text("SSAO Blur Texture");
                 ImGui::Image((void*)(intptr_t)ssaoBlurTexture, ImVec2(256, 256), ImVec2(0, 1), ImVec2(1, 0));

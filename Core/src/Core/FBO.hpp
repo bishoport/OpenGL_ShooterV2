@@ -4,43 +4,67 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include <vector>
 
 namespace libCore {
 
     class FBO {
     public:
-
         std::string nameFBO = "";
 
-        FBO() : framebuffer(0), fboWidth(0), fboHeight(0), internalFormat(GL_RGB8) {}
+        FBO() : framebuffer(0), fboWidth(0), fboHeight(0), internalFormat(GL_RGB8),
+            enableDepth(false), enableStencil(false), enableRBO(false) {}
 
         ~FBO() {
             cleanup();
         }
 
-        void init(int width, int height, GLenum internalFormat, std::string name) {
+        void init(int width, int height, GLenum internalFormat, std::string name,
+            bool enableDepth = false, bool enableStencil = false, bool enableRBO = false) {
             nameFBO = name;
             fboWidth = width;
             fboHeight = height;
             this->internalFormat = internalFormat;
+            this->enableDepth = enableDepth;
+            this->enableStencil = enableStencil;
+            this->enableRBO = enableRBO;
+
+            glGenFramebuffers(1, &framebuffer);
+            bindFBO();
+
+            if (enableRBO) {
+                setupRBO();
+            }
         }
 
-        void addAttachment(const std::string& name, GLenum internalFormat, GLenum format, GLenum type) {
+        void addAttachment(const std::string& name, GLenum internalFormat, GLenum format, GLenum type, GLenum attachmentType = GL_COLOR_ATTACHMENT0) {
             GLuint texture;
             glGenTextures(1, &texture);
             glBindTexture(GL_TEXTURE_2D, texture);
             glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, fboWidth, fboHeight, 0, format, type, nullptr);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            setTextureParameters(attachmentType);
+
+            if (attachmentType == GL_COLOR_ATTACHMENT0) {
+                colorAttachments.push_back(texture);
+            }
+            glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, GL_TEXTURE_2D, texture, 0);
             attachments[name] = texture;
+
+            if (attachmentType != GL_DEPTH_ATTACHMENT && attachmentType != GL_STENCIL_ATTACHMENT && attachmentType != GL_DEPTH_STENCIL_ATTACHMENT) {
+                drawBuffers.push_back(attachmentType);
+            }
         }
 
-        void closeSetup()
-        {
-            setupFBO();
-            //checkFBOStatus();
+        void closeSetup() {
+            if (!enableRBO && !drawBuffers.empty()) {
+                glDrawBuffers(drawBuffers.size(), drawBuffers.data());
+            }
+            else {
+                glDrawBuffer(GL_NONE);
+                glReadBuffer(GL_NONE);
+            }
+            checkFBOStatus();
+            unbindFBO();
         }
 
         void bindFBO() const {
@@ -77,70 +101,88 @@ namespace libCore {
             fboHeight = newHeight;
 
             bindFBO();
-            // Resize color attachment
-            glBindTexture(GL_TEXTURE_2D, attachments["color"]);
-            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, fboWidth, fboHeight, 0, GL_RGB, GL_FLOAT, nullptr);
-
-            // Resize depth attachment
-            glBindTexture(GL_TEXTURE_2D, attachments["depth"]);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, fboWidth, fboHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-
+            for (const auto& attachment : attachments) {
+                glBindTexture(GL_TEXTURE_2D, attachment.second);
+                if (attachment.first == "depth") {
+                    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, fboWidth, fboHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+                }
+                else {
+                    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, fboWidth, fboHeight, 0, GL_RGB, GL_FLOAT, nullptr);
+                }
+            }
             unbindFBO();
         }
+
 
     private:
         GLuint framebuffer;
         std::map<std::string, GLuint> attachments;
+        std::vector<GLuint> colorAttachments;
+        std::vector<GLenum> drawBuffers;
         int fboWidth, fboHeight;
         GLenum internalFormat;
+        bool enableDepth;
+        bool enableStencil;
+        bool enableRBO;
 
-        void setupFBO() {
-            glGenFramebuffers(1, &framebuffer);
-            bindFBO();
-            setupAttachments();
+        GLuint rboDepthId;
+        GLuint rboStencilId;
+
+        void setTextureParameters(GLenum attachmentType) const {
+            if (attachmentType == GL_DEPTH_ATTACHMENT) {
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+                float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+                glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+            }
+            else {
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            }
         }
 
-        void setupAttachments() {
-            // Color attachment
-            GLuint colorAttachment;
-            glGenTextures(1, &colorAttachment);
-            glBindTexture(GL_TEXTURE_2D, colorAttachment);
-            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, fboWidth, fboHeight, 0, GL_RGB, GL_FLOAT, nullptr);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorAttachment, 0);
-            attachments["color"] = colorAttachment;
+        void setupRBO() {
+            if (enableDepth) {
+                glGenRenderbuffers(1, &rboDepthId);
+                glBindRenderbuffer(GL_RENDERBUFFER, rboDepthId);
+                glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, fboWidth, fboHeight);
+                glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepthId);
+            }
 
-            // Depth attachment
-            GLuint depthAttachment;
-            glGenTextures(1, &depthAttachment);
-            glBindTexture(GL_TEXTURE_2D, depthAttachment);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, fboWidth, fboHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthAttachment, 0);
-            attachments["depth"] = depthAttachment;
-
-            // Set draw buffers
-            GLenum drawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
-            glDrawBuffers(1, drawBuffers);
-
-            unbindFBO();
+            if (enableStencil) {
+                glGenRenderbuffers(1, &rboStencilId);
+                glBindRenderbuffer(GL_RENDERBUFFER, rboStencilId);
+                glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, fboWidth, fboHeight);
+                glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboStencilId);
+            }
         }
 
         void cleanup() {
-            for (auto& attachment : attachments) {
+            for (const auto& attachment : attachments) {
                 glDeleteTextures(1, &attachment.second);
             }
-            glDeleteFramebuffers(1, &framebuffer);
+            if (framebuffer != 0) {
+                glDeleteFramebuffers(1, &framebuffer);
+                framebuffer = 0;
+            }
+            if (rboDepthId != 0) {
+                glDeleteRenderbuffers(1, &rboDepthId);
+                rboDepthId = 0;
+            }
+            if (rboStencilId != 0) {
+                glDeleteRenderbuffers(1, &rboStencilId);
+                rboStencilId = 0;
+            }
         }
 
         void checkFBOStatus() const {
-            bindFBO();
             if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
                 std::cerr << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
             }
-            unbindFBO();
         }
     };
 }
