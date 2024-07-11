@@ -97,10 +97,17 @@ namespace libCore {
             glPopDebugGroup();
         }
 
+        // Función recursiva para dibujar los AABB de los modelos
+        void DrawModelAABB(const Ref<libCore::Model>& model, const std::string& shader) {
+            model->DrawAABB(shader);
+            // Llamada recursiva para los modelos hijos
+            for (const auto& child : model->childs) {
+                DrawModelAABB(child, shader);
+            }
+        }
 
 
-
-        void RenderViewport(const Ref<Viewport>& viewport, const Timestep& m_deltaTime, const std::vector<Ref<libCore::ModelContainer>>& modelsInScene) {
+        void RenderViewport(const Ref<Viewport>& viewport, const Timestep& m_deltaTime, const std::vector<Ref<libCore::Model>>& modelsInScene) {
 
             if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_P)) 
             {
@@ -136,8 +143,8 @@ namespace libCore {
 
 
             //--------------------------------------------------------------------------------
-    //-----------------------DIRECTIONAL LIGHT SHADOW PASS----------------------------
-    //--------------------------------------------------------------------------------
+            //-----------------------DIRECTIONAL LIGHT SHADOW PASS----------------------------
+            //--------------------------------------------------------------------------------
             auto& directionalLight = LightsManager::GetInstance().GetDirectionalLight();
 
             if (directionalLight != nullptr && directionalLight->drawShadows) {
@@ -224,7 +231,6 @@ namespace libCore {
             ////--------------------------------------------------------------------------------
             if (ssaoEnabled) 
             {
-
                 // Renderizado SSAO
                 PushDebugGroup("SSAO Pass");
 
@@ -402,10 +408,10 @@ namespace libCore {
             //------------------------------------------------------------------------------------------
 
             //DEBUG AABB
-            for (auto& modelContainer : modelsInScene)
-            {
-               // modelContainer->DrawAABB("debug");
+            for (auto& model : modelsInScene) {
+                DrawModelAABB(model, "debug");
             }
+
             //------------------------------------------------------------------------------------------
             
             // PASADA DE TEXTOS

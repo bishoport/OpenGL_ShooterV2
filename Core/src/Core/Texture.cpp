@@ -1,6 +1,7 @@
-#include"Texture.h"
+#include "Texture.h"
 #include <stdexcept>
 #include <iostream>
+
 
 namespace libCore
 {
@@ -21,13 +22,23 @@ namespace libCore
             return;
         }
 
+        //std::cout << "Image loaded successfully: " << image << std::endl;
+        //std::cout << "Width: " << widthImg << ", Height: " << heightImg << ", Channels: " << numColCh << std::endl;
+
         // Generates an OpenGL texture object
         glGenTextures(1, &ID);
+        if (glGetError() != GL_NO_ERROR) {
+            std::cerr << "Failed to generate texture ID" << std::endl;
+            stbi_image_free(bytes);
+            return;
+        }
+
         // Assigns the texture to a Texture Unit
         glActiveTexture(GL_TEXTURE0 + slot);
         m_unit = slot;
         glBindTexture(GL_TEXTURE_2D, ID);
 
+        // Set the texture parameters
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -42,10 +53,20 @@ namespace libCore
             format = GL_RGBA;
 
         glTexImage2D(GL_TEXTURE_2D, 0, format, widthImg, heightImg, 0, format, GL_UNSIGNED_BYTE, bytes);
+        if (glGetError() != GL_NO_ERROR) {
+            std::cerr << "Failed to set texture image" << std::endl;
+            stbi_image_free(bytes);
+            return;
+        }
+
         glGenerateMipmap(GL_TEXTURE_2D);
+        if (glGetError() != GL_NO_ERROR) {
+            std::cerr << "Failed to generate mipmaps" << std::endl;
+            stbi_image_free(bytes);
+            return;
+        }
 
         glBindTexture(GL_TEXTURE_2D, 0);
-
         stbi_image_free(bytes);
     }
 
@@ -85,13 +106,13 @@ namespace libCore
         //     libCore::ShaderManager::Get(shader)->setInt("aoTexture", m_unit);
     }
 
-	void Texture::Unbind()
-	{
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
+    void Texture::Unbind()
+    {
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 
-	void Texture::Delete()
-	{
-		glDeleteTextures(1, &ID);
-	}
+    void Texture::Delete()
+    {
+        glDeleteTextures(1, &ID);
+    }
 }

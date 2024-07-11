@@ -10,10 +10,24 @@ namespace libCore
 {
     namespace fs = std::filesystem;
 
-    Ref<ModelContainer> ModelLoader::LoadModel(ImportModelData importOptions)
+
+    std::string getFileName(const std::string& path) {
+        size_t lastSlash = path.find_last_of("\\/");
+        if (lastSlash == std::string::npos) {
+            return path; // No hay ningún separador, toda la cadena es el nombre del archivo
+        }
+        return path.substr(lastSlash + 1);
+    }
+
+
+
+
+
+
+    Ref<Model> ModelLoader::LoadModel(ImportModelData importOptions)
     {
-        auto modelContainer = CreateRef<ModelContainer>();
-             modelContainer->skeletal = importOptions.skeletal;
+        auto modelParent = CreateRef<Model>();
+             modelParent->skeletal = importOptions.skeletal;
 
         Assimp::Importer importer;
         std::string completePath = importOptions.filePath + importOptions.fileName;
@@ -26,38 +40,32 @@ namespace libCore
 
         if (importOptions.invertUV == true) flags |= aiProcess_FlipUVs;
 
-
         const aiScene* scene = importer.ReadFile(completePath, flags);
 
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
             std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-            //throw std::runtime_error("Failed to load model");
-            return modelContainer;
+            return modelParent;
         }
 
         aiMatrix4x4 nodeTransform = scene->mRootNode->mTransformation;
-        modelContainer->name = importOptions.fileName;
+        modelParent->name = importOptions.fileName;
 
-        ModelLoader::processNode(scene->mRootNode, scene, modelContainer, nodeTransform, importOptions);
+        ModelLoader::processNode(scene->mRootNode, scene, modelParent, nodeTransform, importOptions);
 
         if (importOptions.processLights == true)
         {
-            ModelLoader::processLights(scene, modelContainer);
+            ModelLoader::processLights(scene);
         }
         
-        return modelContainer;
+        return modelParent;
     }
 
-    std::string getFileName(const std::string& path) {
-        size_t lastSlash = path.find_last_of("\\/");
-        if (lastSlash == std::string::npos) {
-            return path; // No hay ningún separador, toda la cadena es el nombre del archivo
-        }
-        return path.substr(lastSlash + 1);
-    }
+    
+
+
 
     //------------------------------------STANDARD MODELS---------------------------
-    void ModelLoader::processNode(aiNode* node, const aiScene* scene, Ref<ModelContainer> modelContainer, aiMatrix4x4 _nodeTransform, ImportModelData importOptions)
+    void ModelLoader::processNode(aiNode* node, const aiScene* scene, Ref<Model> modelParent, aiMatrix4x4 _nodeTransform, ImportModelData importOptions)
     {
         glm::mat4 glmNodeTransform = aiMatrix4x4ToGlm(_nodeTransform);
         glm::mat4 glmNodeTransformation = aiMatrix4x4ToGlm(node->mTransformation);
@@ -70,26 +78,37 @@ namespace libCore
         glm::mat4 glmFinalTransform = rotationX * scaleMatrix * glmNodeTransform * glmNodeTransformation;
         aiMatrix4x4 finalTransform = glmToAiMatrix4x4(glmFinalTransform);
 
-        for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-            aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-            auto modelBuild = CreateRef<Model>();
 
-            if (modelContainer->skeletal == false)
+        for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+
+            aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+
+            auto modelChild = CreateRef<Model>();
+
+            // Aquí establecemos la relación padre-hijo
+            modelChild->modelParent = modelParent;
+
+            // Asignar el nombre del nodo de Assimp al modelo
+            modelChild->name = node->mName.C_Str();
+
+            if (modelParent->skeletal == false)
             {
-                processMesh(mesh, scene, modelBuild, finalTransform, importOptions, i);
+                processMesh(mesh, scene, modelChild, finalTransform, importOptions, i);
             }
             else
             {
-                processSkeletalMesh(mesh, scene, modelBuild, finalTransform, importOptions, i);
+                processSkeletalMesh(mesh, scene, modelChild, finalTransform, importOptions, i);
             }
             
-            processMaterials(mesh, scene, modelBuild, importOptions);
+            processMaterials(mesh, scene, modelChild, importOptions);
 
-            modelContainer->models.push_back(modelBuild);
+            modelParent->childs.push_back(modelChild);
         }
 
-        for (unsigned int i = 0; i < node->mNumChildren; i++) {
-            ModelLoader::processNode(node->mChildren[i], scene, modelContainer, finalTransform, importOptions); // Asegúrate de pasar `finalTransform`
+
+        for (unsigned int i = 0; i < node->mNumChildren; i++) 
+        {
+            ModelLoader::processNode(node->mChildren[i], scene, modelParent, finalTransform, importOptions);
         }
     }
     void ModelLoader::processMesh(aiMesh* mesh, const aiScene* scene, Ref<Model> modelBuild, aiMatrix4x4 finalTransform, ImportModelData importOptions, int meshIndex)
@@ -340,53 +359,36 @@ namespace libCore
     }
     //------------------------------------------------------------------------------
 
-    //-----------------------------------FEATURES PROCESS---------------------------
-    void ModelLoader::processLights(const aiScene* scene, Ref<ModelContainer> modelContainer)
+
+
+    //-------------------------------------TOOLS---------------------------
+    glm::mat4 ModelLoader::aiMatrix4x4ToGlm(const aiMatrix4x4& from)
     {
-        for (unsigned int i = 0; i < scene->mNumLights; i++) {
+        glm::mat4 to;
 
-            aiLight* ai_light = scene->mLights[i];
+        // Transponer y convertir a glm
+        to[0][0] = from.a1; to[1][0] = from.a2; to[2][0] = from.a3; to[3][0] = from.a4;
+        to[0][1] = from.b1; to[1][1] = from.b2; to[2][1] = from.b3; to[3][1] = from.b4;
+        to[0][2] = from.c1; to[1][2] = from.c2; to[2][2] = from.c3; to[3][2] = from.c4;
+        to[0][3] = from.d1; to[1][3] = from.d2; to[2][3] = from.d3; to[3][3] = from.d4;
 
-            // Find the node that corresponds to the light
-            aiNode* lightNode = scene->mRootNode->FindNode(ai_light->mName);
-
-            // Get the transformation matrix of the node
-            aiMatrix4x4 transform = lightNode->mTransformation;
-
-            // Apply parent node transformations
-            aiNode* parentNode = lightNode->mParent;
-            
-            while (parentNode != nullptr) {
-                transform = parentNode->mTransformation * transform;
-                parentNode = parentNode->mParent;
-            }
-
-            // Transform the light position
-            aiVector3D position = ai_light->mPosition;
-            position *= transform;
-
-
-            //LightType lightType;
-            std::string lightName(ai_light->mName.C_Str());
-
-
-            if (lightName.find("Point") != std::string::npos) {
-                libCore::LightsManager::CreateLight(true, libCore::LightType::POINT, glm::vec3(position.x, position.z, position.y));
-            }
-            else if (lightName.find("Spot") != std::string::npos) {
-                libCore::LightsManager::CreateLight(true, libCore::LightType::SPOT, glm::vec3(position.x, position.y, position.z));
-            }
-            else if (lightName.find("Area") != std::string::npos) {
-                libCore::LightsManager::CreateLight(true, libCore::LightType::AREA, glm::vec3(position.x, position.y, position.z));
-            }
-            else
-            {
-                std::cerr << "Unknown light type: " << lightName << std::endl;
-                continue;
-            }
-        }
+        return to;
     }
-    //------------------------------------------------------------------------------
+    aiMatrix4x4 ModelLoader::glmToAiMatrix4x4(const glm::mat4& from)
+    {
+        aiMatrix4x4 to;
+
+        // Transponer y convertir a Assimp
+        to.a1 = from[0][0]; to.a2 = from[1][0]; to.a3 = from[2][0]; to.a4 = from[3][0];
+        to.b1 = from[0][1]; to.b2 = from[1][1]; to.b3 = from[2][1]; to.b4 = from[3][1];
+        to.c1 = from[0][2]; to.c2 = from[1][2]; to.c3 = from[2][2]; to.c4 = from[3][2];
+        to.d1 = from[0][3]; to.d2 = from[1][3]; to.d3 = from[2][3]; to.d4 = from[3][3];
+
+        return to;
+    }
+    //-----------------------------------------------------------------------
+
+
 
     //------------------------------------SKELETAL MODELS---------------------------
     void ModelLoader::processSkeletalMesh(aiMesh* mesh, const aiScene* scene, Ref<Model> modelBuild, aiMatrix4x4 finalTransform, ImportModelData importOptions, int meshIndex)
@@ -576,31 +578,52 @@ namespace libCore
     }
     //-----------------------------------------------------------------------
 
-
-    //-------------------------------------TOOLS---------------------------
-    glm::mat4 ModelLoader::aiMatrix4x4ToGlm(const aiMatrix4x4& from)
+    //-----------------------------------FEATURES PROCESS---------------------------
+    void ModelLoader::processLights(const aiScene* scene)
     {
-        glm::mat4 to;
+        for (unsigned int i = 0; i < scene->mNumLights; i++) {
 
-        // Transponer y convertir a glm
-        to[0][0] = from.a1; to[1][0] = from.a2; to[2][0] = from.a3; to[3][0] = from.a4;
-        to[0][1] = from.b1; to[1][1] = from.b2; to[2][1] = from.b3; to[3][1] = from.b4;
-        to[0][2] = from.c1; to[1][2] = from.c2; to[2][2] = from.c3; to[3][2] = from.c4;
-        to[0][3] = from.d1; to[1][3] = from.d2; to[2][3] = from.d3; to[3][3] = from.d4;
+            aiLight* ai_light = scene->mLights[i];
 
-        return to;
+            // Find the node that corresponds to the light
+            aiNode* lightNode = scene->mRootNode->FindNode(ai_light->mName);
+
+            // Get the transformation matrix of the node
+            aiMatrix4x4 transform = lightNode->mTransformation;
+
+            // Apply parent node transformations
+            aiNode* parentNode = lightNode->mParent;
+
+            while (parentNode != nullptr) {
+                transform = parentNode->mTransformation * transform;
+                parentNode = parentNode->mParent;
+            }
+
+            // Transform the light position
+            aiVector3D position = ai_light->mPosition;
+            position *= transform;
+
+
+            //LightType lightType;
+            std::string lightName(ai_light->mName.C_Str());
+
+
+            if (lightName.find("Point") != std::string::npos) {
+                libCore::LightsManager::CreateLight(true, libCore::LightType::POINT, glm::vec3(position.x, position.z, position.y));
+            }
+            else if (lightName.find("Spot") != std::string::npos) {
+                libCore::LightsManager::CreateLight(true, libCore::LightType::SPOT, glm::vec3(position.x, position.y, position.z));
+            }
+            else if (lightName.find("Area") != std::string::npos) {
+                libCore::LightsManager::CreateLight(true, libCore::LightType::AREA, glm::vec3(position.x, position.y, position.z));
+            }
+            else
+            {
+                std::cerr << "Unknown light type: " << lightName << std::endl;
+                continue;
+            }
+        }
     }
-    aiMatrix4x4 ModelLoader::glmToAiMatrix4x4(const glm::mat4& from)
-    {
-        aiMatrix4x4 to;
-
-        // Transponer y convertir a Assimp
-        to.a1 = from[0][0]; to.a2 = from[1][0]; to.a3 = from[2][0]; to.a4 = from[3][0];
-        to.b1 = from[0][1]; to.b2 = from[1][1]; to.b3 = from[2][1]; to.b4 = from[3][1];
-        to.c1 = from[0][2]; to.c2 = from[1][2]; to.c3 = from[2][2]; to.c4 = from[3][2];
-        to.d1 = from[0][3]; to.d2 = from[1][3]; to.d3 = from[2][3]; to.d4 = from[3][3];
-
-        return to;
-    }
-    //-----------------------------------------------------------------------
+    //------------------------------------------------------------------------------
+    
 }

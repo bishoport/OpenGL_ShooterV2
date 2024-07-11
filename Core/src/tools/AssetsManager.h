@@ -8,6 +8,7 @@ namespace libCore
 	class AssetsManager
 	{
 	public:
+
 		// Método para obtener la instancia de la clase
 		static AssetsManager& GetInstance() {
 			static AssetsManager instance;

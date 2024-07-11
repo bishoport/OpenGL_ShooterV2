@@ -27,48 +27,48 @@ namespace libCore
 	};
 
 
-	struct ModelContainer
-	{
-		std::string name;
-		std::vector<Ref<Model>> models;
-		bool skeletal = false;
+	//struct ModelContainer
+	//{
+	//	std::string name;
+	//	std::vector<Ref<Model>> models;
+	//	bool skeletal = false;
 
-		std::vector<Ref<Light>> lights;
+	//	std::vector<Ref<Light>> lights;
 
-		void Draw(const std::string& shader)
-		{
-			for (auto& model : models)
-			{
-				
-				model->Draw(shader);
-			}
-		}
+	//	void Draw(const std::string& shader)
+	//	{
+	//		for (auto& model : models)
+	//		{
+	//			
+	//			model->Draw(shader);
+	//		}
+	//	}
 
-		void DrawAABB(const std::string& shader)
-		{
-			for (auto& model : models)
-			{
+	//	void DrawAABB(const std::string& shader)
+	//	{
+	//		for (auto& model : models)
+	//		{
 
-				model->DrawAABB(shader);
-			}
-		}
+	//			model->DrawAABB(shader);
+	//		}
+	//	}
 
-		Ref<Model> UnifyMeshes() {
-			auto unifiedModel = CreateRef<Model>();
+	//	Ref<Model> UnifyMeshes() {
+	//		auto unifiedModel = CreateRef<Model>();
 
-			for (const auto& model : models) {
-				unifiedModel->meshes.insert(unifiedModel->meshes.end(), model->meshes.begin(), model->meshes.end());
-				// Unir los mapas de huesos.
-				for (const auto& [boneName, boneInfo] : model->GetBoneInfoMap()) {
-					if (unifiedModel->GetBoneInfoMap().find(boneName) == unifiedModel->GetBoneInfoMap().end()) {
-						unifiedModel->GetBoneInfoMap()[boneName] = boneInfo;
-					}
-				}
-				unifiedModel->GetBoneCount() += model->GetBoneCount();
-			}
-			return unifiedModel;
-		}
-	};
+	//		for (const auto& model : models) {
+	//			unifiedModel->meshes.insert(unifiedModel->meshes.end(), model->meshes.begin(), model->meshes.end());
+	//			// Unir los mapas de huesos.
+	//			for (const auto& [boneName, boneInfo] : model->GetBoneInfoMap()) {
+	//				if (unifiedModel->GetBoneInfoMap().find(boneName) == unifiedModel->GetBoneInfoMap().end()) {
+	//					unifiedModel->GetBoneInfoMap()[boneName] = boneInfo;
+	//				}
+	//			}
+	//			unifiedModel->GetBoneCount() += model->GetBoneCount();
+	//		}
+	//		return unifiedModel;
+	//	}
+	//};
 
 
 
@@ -81,12 +81,12 @@ namespace libCore
 	class ModelLoader 
 	{
 	public:
-		static Ref<ModelContainer> LoadModel(ImportModelData importOptions);
+		static Ref<Model> LoadModel(ImportModelData importOptions);
 
 	private:
 
 		//Standard
-		static void processNode(aiNode* node, const aiScene* scene, Ref<ModelContainer> modelContainer, aiMatrix4x4 _nodeTransform, ImportModelData importOptions);
+		static void processNode(aiNode* node, const aiScene* scene, Ref<Model> modelParent, aiMatrix4x4 _nodeTransform, ImportModelData importOptions);
 		static void processMesh(aiMesh* mesh, const aiScene* scene, Ref<Model> modelBuild, aiMatrix4x4 finalTransform, ImportModelData importOptions, int meshIndex);
 		static void processMaterials(aiMesh* mesh, const aiScene* scene, Ref<Model> modelBuild, ImportModelData importOptions);
 
@@ -97,7 +97,7 @@ namespace libCore
 		static void SetVertexBoneData(Vertex& vertex, int boneID, float weight);
 
 		//Process Features
-		static void processLights(const aiScene* scene, Ref<ModelContainer> modelContainer);
+		static void processLights(const aiScene* scene);
 
 		//Tools
 		static glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4& from);

@@ -10,19 +10,24 @@
 
 
 
+
 namespace libCore
 {
-	//MANAGERS
+	//--MANAGERS
 	Scope<GuiLayer> guiLayer = nullptr; //esto se declara en el cpp porque si se pone en el h, hay errores de includes cíclicos
 	Scope<ViewportManager> viewportManager = nullptr; //esto se declara en el cpp porque si se pone en el h, hay errores de includes cíclicos
-	Scope<RoofGenerator> roofGenerator = nullptr;
-	//Scope<Renderer> renderer = nullptr;
+	//Scope<RoofGenerator> roofGenerator = nullptr;
+	// -------------------------------------------------
+	// -------------------------------------------------
 	
-
+	// Size callback function
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	{
 		EventManager::OnWindowResizeEvent().trigger(width, height);
 	}
+	// -------------------------------------------------
+	// -------------------------------------------------
+
 
 	// Message callback function
 	void GLAPIENTRY MessageCallback(GLenum source,
@@ -47,6 +52,8 @@ namespace libCore
 			std::cout << "GL NOTIFICATION: " << message << std::endl;
 		}
 	}
+	// -------------------------------------------------
+	// -------------------------------------------------
 
 
 	//--INIT & LIFE CYCLE
@@ -193,7 +200,7 @@ namespace libCore
 		//---------------------------------------------------------------------------
 
 		//-- ROOF GENERATOR
-		roofGenerator = CreateScope<RoofGenerator>();
+		//roofGenerator = CreateScope<RoofGenerator>();
 		//---------------------------------------------------------------------------
 
 		// -- RENDERER
@@ -271,7 +278,7 @@ namespace libCore
 			//-------------------------------------------
 
 			//--UPDATES
-			UpdateAfterRender();
+			UpdateBeforeRender();
 			//-------------------------------------------
 			
 
@@ -282,6 +289,16 @@ namespace libCore
 			//-- ImGUI
 			if (useImGUI)
 			{
+				// En tu bucle principal o en el manejo de eventos
+				if (ImGui::IsAnyItemHovered() || ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
+				{
+					mouseInImGUI = true;
+				}
+				else
+				{
+					mouseInImGUI = false;
+				}
+
 				guiLayer->begin();
 				guiLayer->renderMainMenuBar();
 				guiLayer->renderDockers();
@@ -310,6 +327,24 @@ namespace libCore
 	// -------------------------------------------------
 	// -------------------------------------------------
 
+
+	//--VIEWPORTS
+	void EngineOpenGL::CreateViewport(std::string name, glm::vec3 cameraPosition, CAMERA_CONTROLLERS controller)
+	{
+		viewportManager->CreateViewport(name, cameraPosition, windowWidth, windowHeight, controller);
+	}
+	void EngineOpenGL::RenderViewports()
+	{
+		//RENDERING
+		Renderer::getInstance().RenderViewport(viewportManager->viewports[currentViewport], m_deltaTime, modelsInScene);
+		Renderer::getInstance().ShowViewportInQuad(viewportManager->viewports[currentViewport]);
+		//-------------------------------------------
+	}
+	// -------------------------------------------------
+	// -------------------------------------------------
+
+
+	//--UPDATES
 	bool rayIntersectsBoundingBox(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, glm::vec3 boxMin, glm::vec3 boxMax)
 	{
 		float tMin = (boxMin.x - rayOrigin.x) / rayDirection.x;
@@ -347,14 +382,40 @@ namespace libCore
 
 		return true;
 	}
-
-
-	//--VIEWPORTS
-	void EngineOpenGL::CreateViewport(std::string name, glm::vec3 cameraPosition, CAMERA_CONTROLLERS controller)
-	{
-		viewportManager->CreateViewport(name, cameraPosition, windowWidth, windowHeight, controller);
+	void UpdateModelAABB(const Ref<libCore::Model>& model) {
+		glm::mat4 modelMatrix = model->transform.getLocalModelMatrix();
+		for (const auto& mesh : model->meshes) {
+			mesh->UpdateAABB(modelMatrix);
+		}
+		// Llamada recursiva para los modelos hijos
+		for (const auto& child : model->childs) {
+			UpdateModelAABB(child);
+		}
 	}
-	void EngineOpenGL::UpdateAfterRender()
+	void EngineOpenGL::checkRayModelIntersection(const Ref<libCore::Model>& model, const glm::vec3& rayOrigin, const glm::vec3& rayDirection, const glm::mat4& accumulatedTransform) {
+		
+		glm::mat4 modelMatrix = accumulatedTransform * model->transform.getLocalModelMatrix();
+
+		for (const auto& mesh : model->meshes) {
+			// Transformar AABB
+			glm::vec3 transformedMin = glm::vec3(modelMatrix * glm::vec4(mesh->minBounds, 1.0));
+			glm::vec3 transformedMax = glm::vec3(modelMatrix * glm::vec4(mesh->maxBounds, 1.0));
+
+			// Verificar la intersección del rayo con la AABB transformada
+			if (rayIntersectsBoundingBox(rayOrigin, rayDirection, transformedMin, transformedMax)) 
+			{
+				modelsInRay.push_back(model);
+				std::cout << "model " << model->name << std::endl;
+			}
+		}
+
+		// Recorrer modelos hijos
+		for (const auto& child : model->childs) {
+			checkRayModelIntersection(child, rayOrigin, rayDirection, modelMatrix);
+		}
+	}
+	
+	void EngineOpenGL::UpdateBeforeRender()
 	{
 		//--INPUT UPDATE
 		InputManager::Instance().Update();
@@ -381,66 +442,66 @@ namespace libCore
 		}
 		//-------------------------------------------------------------------
 
+		//--UPDATE MODEL TRANSFORM
+		for (const auto& model : modelsInScene) {
+			model->transform.updateRotationFromEulerAngles();
+		}
+		//-------------------------------------------
 
 		//--UPDATE AABB
-		for (const auto& modelContainer : modelsInScene) {
-			for (const auto& model : modelContainer->models) {
-				glm::mat4 modelMatrix = model->transform.getLocalModelMatrix();
-				for (const auto& mesh : model->meshes) {
-					mesh->UpdateAABB(modelMatrix);
-				}
-			}
+		for (const auto& model : modelsInScene) {
+			UpdateModelAABB(model);
 		}
 		//-------------------------------------------
 
 		//--MOUSE PICKING
-		float mouseX, mouseY;
-		std::tie(mouseX, mouseY) = InputManager::Instance().GetMousePosition();
-
-		// Aquí empieza el raycasting
-		if (InputManager::Instance().IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_LEFT))
+		if (mouseInImGUI == false)
 		{
-			// Llevar un punto 2D a un espacio 3D (mouse position -> escena)
-			float normalizedX = (2.0f * mouseX) / viewportManager->viewports[currentViewport]->viewportSize.x - 1.0f;
-			float normalizedY = ((2.0f * mouseY) / viewportManager->viewports[currentViewport]->viewportSize.y - 1.0f) * -1.0f;
+			if (isSelectingObject == true)
+			{
+				return;
+			}
 
-			glm::vec3 clipSpaceCoordinates(normalizedX, normalizedY, -1.0); // -1.0 para proyectar hacia adelante
+			isSelectingObject = false;
 
-			glm::vec4 homogenousClipCoordinates = glm::vec4(clipSpaceCoordinates, 1.0);
-			glm::mat4 invProjView = glm::inverse(viewportManager->viewports[currentViewport]->camera->cameraMatrix); // Invertir solo la cameraMatrix que ya es projection * view
-			glm::vec4 homogenousWorldCoordinates = invProjView * homogenousClipCoordinates;
-			glm::vec3 worldCoordinates = glm::vec3(homogenousWorldCoordinates) / homogenousWorldCoordinates.w;
+			float mouseX, mouseY;
+			std::tie(mouseX, mouseY) = InputManager::Instance().GetMousePosition();
 
-			// Preparamos el rayo para lanzarlo desde la cámara hasta la posición del mouse ya convertido al espacio 3D
-			glm::vec3 rayOrigin = viewportManager->viewports[currentViewport]->camera->Position;
-			glm::vec3 rayDirection = glm::normalize(worldCoordinates - rayOrigin);
-			float rayLength = 1000.0f;  // Puedes ajustar esto según la escala de tu escena
-			glm::vec3 rayEnd = rayOrigin + rayDirection * rayLength;
+			if (InputManager::Instance().IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_LEFT) && isSelectingObject == false)
+			{
+				modelsInRay.clear();
 
-			//std::cout << "Camera Position: " << glm::to_string(rayOrigin) << std::endl;
-			//std::cout << "Camera Orientation: " << glm::to_string(viewportManager->viewports[currentViewport]->camera->Orientation) << std::endl;
-			//std::cout << "Ray Origin: " << glm::to_string(rayOrigin) << std::endl;
-			//std::cout << "Ray Direction: " << glm::to_string(rayDirection) << std::endl;
-			//CreatePrefabLine(rayOrigin, rayEnd);  // Dibuja el rayo para visualización
+				float normalizedX = (2.0f * mouseX) / viewportManager->viewports[currentViewport]->viewportSize.x - 1.0f;
+				float normalizedY = ((2.0f * mouseY) / viewportManager->viewports[currentViewport]->viewportSize.y - 1.0f) * -1.0f;
 
-			for (const auto& modelContainer : modelsInScene) {
-				for (const auto& model : modelContainer->models) {
-					for (const auto& mesh : model->meshes) {
-						// Verificar la intersección del rayo con la AABB transformada
-						if (rayIntersectsBoundingBox(rayOrigin, rayDirection, mesh->worldMinBounds, mesh->worldMaxBounds)) {
-							std::cout << "MESH " << mesh->meshName << std::endl;
-						}
-					}
+				glm::vec3 clipSpaceCoordinates(normalizedX, normalizedY, -1.0);
+				glm::vec4 homogenousClipCoordinates = glm::vec4(clipSpaceCoordinates, 1.0);
+				glm::mat4 invProjView = glm::inverse(viewportManager->viewports[currentViewport]->camera->cameraMatrix);
+				glm::vec4 homogenousWorldCoordinates = invProjView * homogenousClipCoordinates;
+				glm::vec3 worldCoordinates = glm::vec3(homogenousWorldCoordinates) / homogenousWorldCoordinates.w;
+
+				glm::vec3 rayOrigin = viewportManager->viewports[currentViewport]->camera->Position;
+				glm::vec3 rayDirection = glm::normalize(worldCoordinates - rayOrigin);
+
+				for (const auto& model : modelsInScene) {
+					checkRayModelIntersection(model, rayOrigin, rayDirection, glm::mat4(1.0f));
+				}
+
+				if (modelsInRay.size() == 1) {
+					currentSelectedModelInScene = modelsInRay[0];
+					isSelectingObject = false; // No need to select, auto-selected
+					showModelSelectionCombo = false;
+				}
+				else if (modelsInRay.size() > 1) {
+					isSelectingObject = true; // Multiple options, need to select
+					showModelSelectionCombo = true;
+				}
+				else {
+					isSelectingObject = false; // No selection
+					showModelSelectionCombo = false;
 				}
 			}
 		}
-		//-------------------------------------------
-	}
-	void EngineOpenGL::RenderViewports()
-	{
-		//RENDERING
-		Renderer::getInstance().RenderViewport(viewportManager->viewports[currentViewport], m_deltaTime, modelsInScene);
-		Renderer::getInstance().ShowViewportInQuad(viewportManager->viewports[currentViewport]);
 		//-------------------------------------------
 	}
 	// -------------------------------------------------
@@ -455,12 +516,9 @@ namespace libCore
 	}
 	void EngineOpenGL::CreatePrefabDot(const glm::vec3& pos, const glm::vec3& polygonColor)
 	{
-		auto modelContainer = CreateRef<ModelContainer>();
-		modelContainer->skeletal = false;
-
 		auto modelBuild = CreateRef<Model>();
 		modelBuild->transform.position = pos;
-		modelContainer->name = "PRIMITIVE_DOT";
+		modelBuild->name = "PRIMITIVE_DOT";
 		modelBuild->meshes.push_back(PrimitivesHelper::CreateDot());
 		
 
@@ -477,21 +535,14 @@ namespace libCore
 		//material->aOMap = assetsManager.GetTexture("default_ao");
 
 		modelBuild->materials.push_back(material);
-
-		modelContainer->models.push_back(modelBuild);
-
-		modelsInScene.push_back(modelContainer);
+		modelsInScene.push_back(modelBuild);
 	}
 	void EngineOpenGL::CreatePrefabLine(const glm::vec3& point1, const glm::vec3& point2)
 	{
-		auto modelContainer = CreateRef<ModelContainer>();
-		modelContainer->skeletal = false;
-
 		auto modelBuild = CreateRef<Model>();
 
-		modelContainer->name = "PRIMITIVE_LINE";
+		modelBuild->name = "PRIMITIVE_LINE";
 		modelBuild->meshes.push_back(PrimitivesHelper::CreateLine(point1, point2));
-		modelContainer->models.push_back(modelBuild);
 
 
 		//--DEFAULT_MATERIAL
@@ -510,19 +561,15 @@ namespace libCore
 
 		modelBuild->materials.push_back(material);
 
-		modelsInScene.push_back(modelContainer);
+		modelsInScene.push_back(modelBuild);
 	}
 	void EngineOpenGL::CreateTriangle(const glm::vec3& pos1, const glm::vec3& pos2, const glm::vec3& pos3)
 	{
-		auto modelContainer = CreateRef<ModelContainer>();
-		modelContainer->skeletal = false;
-
 		auto modelBuild = CreateRef<Model>();
 
 
-		modelContainer->name = "PRIMIVITE_TRIANGLE";
+		modelBuild->name = "PRIMIVITE_TRIANGLE";
 		modelBuild->meshes.push_back(PrimitivesHelper::CreateTriangle(pos1, pos2, pos3));
-		modelContainer->models.push_back(modelBuild);
 
 
 		//--DEFAULT_MATERIAL
@@ -541,20 +588,14 @@ namespace libCore
 
 		modelBuild->materials.push_back(material);
 
-		modelsInScene.push_back(modelContainer);
+		modelsInScene.push_back(modelBuild);
 	}
 	void EngineOpenGL::CreatePrefabSphere(float radius, unsigned int sectorCount, unsigned int stackCount)
 	{
-		auto modelContainer = CreateRef<ModelContainer>();
-		modelContainer->skeletal = false;
-
 		auto modelBuild = CreateRef<Model>();
 
-
-		modelContainer->name = "PRIMIVITE_SPHERE";
+		modelBuild->name = "PRIMIVITE_SPHERE";
 		modelBuild->meshes.push_back(PrimitivesHelper::CreateSphere(0.01f, 6, 6));
-		modelContainer->models.push_back(modelBuild);
-
 
 		//--DEFAULT_MATERIAL
 		auto material = CreateRef<Material>();
@@ -572,16 +613,13 @@ namespace libCore
 
 		modelBuild->materials.push_back(material);
 
-		modelsInScene.push_back(modelContainer);
+		modelsInScene.push_back(modelBuild);
 	}
 	void EngineOpenGL::CreatePrefabCube(glm::vec3 position)
 	{
-		auto modelContainer = CreateRef<ModelContainer>();
-		modelContainer->skeletal = false;
-
 		auto modelBuild = CreateRef<Model>();
 
-		modelContainer->name = "PRIMIVITE_CUBE";
+		modelBuild->name = "PRIMIVITE_CUBE";
 		modelBuild->meshes.push_back(PrimitivesHelper::CreateCube());
 		modelBuild->transform.position = position;
 
@@ -601,29 +639,54 @@ namespace libCore
 
 		modelBuild->materials.push_back(material);
 
-		modelContainer->models.push_back(modelBuild);
-
-		modelsInScene.push_back(modelContainer);
+		modelsInScene.push_back(modelBuild);
 	}
 	void EngineOpenGL::CreateRoof(const std::vector<Vector2d>& points, const std::vector<Vector2d>& holes)
 	{
-		modelsInScene.push_back(roofGenerator->GenerateRoof(points, holes));
+		//modelsInScene.push_back(roofGenerator->GenerateRoof(points, holes));
 	}
 	// -------------------------------------------------
 	// -------------------------------------------------
 
 
-	//--PANELS
+	//--IMGUI
 	void EngineOpenGL::DrawHierarchyPanel()
 	{
 		if (useImGUI)
 		{
+			//--SELECT MODEL FROM RAY POPUP
+			if (isSelectingObject == true)
+			{
+				ImGui::OpenPopup("Select Model");
+			}
+			if (ImGui::BeginPopup("Select Model"))
+			{
+				for (const auto& model : modelsInRay) {
+					if (ImGui::Button(model->name.c_str())) {
+						currentSelectedModelInScene = model;
+						isSelectingObject = false; // Esta asignación cerrará el popup al finalizar el frame
+						ImGui::CloseCurrentPopup();
+					}
+				}
+				ImGui::EndPopup();
+			}
+			//--------------------------------------------------------
+
+			//--CHECK ImGizmo
+			guiLayer->checkGizmo(viewportManager->viewports[currentViewport]);
+			//--------------------------------------------------------
+
 			guiLayer->DrawHierarchyPanel(modelsInScene);
+			guiLayer->DrawInspectorPanel(currentSelectedModelInScene);
 			guiLayer->DrawLightsPanel(LightsManager::GetLights());
 			guiLayer->DrawMaterialsPanel();
+			//guiLayer->RenderCheckerMatrix(); //Panel para el editor de roofs
+
 			Renderer::getInstance().ShowControlsGUI();
 			viewportManager->DrawPanelGUI();
-			//guiLayer->RenderCheckerMatrix(); //Panel para el editor de roofs
+
+			
+			//--------------------------------------------------------
 		}
 	}
 	// -------------------------------------------------

@@ -9,6 +9,7 @@
 #include "../StraightSkeleton/Vector2d.h"
 #include "../tools/FreeTypeManager.h"
 
+
 namespace libCore
 {
     class EngineOpenGL
@@ -28,7 +29,7 @@ namespace libCore
 
 
         //VIEWPORTS, UPDATE & RENDER
-        void UpdateAfterRender();
+        void UpdateBeforeRender();
         void CreateViewport(std::string name, glm::vec3 cameraPosition, CAMERA_CONTROLLERS controller);
         void RenderViewports();
 
@@ -62,11 +63,16 @@ namespace libCore
     public:
         FreeTypeManager* freeTypeManager = nullptr;
 
+        std::vector<Ref<Model>> modelsInRay;
+        Ref<Model> currentSelectedModelInScene = nullptr;
+        bool isSelectingObject = false;
+        bool showModelSelectionCombo = false;
+
     private:
 
         int currentViewport = 0; //Editor Camera by default
 
-        std::vector<Ref<libCore::ModelContainer>> modelsInScene;
+        std::vector<Ref<libCore::Model>> modelsInScene;
 
         GLFWwindow* window;
         Timestep m_deltaTime;
@@ -82,8 +88,13 @@ namespace libCore
         bool useImGUI = true;
         bool renderInImGUI = false;
 
+        bool mouseInImGUI = false;
+
         int windowWidth = 0;
         int windowHeight = 0;
+
+        
+        void checkRayModelIntersection(const Ref<libCore::Model>& model, const glm::vec3& rayOrigin, const glm::vec3& rayDirection, const glm::mat4& accumulatedTransform);
 
 
         // Constructor privado para el patrón Singleton

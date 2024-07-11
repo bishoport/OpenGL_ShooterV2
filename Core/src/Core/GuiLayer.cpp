@@ -1,5 +1,6 @@
 ﻿#include "GuiLayer.h"
 #include "../tools/ShaderManager.h"
+#include <imGizmo/ImGuizmo.h>
 #include <imgui_internal.h>
 #include "../tools/LightsManager.hpp"
 #include "../tools/MaterialManager.hpp"
@@ -77,6 +78,7 @@ namespace libCore
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        ImGuizmo::BeginFrame();
     }
 
     void GuiLayer::renderDockers()
@@ -183,75 +185,164 @@ namespace libCore
         }
     }
 
-    //PANELES PRINCIPALES
-    void GuiLayer::DrawHierarchyPanel(const std::vector<Ref<libCore::ModelContainer>>& modelsInScene)
+    void printMatrix(const glm::mat4& mat, const std::string& name) {
+        const float* m = glm::value_ptr(mat);
+        std::cout << name << " Matrix:" << std::endl;
+        std::cout << m[0] << ", " << m[1] << ", " << m[2] << ", " << m[3] << std::endl;
+        std::cout << m[4] << ", " << m[5] << ", " << m[6] << ", " << m[7] << std::endl;
+        std::cout << m[8] << ", " << m[9] << ", " << m[10] << ", " << m[11] << std::endl;
+        std::cout << m[12] << ", " << m[13] << ", " << m[14] << ", " << m[15] << std::endl;
+    }
+
+    //--UPDATES
+    void GuiLayer::checkGizmo(const Ref<Viewport>& viewport)
     {
-        ImGui::Begin("Hierarchy");
-        for (auto& modelContainer : modelsInScene) {
-            if (ImGui::TreeNode(modelContainer.get(), "Model: %s", modelContainer->name.c_str())) {
-                for (int j = 0; j < modelContainer->models.size(); j++) {
-                    if (ImGui::TreeNode(modelContainer->models[j].get(), "Child: %d", j)) {
-                        
-                        // Listamos las Meshes de cada Model
-                        auto& model = modelContainer->models[j];
+        //--INPUTS TOOLS
+        if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_T))
+        {
+            m_GizmoOperation = GizmoOperation::Translate;
+        }
+        else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_Y))
+        {
+            m_GizmoOperation = GizmoOperation::Rotate3D;
+        }
+        else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_U))
+        {
+            m_GizmoOperation = GizmoOperation::Scale;
+        }
+        //------------------------------------------------------------------------------
 
 
-                        //MESHES
-                        for (int k = 0; k < model->meshes.size(); k++) {
-                            ImGui::BulletText("Mesh: %s", model->meshes[k]->meshName.c_str());
-                            ImGui::BulletText("Transform:");
-                            ImGui::DragFloat3("Position", &model->transform.position[0], 0.1f);
-                            ImGui::DragFloat3("Rotation", &model->transform.rotation[0], 0.01f, -3.14159f, 3.14159f, "%.3f rad");
-                            ImGui::DragFloat3("Scale", &model->transform.scale[0], 0.1f, 0.01f, 100.0f, "%.3f");
-                        }
+        //---------------------------ImGUIZMO------------------------------------------
+        if (EngineOpenGL::GetInstance().currentSelectedModelInScene != nullptr)
+        {
+            ImGuizmo::SetOrthographic(false);
+            ImGuizmo::SetDrawlist();
+            ImGuizmo::SetRect(viewport->viewportPos.x,
+                viewport->viewportPos.y,
+                viewport->viewportSize.x,
+                viewport->viewportSize.y);
+
+            // Obtén las matrices correctas
+            glm::mat4 camera_view = glm::lookAt(viewport->camera->Position, viewport->camera->Position + viewport->camera->Orientation, viewport->camera->Up);
+            glm::mat4 camera_projection = viewport->camera->projection;
+            glm::mat4 entity_transform = EngineOpenGL::GetInstance().currentSelectedModelInScene->transform.getMatrix();
 
 
-                        //MATERIALS
-                        for (int k = 0; k < model->materials.size(); k++) {
-                            auto& material = model->materials[k];
+            switch (m_GizmoOperation)
+            {
+            case GizmoOperation::Translate:
+                ImGuizmo::Manipulate(glm::value_ptr(camera_view), glm::value_ptr(camera_projection),
+                    ImGuizmo::TRANSLATE, ImGuizmo::LOCAL, glm::value_ptr(entity_transform));
+                break;
+            case GizmoOperation::Rotate3D:
+                ImGuizmo::Manipulate(glm::value_ptr(camera_view), glm::value_ptr(camera_projection),
+                    ImGuizmo::ROTATE, ImGuizmo::LOCAL, glm::value_ptr(entity_transform));
+                break;
+            case GizmoOperation::Scale:
+                ImGuizmo::Manipulate(glm::value_ptr(camera_view), glm::value_ptr(camera_projection),
+                    ImGuizmo::SCALE, ImGuizmo::LOCAL, glm::value_ptr(entity_transform));
+                break;
+            }
 
-                            if (ImGui::TreeNode(&material, "Material: %s", material->materialName.c_str())) {
-                                ImGui::Text("Shader: %s", material->shaderName.c_str());
-
-                                // Manipulate material values
-                                ImGui::ColorEdit3("Albedo Color", (float*)&material->albedoColor);
-                                ImGui::DragFloat("Normal Strength", &material->normalStrength, 0.1f, -10.0f, 10.0f);
-                                ImGui::DragFloat("Metallic Value", &material->metallicValue, 0.1f, 0.0f, 10.0f);
-                                ImGui::DragFloat("Roughness Value", &material->roughnessValue, 0.1f, 0.0f, 10.0f);
-                                ImGui::DragFloat("AO Value", &material->aoValue, 0.1f, 0.0f, 10.0f);
-
-                                // Display material textures
-                                if (material->albedoMap) {
-                                    ImGui::Text("Albedo Map");
-                                    ImGui::Image((void*)(intptr_t)material->albedoMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
-                                }
-                                if (material->normalMap) {
-                                    ImGui::Text("Normal Map");
-                                    ImGui::Image((void*)(intptr_t)material->normalMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
-                                }
-                                if (material->metallicMap) {
-                                    ImGui::Text("Metallic Map");
-                                    ImGui::Image((void*)(intptr_t)material->metallicMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
-                                }
-                                if (material->roughnessMap) {
-                                    ImGui::Text("Roughness Map");
-                                    ImGui::Image((void*)(intptr_t)material->roughnessMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
-                                }
-                                if (material->aOMap) {
-                                    ImGui::Text("AO Map");
-                                    ImGui::Image((void*)(intptr_t)material->aOMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
-                                }
-
-                                ImGui::TreePop();
-                            }
-                        }
-
-                        ImGui::TreePop(); // Finaliza el nodo del Model
-                    }
-                }
-                ImGui::TreePop(); // Finaliza el nodo del ModelContainer
+            if (ImGuizmo::IsUsing())
+            {
+                EngineOpenGL::GetInstance().currentSelectedModelInScene->transform.setMatrix(entity_transform);
             }
         }
+    }
+
+
+
+    //PANELES PRINCIPALES
+    void GuiLayer::DrawModelNode(const Ref<libCore::Model>& model)
+    {
+        // Determinar los flags del nodo basado en si tiene hijos
+        int node_flags = ImGuiTreeNodeFlags_OpenOnArrow;
+        if (model->childs.empty() && model->meshes.empty()) {
+            node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen; // Nodo es una hoja si no tiene hijos ni mallas
+        }
+
+        bool opened = ImGui::TreeNodeEx(model.get(), node_flags, "%s", model->name.c_str());
+        if (opened) {
+            // Mostrar mallas del modelo, si tiene
+            for (const auto& mesh : model->meshes) {
+                ImGui::BulletText("Mesh: %s", mesh->meshName.c_str());
+            }
+
+            // Recursivamente dibujar los modelos hijos, si tiene
+            if (!model->childs.empty()) {
+                for (const auto& child : model->childs) {
+                    DrawModelNode(child); // Este llamado recursivo maneja tanto mallas como otros hijos
+                }
+            }
+
+            ImGui::TreePop();
+        }
+    }
+    void GuiLayer::DrawHierarchyPanel(const std::vector<Ref<libCore::Model>>& modelsInScene)
+    {
+        ImGui::Begin("Hierarchy");
+
+        for (auto& model : modelsInScene)
+        {
+            DrawModelNode(model);
+        }
+
+        ImGui::End();
+    }
+    void libCore::GuiLayer::DrawInspectorPanel(const Ref<libCore::Model>& model)
+    {
+        ImGui::Begin("Inspector");
+
+        if (model == nullptr) {
+            ImGui::Text("No model selected");
+            ImGui::End();
+            return;
+        }
+
+        if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            auto& transform = model->transform;
+
+            // Posición
+            ImGui::Text("Position");
+            ImGui::TextColored(ImVec4(1, 0, 0, 1), "X");
+            ImGui::SameLine();
+            ImGui::DragFloat("##PosX", &transform.position.x, 0.1f, -FLT_MAX, FLT_MAX, "X: %.2f");
+            ImGui::TextColored(ImVec4(0, 1, 0, 1), "Y");
+            ImGui::SameLine();
+            ImGui::DragFloat("##PosY", &transform.position.y, 0.1f, -FLT_MAX, FLT_MAX, "Y: %.2f");
+            ImGui::TextColored(ImVec4(0, 0, 1, 1), "Z");
+            ImGui::SameLine();
+            ImGui::DragFloat("##PosZ", &transform.position.z, 0.1f, -FLT_MAX, FLT_MAX, "Z: %.2f");
+
+            // Rotación
+            ImGui::Text("Rotation");
+            ImGui::TextColored(ImVec4(1, 0, 0, 1), "X");
+            ImGui::SameLine();
+            ImGui::DragFloat("##RotX", &transform.eulerAngles.x, 0.1f, -360.0f, 360.0f, "X: %.2f");
+            ImGui::TextColored(ImVec4(0, 1, 0, 1), "Y");
+            ImGui::SameLine();
+            ImGui::DragFloat("##RotY", &transform.eulerAngles.y, 0.1f, -360.0f, 360.0f, "Y: %.2f");
+            ImGui::TextColored(ImVec4(0, 0, 1, 1), "Z");
+            ImGui::SameLine();
+            ImGui::DragFloat("##RotZ", &transform.eulerAngles.z, 0.1f, -360.0f, 360.0f, "Z: %.2f");
+
+
+            // Escala
+            ImGui::Text("Scale");
+            ImGui::TextColored(ImVec4(1, 0, 0, 1), "X");
+            ImGui::SameLine();
+            ImGui::DragFloat("##ScaleX", &transform.scale.x, 0.01f, 0.0f, FLT_MAX, "X: %.2f");
+            ImGui::TextColored(ImVec4(0, 1, 0, 1), "Y");
+            ImGui::SameLine();
+            ImGui::DragFloat("##ScaleY", &transform.scale.y, 0.01f, 0.0f, FLT_MAX, "Y: %.2f");
+            ImGui::TextColored(ImVec4(0, 0, 1, 1), "Z");
+            ImGui::SameLine();
+            ImGui::DragFloat("##ScaleZ", &transform.scale.z, 0.01f, 0.0f, FLT_MAX, "Z: %.2f");
+        }
+
         ImGui::End();
     }
     void GuiLayer::DrawLightsPanel(const std::vector<Ref<libCore::Light>>& lightsInScene)
@@ -490,8 +581,6 @@ namespace libCore
 
         ImGui::End();
     }
-
-
     void GuiLayer::ShowTexture(const char* label, Ref<Texture> texture)
     {
         if (texture && texture->IsValid()) {
@@ -502,114 +591,6 @@ namespace libCore
             ImGui::Text("%s: None", label); // Para texturas que no existen
         }
     }
-
-
-    //void GuiLayer::DrawMaterialsPanel() {
-    //    ImGui::Begin("Materials In Scene"); // Comienza el panel de materiales
-
-    //    if (ImGui::TreeNode("Materials")) {
-    //        for (auto& pair : MaterialManager::getInstance().materials) {
-    //            std::string key = pair.first;
-    //            Ref<Material> material = pair.second;
-
-    //            // Haz que cada nodo de material sea una fuente de arrastre
-    //            bool treeNodeOpen = ImGui::TreeNodeEx(key.c_str(), ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth);
-    //            if (treeNodeOpen) {
-    //                // Iniciar una fuente de arrastre
-    //                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
-    //                    // Establecer la carga útil para el arrastre, que es el nombre del material
-    //                    ImGui::SetDragDropPayload("MATERIAL_NAME", key.c_str(), key.size() + 1);
-
-    //                    // Muestra una vista previa (opcional)
-    //                    ImGui::Text("Assign %s", key.c_str());
-    //                    ImGui::EndDragDropSource();
-    //                }
-    //                DrawMaterial(material); // Dibuja la interfaz para este material específico
-    //                ImGui::TreePop();
-    //            }
-    //        }
-    //        ImGui::TreePop();
-    //    }
-
-    //    ImGui::End();
-    //}
-
-    //void GuiLayer::DrawMaterial(const Ref<Material> materialData) {
-    //    // Asegúrate de que no haya elementos previos que puedan afectar la alineación vertical.
-    //    ImGui::Columns(2);
-
-    //    // Calcular el ancho de las columnas en proporción al ancho del panel
-    //    float windowWidth = ImGui::GetWindowSize().x; // Obtener el ancho de la ventana
-    //    float columnWidthLeft = windowWidth * 0.4f; // 40% para la columna izquierda
-    //    float columnWidthRight = windowWidth * 0.6f; // 60% para la columna derecha
-
-    //    ImGui::SetColumnWidth(0, columnWidthLeft); // Establecer el ancho de la columna izquierda
-    //    ImGui::SetColumnWidth(1, columnWidthRight); // Establecer el ancho de la columna derecha
-
-    //    bool treeNodeOpen = ImGui::TreeNode((void*)(&materialData), "Material: %s", materialData->materialName.c_str());
-    //    if (treeNodeOpen) {
-    //        ImGui::Text("Shader: %s", materialData->shaderName.c_str());
-
-    //        // Manipulate material values
-    //        ImGui::ColorEdit3("Albedo Color", (float*)&materialData->albedoColor);
-    //        ImGui::DragFloat("Normal Strength", &materialData->normalStrength, 0.1f, -10.0f, 10.0f);
-    //        ImGui::DragFloat("Metallic Value", &materialData->metallicValue, 0.1f, 0.0f, 10.0f);
-    //        ImGui::DragFloat("Roughness Value", &materialData->roughnessValue, 0.1f, 0.0f, 10.0f);
-    //        //ImGui::DragFloat("AO Value", &materialData->aoValue, 0.1f, 0.0f, 10.0f);
-
-    //        // Display material textures
-    //        if (materialData->albedoMap && materialData->albedoMap->IsValid()) {
-    //            ImGui::Text("Albedo Map");
-    //            ImGui::Image((void*)(intptr_t)materialData->albedoMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
-    //        }
-    //        if (materialData->normalMap && materialData->normalMap->IsValid()) {
-    //            ImGui::Text("Normal Map");
-    //            ImGui::Image((void*)(intptr_t)materialData->normalMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
-    //        }
-    //        if (materialData->metallicMap && materialData->metallicMap->IsValid()) {
-    //            ImGui::Text("Metallic Map");
-    //            ImGui::Image((void*)(intptr_t)materialData->metallicMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
-    //        }
-    //        if (materialData->roughnessMap && materialData->roughnessMap->IsValid()) {
-    //            ImGui::Text("Roughness Map");
-    //            ImGui::Image((void*)(intptr_t)materialData->roughnessMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
-    //        }
-    //        ImGui::TreePop();
-    //    }
-
-    //    ImGui::NextColumn(); // Pasar a la columna de la derecha
-
-    //    // Comienza un child window para las previsualizaciones de texturas
-    //    if (ImGui::BeginChild("TexturePreviews", ImVec2(-1, -1), true)) {
-    //        ImGui::Columns(2); // Establece dos columnas para el grid
-
-    //        // Llama a showTexture para cada textura en el grid de 2 columnas
-    //        ShowTexture("Albedo Map", materialData->albedoMap);
-    //        ImGui::NextColumn(); // Mueve a la siguiente columna
-    //        ShowTexture("Normal Map", materialData->normalMap);
-    //        ImGui::NextColumn(); // Vuelve a la primera columna para la siguiente fila
-    //        ShowTexture("Metallic Map", materialData->metallicMap);
-    //        ImGui::NextColumn();
-    //        ShowTexture("Roughness Map", materialData->roughnessMap);
-
-    //        ImGui::Columns(1); // Restablece a una columna antes de cerrar el child window
-    //        ImGui::EndChild();
-    //    }
-
-    //    ImGui::Columns(1); // Restablece a una columna después de dibujar el material
-    //}
-
-    //void GuiLayer::ShowTexture(const char* label, Ref<Texture> texture)
-    //{
-    //    if (texture && texture->IsValid()) {
-    //        ImGui::Image((void*)(intptr_t)texture->GetTextureID(), ImVec2(128, 128)); // Ajustar según el tamaño deseado
-    //        ImGui::Text("%s", label); // Muestra el nombre de la textura
-    //    }
-    //    else {
-    //        ImGui::Text("%s: None", label); // Para texturas que no existen
-    //    }
-    //}
-
     //-----------------------------------------------------------------------------------------------------
 
     //Especial para el editor de Roofs
@@ -771,6 +752,120 @@ namespace libCore
         }
     }
 }
+
+
+
+
+
+
+
+//void GuiLayer::DrawMaterialsPanel() {
+//    ImGui::Begin("Materials In Scene"); // Comienza el panel de materiales
+
+//    if (ImGui::TreeNode("Materials")) {
+//        for (auto& pair : MaterialManager::getInstance().materials) {
+//            std::string key = pair.first;
+//            Ref<Material> material = pair.second;
+
+//            // Haz que cada nodo de material sea una fuente de arrastre
+//            bool treeNodeOpen = ImGui::TreeNodeEx(key.c_str(), ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth);
+//            if (treeNodeOpen) {
+//                // Iniciar una fuente de arrastre
+//                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
+//                    // Establecer la carga útil para el arrastre, que es el nombre del material
+//                    ImGui::SetDragDropPayload("MATERIAL_NAME", key.c_str(), key.size() + 1);
+
+//                    // Muestra una vista previa (opcional)
+//                    ImGui::Text("Assign %s", key.c_str());
+//                    ImGui::EndDragDropSource();
+//                }
+//                DrawMaterial(material); // Dibuja la interfaz para este material específico
+//                ImGui::TreePop();
+//            }
+//        }
+//        ImGui::TreePop();
+//    }
+
+//    ImGui::End();
+//}
+
+//void GuiLayer::DrawMaterial(const Ref<Material> materialData) {
+//    // Asegúrate de que no haya elementos previos que puedan afectar la alineación vertical.
+//    ImGui::Columns(2);
+
+//    // Calcular el ancho de las columnas en proporción al ancho del panel
+//    float windowWidth = ImGui::GetWindowSize().x; // Obtener el ancho de la ventana
+//    float columnWidthLeft = windowWidth * 0.4f; // 40% para la columna izquierda
+//    float columnWidthRight = windowWidth * 0.6f; // 60% para la columna derecha
+
+//    ImGui::SetColumnWidth(0, columnWidthLeft); // Establecer el ancho de la columna izquierda
+//    ImGui::SetColumnWidth(1, columnWidthRight); // Establecer el ancho de la columna derecha
+
+//    bool treeNodeOpen = ImGui::TreeNode((void*)(&materialData), "Material: %s", materialData->materialName.c_str());
+//    if (treeNodeOpen) {
+//        ImGui::Text("Shader: %s", materialData->shaderName.c_str());
+
+//        // Manipulate material values
+//        ImGui::ColorEdit3("Albedo Color", (float*)&materialData->albedoColor);
+//        ImGui::DragFloat("Normal Strength", &materialData->normalStrength, 0.1f, -10.0f, 10.0f);
+//        ImGui::DragFloat("Metallic Value", &materialData->metallicValue, 0.1f, 0.0f, 10.0f);
+//        ImGui::DragFloat("Roughness Value", &materialData->roughnessValue, 0.1f, 0.0f, 10.0f);
+//        //ImGui::DragFloat("AO Value", &materialData->aoValue, 0.1f, 0.0f, 10.0f);
+
+//        // Display material textures
+//        if (materialData->albedoMap && materialData->albedoMap->IsValid()) {
+//            ImGui::Text("Albedo Map");
+//            ImGui::Image((void*)(intptr_t)materialData->albedoMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
+//        }
+//        if (materialData->normalMap && materialData->normalMap->IsValid()) {
+//            ImGui::Text("Normal Map");
+//            ImGui::Image((void*)(intptr_t)materialData->normalMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
+//        }
+//        if (materialData->metallicMap && materialData->metallicMap->IsValid()) {
+//            ImGui::Text("Metallic Map");
+//            ImGui::Image((void*)(intptr_t)materialData->metallicMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
+//        }
+//        if (materialData->roughnessMap && materialData->roughnessMap->IsValid()) {
+//            ImGui::Text("Roughness Map");
+//            ImGui::Image((void*)(intptr_t)materialData->roughnessMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
+//        }
+//        ImGui::TreePop();
+//    }
+
+//    ImGui::NextColumn(); // Pasar a la columna de la derecha
+
+//    // Comienza un child window para las previsualizaciones de texturas
+//    if (ImGui::BeginChild("TexturePreviews", ImVec2(-1, -1), true)) {
+//        ImGui::Columns(2); // Establece dos columnas para el grid
+
+//        // Llama a showTexture para cada textura en el grid de 2 columnas
+//        ShowTexture("Albedo Map", materialData->albedoMap);
+//        ImGui::NextColumn(); // Mueve a la siguiente columna
+//        ShowTexture("Normal Map", materialData->normalMap);
+//        ImGui::NextColumn(); // Vuelve a la primera columna para la siguiente fila
+//        ShowTexture("Metallic Map", materialData->metallicMap);
+//        ImGui::NextColumn();
+//        ShowTexture("Roughness Map", materialData->roughnessMap);
+
+//        ImGui::Columns(1); // Restablece a una columna antes de cerrar el child window
+//        ImGui::EndChild();
+//    }
+
+//    ImGui::Columns(1); // Restablece a una columna después de dibujar el material
+//}
+
+//void GuiLayer::ShowTexture(const char* label, Ref<Texture> texture)
+//{
+//    if (texture && texture->IsValid()) {
+//        ImGui::Image((void*)(intptr_t)texture->GetTextureID(), ImVec2(128, 128)); // Ajustar según el tamaño deseado
+//        ImGui::Text("%s", label); // Muestra el nombre de la textura
+//    }
+//    else {
+//        ImGui::Text("%s: None", label); // Para texturas que no existen
+//    }
+//}
+
+
 
 
 

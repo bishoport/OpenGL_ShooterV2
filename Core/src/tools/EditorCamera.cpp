@@ -1,4 +1,3 @@
-// EditorCamera.cpp
 #include "EditorCamera.h"
 
 namespace libCore
@@ -10,20 +9,22 @@ namespace libCore
 
     void EditorCamera::Inputs(libCore::Timestep deltaTime)
     {
-        // Lógica de entradas para la cámara de edición (idéntica a tu clase original)
+        // Movimiento de la cámara
+        float velocity = speed * deltaTime.GetMilliseconds();
         if (InputManager::Instance().IsKeyPressed(GLFW_KEY_W))
-            Position += speed * Orientation * deltaTime.GetMilliseconds();
+            Position += velocity * Orientation;
         if (InputManager::Instance().IsKeyPressed(GLFW_KEY_S))
-            Position += speed * -Orientation * deltaTime.GetMilliseconds();
+            Position -= velocity * Orientation;
         if (InputManager::Instance().IsKeyPressed(GLFW_KEY_A))
-            Position += speed * -glm::normalize(glm::cross(Orientation, Up)) * deltaTime.GetMilliseconds();
+            Position -= glm::normalize(glm::cross(Orientation, Up)) * velocity;
         if (InputManager::Instance().IsKeyPressed(GLFW_KEY_D))
-            Position += speed * glm::normalize(glm::cross(Orientation, Up)) * deltaTime.GetMilliseconds();
+            Position += glm::normalize(glm::cross(Orientation, Up)) * velocity;
         if (InputManager::Instance().IsKeyPressed(GLFW_KEY_R))
-            Position += speed * Up * deltaTime.GetMilliseconds();
+            Position += Up * velocity;
         if (InputManager::Instance().IsKeyPressed(GLFW_KEY_F))
-            Position += speed * -Up * deltaTime.GetMilliseconds();
+            Position -= Up * velocity;
 
+        // Rotación de la cámara
         if (InputManager::Instance().IsMouseButtonDown(GLFW_MOUSE_BUTTON_RIGHT))
         {
             glfwSetInputMode(libCore::EngineOpenGL::GetWindow(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -34,22 +35,21 @@ namespace libCore
                 firstClick = false;
             }
 
-            double mouseX;
-            double mouseY;
+            double mouseX, mouseY;
             glfwGetCursorPos(libCore::EngineOpenGL::GetWindow(), &mouseX, &mouseY);
 
-            float rotX = sensitivity * (float)(mouseY - (height / 2)) / height;
-            float rotY = sensitivity * (float)(mouseX - (width / 2)) / width;
+            float rotX = sensitivity * static_cast<float>(mouseY - (height / 2)) / height;
+            float rotY = sensitivity * static_cast<float>(mouseX - (width / 2)) / width;
 
-            glm::vec3 newOrientation = glm::rotate(Orientation, glm::radians(-rotX), glm::normalize(glm::cross(Orientation, Up)));
-
-            if (abs(glm::angle(newOrientation, Up) - glm::radians(90.0f)) <= glm::radians(85.0f))
-            {
-                Orientation = newOrientation;
-            }
-
+            // Calcular la nueva orientación
+            glm::vec3 right = glm::normalize(glm::cross(Orientation, Up));
+            Orientation = glm::rotate(Orientation, glm::radians(-rotX), right);
             Orientation = glm::rotate(Orientation, glm::radians(-rotY), Up);
 
+            // Normalizar la orientación
+            Orientation = glm::normalize(Orientation);
+
+            // Resetear la posición del cursor
             glfwSetCursorPos(libCore::EngineOpenGL::GetWindow(), (width / 2), (height / 2));
         }
         else
@@ -57,6 +57,10 @@ namespace libCore
             glfwSetInputMode(libCore::EngineOpenGL::GetWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             firstClick = true;
         }
+
+        // Actualizar la matriz de cámara
+        updateMatrix(45.0f, 0.1f, 100.0f); // Puedes ajustar los parámetros de FOV, nearPlane y farPlane según sea necesario
     }
 }
+
 

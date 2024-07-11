@@ -7,7 +7,7 @@ namespace libCore
 
 	void AssetsManager::LoadDefaultAssets()
 	{
-		std::string defaultAssetsPathTexture = "C:/Users/pdortegon/Documents/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/";
+		std::string defaultAssetsPathTexture = "C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/";
 
 		Ref<Texture> defaultAlbedo = TextureManager::LoadTexture((defaultAssetsPathTexture).c_str(), "default_white.jpg", TEXTURE_TYPES::ALBEDO, 0);
 		SetTexture("default_albedo", defaultAlbedo);
@@ -38,8 +38,6 @@ namespace libCore
 		//SetTexture("default_wall", wallRoof);
 
 	}
-
-
 
 	// Método para obtener una textura
 	Ref<Texture> AssetsManager::GetTexture(const std::string& name) {

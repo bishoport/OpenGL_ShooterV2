@@ -40,6 +40,8 @@
     <ClInclude Include="src\Core\ViewportManager.hpp" />
     <ClInclude Include="src\ECS\ECS.h" />
     <ClInclude Include="src\Core\GuiLayer.h" />
+    <ClInclude Include="src\ECS\EntityManager.hpp" />
+    <ClInclude Include="src\ECS\Scene.h" />
     <ClInclude Include="src\input\InputManager.h" />
     <ClInclude Include="src\input\KeyCodes.h" />
     <ClInclude Include="src\input\MouseButtonCodes.h" />
@@ -87,6 +89,7 @@
     <ClInclude Include="src\tools\ModelLoader.h" />
     <ClInclude Include="src\tools\MousePicker.hpp" />
     <ClInclude Include="src\tools\PrimitivesHelper.h" />
+    <ClInclude Include="src\tools\Raycast.h" />
     <ClInclude Include="src\tools\RoofGenerator.hpp" />
     <ClInclude Include="src\tools\Shader.h" />
     <ClInclude Include="src\tools\ShaderManager.h" />
@@ -98,6 +101,7 @@
     <ClInclude Include="vendor\ApproxMVBB\GeometryPredicates\Predicates.hpp" />
     <ClInclude Include="vendor\earcut\include\mapbox\earcut.hpp" />
     <ClInclude Include="vendor\ft\ft2build.h" />
+    <ClInclude Include="vendor\imGizmo\ImGuizmo.h" />
     <ClInclude Include="vendor\imgui\imconfig.h" />
     <ClInclude Include="vendor\imgui\imgui.h" />
     <ClInclude Include="vendor\imgui\imgui_impl_glfw.h" />
@@ -118,6 +122,7 @@
     <ClCompile Include="src\Core\VAO.cpp" />
     <ClCompile Include="src\Core\VBO.cpp" />
     <ClCompile Include="src\Core\GuiLayer.cpp" />
+    <ClCompile Include="src\ECS\Scene.cpp" />
     <ClCompile Include="src\input\InputManager.cpp" />
     <ClCompile Include="src\StraightSkeleton\CircularList.cpp" />
     <ClCompile Include="src\StraightSkeleton\CircularNode.cpp" />
@@ -152,10 +157,12 @@
     <ClCompile Include="src\tools\FPSCamera.cpp" />
     <ClCompile Include="src\tools\ModelLoader.cpp" />
     <ClCompile Include="src\tools\PrimitivesHelper.cpp" />
+    <ClCompile Include="src\tools\Raycast.cpp" />
     <ClCompile Include="src\tools\ShaderManager.cpp" />
     <ClCompile Include="src\tools\SkeletalModelLoader.cpp" />
     <ClCompile Include="src\tools\TextureManager.cpp" />
     <ClCompile Include="vendor\glad\glad.c" />
+    <ClCompile Include="vendor\imGizmo\ImGuizmo.cpp" />
     <ClCompile Include="vendor\imgui\imgui.cpp" />
     <ClCompile Include="vendor\imgui\imgui_demo.cpp" />
     <ClCompile Include="vendor\imgui\imgui_draw.cpp" />

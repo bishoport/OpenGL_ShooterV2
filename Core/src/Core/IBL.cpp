@@ -387,7 +387,7 @@ namespace libCore
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void IBL::UpdateIBL(const glm::vec3& cameraPosition, const std::vector<Ref<libCore::ModelContainer>>& modelsInScene, float nearPlane, float farPlane)
+	void IBL::UpdateIBL(const glm::vec3& cameraPosition, const std::vector<Ref<libCore::Model>>& modelsInScene, float nearPlane, float farPlane)
 	{
 		if (!m_dynamic) return;
 

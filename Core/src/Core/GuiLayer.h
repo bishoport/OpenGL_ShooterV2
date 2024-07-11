@@ -36,12 +36,24 @@ namespace libCore
         void DrawViewports(std::vector<Ref<Viewport>> viewports);
 
 		//Panels
-		void DrawHierarchyPanel(const std::vector<Ref<libCore::ModelContainer>>& modelsInScene);
+        void DrawModelNode(const Ref<libCore::Model>& model);
+		void DrawHierarchyPanel(const std::vector<Ref<libCore::Model>>& modelsInScene);
+		void DrawInspectorPanel(const Ref<libCore::Model>& model);
         void DrawLightsPanel(const std::vector<Ref<libCore::Light>>& lightsInScene);
         void DrawMaterialsPanel();
         void DrawMaterial(const Ref<Material> materialData);
         void ShowTexture(const char* label, Ref<Texture> texture);
         void RenderCheckerMatrix();
+
+        void checkGizmo(const Ref<Viewport>& viewport);
+
+        enum class GizmoOperation
+        {
+            Translate,
+            Rotate2D, Rotate3D,
+            Scale
+        };
+        GizmoOperation m_GizmoOperation;
 
     private:
 

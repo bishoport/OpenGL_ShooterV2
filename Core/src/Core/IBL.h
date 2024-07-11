@@ -22,7 +22,7 @@ namespace libCore
 
         void prepareIBL(int screenWidth, int screenHeight, bool dynamic);
 
-        void UpdateIBL(const glm::vec3& cameraPosition, const std::vector<Ref<libCore::ModelContainer>>& modelsInScene, float nearPlane, float farPlane);
+        void UpdateIBL(const glm::vec3& cameraPosition, const std::vector<Ref<libCore::Model>>& modelsInScene, float nearPlane, float farPlane);
         //----------------------------------------------------
 
         GLuint m_hdrTexture;

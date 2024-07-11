@@ -364,3 +364,4 @@ FodyWeavers.xsd
 /MapEditor/assets/models/StarWars
 /MapEditor/assets/models/CyberpunkStreet
 *.env
+/MapEditor/assets/models/GLTF
