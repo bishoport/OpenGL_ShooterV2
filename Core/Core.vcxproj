@@ -23,6 +23,7 @@
     <ClInclude Include="src\Core\EngineOpenGL.h" />
     <ClInclude Include="src\Core\GBO.hpp" />
     <ClInclude Include="src\Core\IBL.h" />
+    <ClInclude Include="src\Core\Itc_matrix_floats.hpp" />
     <ClInclude Include="src\Core\Light.hpp" />
     <ClInclude Include="src\Core\Material.h" />
     <ClInclude Include="src\Core\Mesh.h" />
@@ -85,6 +86,7 @@
     <ClInclude Include="src\tools\FPSCamera.h" />
     <ClInclude Include="src\tools\FreeTypeManager.h" />
     <ClInclude Include="src\tools\LightsManager.hpp" />
+    <ClInclude Include="src\tools\LUTGenerator.hpp" />
     <ClInclude Include="src\tools\MaterialManager.hpp" />
     <ClInclude Include="src\tools\ModelLoader.h" />
     <ClInclude Include="src\tools\MousePicker.hpp" />

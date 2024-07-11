@@ -26,15 +26,15 @@ void MapEditor::Init()
     //libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData);
 
 
-    //libCore::ImportModelData importModelData;
-    //importModelData.filePath = "assets/models/Robot/";
-    //importModelData.fileName = "Robot.fbx";
-    //importModelData.invertUV = false;
-    //importModelData.rotate90 = false;
-    //importModelData.useCustomTransform = true;
-    //importModelData.modelID = 1;
-    //importModelData.globalScaleFactor = 1.0f;
-    //libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData);
+    libCore::ImportModelData importModelData;
+    importModelData.filePath = "assets/models/Robot/";
+    importModelData.fileName = "Robot.fbx";
+    importModelData.invertUV = false;
+    importModelData.rotate90 = false;
+    importModelData.useCustomTransform = true;
+    importModelData.modelID = 1;
+    importModelData.globalScaleFactor = 1.0f;
+    libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData);
 
     //libCore::ImportModelData importModelData2;
     //importModelData2.filePath = "assets/models/Turbina/";
@@ -79,16 +79,16 @@ void MapEditor::Init()
     //importModelData4.processLights = false;
     //libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData4);
 
-    //libCore::ImportModelData importModelData4;
-    //importModelData4.filePath = "assets/models/Scenario_1/";
-    //importModelData4.fileName = "CorridorModule_1.fbx";
-    //importModelData4.invertUV = false;
-    //importModelData4.rotate90 = false;
-    //importModelData4.useCustomTransform = true;
-    //importModelData4.modelID = 1;
-    //importModelData4.globalScaleFactor = 1.0f;
-    //importModelData4.processLights = false;
-    //libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData4);
+    libCore::ImportModelData importModelData4;
+    importModelData4.filePath = "assets/models/Scenario_1/";
+    importModelData4.fileName = "CorridorModule_1.fbx";
+    importModelData4.invertUV = false;
+    importModelData4.rotate90 = false;
+    importModelData4.useCustomTransform = true;
+    importModelData4.modelID = 1;
+    importModelData4.globalScaleFactor = 1.0f;
+    importModelData4.processLights = true;
+    libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData4);
 
     //libCore::ImportModelData importModelData4;
     //importModelData4.filePath = "assets/models/";
@@ -124,7 +124,7 @@ void MapEditor::Init()
     //importModelData4.processLights = true;
     //libCore::EngineOpenGL::GetInstance().CreatePrefabExternalModel(importModelData4);
 
-    libCore::EngineOpenGL::GetInstance().CreatePrefabCube(glm::vec3(0.0f, 0.0f, 0.0f));
+    //libCore::EngineOpenGL::GetInstance().CreatePrefabCube(glm::vec3(0.0f, 0.0f, 0.0f));
 
     //libCore::EngineOpenGL::GetInstance().CreateTriangle(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec3(1.0f, -1.0f, 0.0f));
     //libCore::EngineOpenGL::GetInstance().CreateTriangle(glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(-1.0f, -1.0f, 0.0f));

@@ -13,6 +13,8 @@ namespace libCore
     {
     public:
 
+        bool showAABB = false;
+
         libCore::Transform transform;
         std::string name = "no_name_model";
 

@@ -67,6 +67,7 @@ namespace libCore
         Ref<Model> currentSelectedModelInScene = nullptr;
         bool isSelectingObject = false;
         bool showModelSelectionCombo = false;
+        bool usingGizmo = false;
 
     private:
 
@@ -87,6 +88,8 @@ namespace libCore
         bool running = false;
         bool useImGUI = true;
         bool renderInImGUI = false;
+
+        
 
         bool mouseInImGUI = false;
 

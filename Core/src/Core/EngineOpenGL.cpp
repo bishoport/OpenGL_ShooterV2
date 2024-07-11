@@ -392,6 +392,13 @@ namespace libCore
 			UpdateModelAABB(child);
 		}
 	}
+	void UpdateModelTransform(const Ref<libCore::Model>& model) {
+		model->transform.updateRotationFromEulerAngles();
+		// Llamada recursiva para los modelos hijos
+		for (const auto& child : model->childs) {
+			UpdateModelTransform(child);
+		}
+	}
 	void EngineOpenGL::checkRayModelIntersection(const Ref<libCore::Model>& model, const glm::vec3& rayOrigin, const glm::vec3& rayDirection, const glm::mat4& accumulatedTransform) {
 		
 		glm::mat4 modelMatrix = accumulatedTransform * model->transform.getLocalModelMatrix();
@@ -444,7 +451,7 @@ namespace libCore
 
 		//--UPDATE MODEL TRANSFORM
 		for (const auto& model : modelsInScene) {
-			model->transform.updateRotationFromEulerAngles();
+			UpdateModelTransform(model);
 		}
 		//-------------------------------------------
 
@@ -455,7 +462,7 @@ namespace libCore
 		//-------------------------------------------
 
 		//--MOUSE PICKING
-		if (mouseInImGUI == false)
+		if (mouseInImGUI == false && usingGizmo == false)
 		{
 			if (isSelectingObject == true)
 			{

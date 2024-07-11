@@ -245,14 +245,22 @@ namespace libCore
                 break;
             }
 
+            if (ImGuizmo::IsOver())
+            {
+                EngineOpenGL::GetInstance().usingGizmo = true;
+            }
+            else
+            {
+                EngineOpenGL::GetInstance().usingGizmo = false;
+            }
+
             if (ImGuizmo::IsUsing())
             {
                 EngineOpenGL::GetInstance().currentSelectedModelInScene->transform.setMatrix(entity_transform);
             }
+
         }
     }
-
-
 
     //PANELES PRINCIPALES
     void GuiLayer::DrawModelNode(const Ref<libCore::Model>& model)
@@ -342,6 +350,8 @@ namespace libCore
             ImGui::SameLine();
             ImGui::DragFloat("##ScaleZ", &transform.scale.z, 0.01f, 0.0f, FLT_MAX, "Z: %.2f");
         }
+
+        ImGui::Checkbox("Show AABB", &model->showAABB);
 
         ImGui::End();
     }

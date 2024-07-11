@@ -23,8 +23,8 @@ namespace libCore {
         glm::vec3 dayNightColor = glm::vec3(0.0f / 255.0f, 0.0f / 255.0f, 0.0f / 255.0f);
         glm::vec3 groundColor = glm::vec3(36.0f / 255.0f, 89.0f / 255.0f, 122.0f / 255.0f);
 
-        float lowerBound = -0.05;
-        float upperBound = 0.05;
+        float lowerBound = -0.05f;
+        float upperBound = 0.05f;
 
         // Stars
         float starDensity = 0.0005f; // Densidad de estrellas

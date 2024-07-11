@@ -9,7 +9,8 @@
 #include <random>
 #include <vector>
 #include <glm/glm.hpp>
-//#include "Itc_matrix.hpp"
+#include "Itc_matrix_floats.hpp"
+#include "../tools/LUTGenerator.hpp"
 
 namespace libCore {
 
@@ -82,8 +83,10 @@ namespace libCore {
 
 
             //--AREA LIGHT
-            //mLTC.mat1 = loadMTexture();
-            //mLTC.mat2 = loadLUTTexture();
+            //mLTC.mat1 = LUTGenerator::GetInstance().createLTC1Texture(64);
+            //mLTC.mat2 = LUTGenerator::GetInstance().createLTC2Texture(64);
+            mLTC.mat1 = loadMTexture();
+            mLTC.mat2 = loadLUTTexture();
             //-------------------------------------------------------
         }
         
@@ -99,7 +102,10 @@ namespace libCore {
 
         // Función recursiva para dibujar los AABB de los modelos
         void DrawModelAABB(const Ref<libCore::Model>& model, const std::string& shader) {
-            model->DrawAABB(shader);
+            if (model->showAABB == true)
+            {
+                model->DrawAABB(shader);
+            }
             // Llamada recursiva para los modelos hijos
             for (const auto& child : model->childs) {
                 DrawModelAABB(child, shader);
@@ -630,24 +636,24 @@ namespace libCore {
         GLuint loadMTexture()
         {
             GLuint texture = 0;
-            //glGenTextures(1, &texture);
-            //glBindTexture(GL_TEXTURE_2D, texture);
+            glGenTextures(1, &texture);
+            glBindTexture(GL_TEXTURE_2D, texture);
 
-            //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_FLOAT, LTC1);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_FLOAT, LTC1);
 
-            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-            //glBindTexture(GL_TEXTURE_2D, 0);
+            glBindTexture(GL_TEXTURE_2D, 0);
             return texture;
         }
 
         GLuint loadLUTTexture()
         {
             GLuint texture = 0;
-            /*glGenTextures(1, &texture);
+            glGenTextures(1, &texture);
             glBindTexture(GL_TEXTURE_2D, texture);
 
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_FLOAT, LTC2);
@@ -657,7 +663,7 @@ namespace libCore {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-            glBindTexture(GL_TEXTURE_2D, 0);*/
+            glBindTexture(GL_TEXTURE_2D, 0);
             return texture;
         }
     };
