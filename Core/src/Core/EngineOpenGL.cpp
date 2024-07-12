@@ -15,7 +15,7 @@ namespace libCore
 {
 	//--MANAGERS
 	Scope<GuiLayer> guiLayer = nullptr; //esto se declara en el cpp porque si se pone en el h, hay errores de includes cíclicos
-	Scope<ViewportManager> viewportManager = nullptr; //esto se declara en el cpp porque si se pone en el h, hay errores de includes cíclicos
+	//Scope<ViewportManager> viewportManager = nullptr; //esto se declara en el cpp porque si se pone en el h, hay errores de includes cíclicos
 	//Scope<RoofGenerator> roofGenerator = nullptr;
 	// -------------------------------------------------
 	// -------------------------------------------------
@@ -134,41 +134,42 @@ namespace libCore
 		//-----------------------------
 
 		// -- SHADERS
+		//libCore::ShaderManager shaderManager;
 		std::string shadersDirectory = "assets/shaders/";
 		//shaderManager.setShaderDataLoad("basic",        shadersDirectory + "basic.vert",    shadersDirectory + "basic.frag");
-		shaderManager.setShaderDataLoad("colorQuadFBO", shadersDirectory + "quad_fbo.vert", shadersDirectory + "color_quad_fbo.frag");
+		ShaderManager::setShaderDataLoad("colorQuadFBO", shadersDirectory + "quad_fbo.vert", shadersDirectory + "color_quad_fbo.frag");
 		
 		//-DEBUG & TEXT
-		shaderManager.setShaderDataLoad("debug", shadersDirectory + "debug.vert", shadersDirectory + "debug.frag");
-		shaderManager.setShaderDataLoad("text",  shadersDirectory + "text.vert",  shadersDirectory + "text.frag");
+		ShaderManager::setShaderDataLoad("debug", shadersDirectory + "debug.vert", shadersDirectory + "debug.frag");
+		ShaderManager::setShaderDataLoad("text",  shadersDirectory + "text.vert",  shadersDirectory + "text.frag");
 
 		//-SSAO
-		shaderManager.setShaderDataLoad("ssao",     shadersDirectory + "ssao.vert", shadersDirectory + "ssao.frag");
-		shaderManager.setShaderDataLoad("ssaoBlur", shadersDirectory + "ssao.vert", shadersDirectory + "ssao_blur.frag");
+		ShaderManager::setShaderDataLoad("ssao",     shadersDirectory + "ssao.vert", shadersDirectory + "ssao.frag");
+		ShaderManager::setShaderDataLoad("ssaoBlur", shadersDirectory + "ssao.vert", shadersDirectory + "ssao_blur.frag");
 
 		//-SKYBOX
-		shaderManager.setShaderDataLoad("dynamicSkybox", shadersDirectory + "skybox/dynamicSkybox.vs", shadersDirectory + "skybox/dynamicSkybox.fs");
+		ShaderManager::setShaderDataLoad("dynamicSkybox", shadersDirectory + "skybox/dynamicSkybox.vs", shadersDirectory + "skybox/dynamicSkybox.fs");
 
 		//-G_Buffer
-		shaderManager.setShaderDataLoad("geometryPass", shadersDirectory + "deferred/geometryPass.vert", shadersDirectory + "deferred/geometryPass.frag");
-		shaderManager.setShaderDataLoad("lightingPass", shadersDirectory + "deferred/lightingPass.vert", shadersDirectory + "deferred/lightingPass.frag");
-		shaderManager.setShaderDataLoad("combinePass",  shadersDirectory + "combine.vert",               shadersDirectory + "combine.frag");
+		ShaderManager::setShaderDataLoad("geometryPass", shadersDirectory + "deferred/geometryPass.vert", shadersDirectory + "deferred/geometryPass.frag");
+		ShaderManager::setShaderDataLoad("lightingPass", shadersDirectory + "deferred/lightingPass.vert", shadersDirectory + "deferred/lightingPass.frag");
+		ShaderManager::setShaderDataLoad("combinePass",  shadersDirectory + "combine.vert",               shadersDirectory + "combine.frag");
 
 		//-IBL
-		shaderManager.setShaderDataLoad("equirectangularToCubemap", shadersDirectory + "IBL/cubemap.vs"             , shadersDirectory + "IBL/equirectangular_to_cubemap.fs");
-		shaderManager.setShaderDataLoad("irradiance",               shadersDirectory + "IBL/cubemap.vs"             , shadersDirectory + "IBL/irradiance_convolution.fs");
-		shaderManager.setShaderDataLoad("prefilter",                shadersDirectory + "IBL/cubemap.vs"             , shadersDirectory + "IBL/prefilter.fs");
-		shaderManager.setShaderDataLoad("brdf",                     shadersDirectory + "IBL/brdf.vs"                , shadersDirectory + "IBL/brdf.fs");
-		shaderManager.setShaderDataLoad("background",               shadersDirectory + "IBL/background.vs"          , shadersDirectory + "IBL/background.fs");
-		shaderManager.setShaderDataLoad("captureIBL",               shadersDirectory + "IBL/capture_enviroment.vert", shadersDirectory + "IBL/capture_enviroment.frag");
+		ShaderManager::setShaderDataLoad("equirectangularToCubemap", shadersDirectory + "IBL/cubemap.vs"             , shadersDirectory + "IBL/equirectangular_to_cubemap.fs");
+		ShaderManager::setShaderDataLoad("irradiance",               shadersDirectory + "IBL/cubemap.vs"             , shadersDirectory + "IBL/irradiance_convolution.fs");
+		ShaderManager::setShaderDataLoad("prefilter",                shadersDirectory + "IBL/cubemap.vs"             , shadersDirectory + "IBL/prefilter.fs");
+		ShaderManager::setShaderDataLoad("brdf",                     shadersDirectory + "IBL/brdf.vs"                , shadersDirectory + "IBL/brdf.fs");
+		ShaderManager::setShaderDataLoad("background",               shadersDirectory + "IBL/background.vs"          , shadersDirectory + "IBL/background.fs");
+		ShaderManager::setShaderDataLoad("captureIBL",               shadersDirectory + "IBL/capture_enviroment.vert", shadersDirectory + "IBL/capture_enviroment.frag");
 
 		//-SHADOWS
-		shaderManager.setShaderDataLoad("direct_light_depth_shadows", shadersDirectory + "shadows/directLight_shadow_mapping_depth_shader.vs", shadersDirectory + "shadows/directLight_shadow_mapping_depth_shader.fs");
+		ShaderManager::setShaderDataLoad("direct_light_depth_shadows", shadersDirectory + "shadows/directLight_shadow_mapping_depth_shader.vs", shadersDirectory + "shadows/directLight_shadow_mapping_depth_shader.fs");
 
 		//-STENCIL MOUSE PICKING
-		shaderManager.setShaderDataLoad("stencil", shadersDirectory + "Stencil.vert", shadersDirectory + "Stencil.frag");
+		ShaderManager::setShaderDataLoad("stencil", shadersDirectory + "Stencil.vert", shadersDirectory + "Stencil.frag");
 		
-		shaderManager.LoadAllShaders();
+		ShaderManager::LoadAllShaders();
 		//-----------------------------------------------------------------
 
 
@@ -188,15 +189,15 @@ namespace libCore
 		//---------------------------------------------------------------------------
 
 		// -- ViewportManager
-		viewportManager = CreateScope<ViewportManager>();
+		//viewportManager = CreateScope<ViewportManager>();
 		//---------------------------------------------------------------------------
 		 		
 		//-- FREETYPE
-		freeTypeManager = new libCore::FreeTypeManager();
+		FreeTypeManager::GetInstance().init();
 		//---------------------------------------------------------------------------
 
 		// -- ASSETS MANAGER (load Default Assets)
-		assetsManager.LoadDefaultAssets();
+		AssetsManager::GetInstance().LoadDefaultAssets();
 		//---------------------------------------------------------------------------
 
 		//-- ROOF GENERATOR
@@ -211,7 +212,6 @@ namespace libCore
 		//MousePicker::getInstance().initialize(window);
 		//MousePicker::getInstance().setupStencilBuffer();
 		//---------------------------------------------------------------------------
-
 
 		return true;
 	}
@@ -331,13 +331,13 @@ namespace libCore
 	//--VIEWPORTS
 	void EngineOpenGL::CreateViewport(std::string name, glm::vec3 cameraPosition, CAMERA_CONTROLLERS controller)
 	{
-		viewportManager->CreateViewport(name, cameraPosition, windowWidth, windowHeight, controller);
+		ViewportManager::GetInstance().CreateViewport(name, cameraPosition, windowWidth, windowHeight, controller);
 	}
 	void EngineOpenGL::RenderViewports()
 	{
 		//RENDERING
-		Renderer::getInstance().RenderViewport(viewportManager->viewports[currentViewport], m_deltaTime, modelsInScene);
-		Renderer::getInstance().ShowViewportInQuad(viewportManager->viewports[currentViewport]);
+		Renderer::getInstance().RenderViewport(ViewportManager::GetInstance().viewports[currentViewport], m_deltaTime, modelsInScene);
+		Renderer::getInstance().ShowViewportInQuad(ViewportManager::GetInstance().viewports[currentViewport]);
 		//-------------------------------------------
 	}
 	// -------------------------------------------------
@@ -478,16 +478,16 @@ namespace libCore
 			{
 				modelsInRay.clear();
 
-				float normalizedX = (2.0f * mouseX) / viewportManager->viewports[currentViewport]->viewportSize.x - 1.0f;
-				float normalizedY = ((2.0f * mouseY) / viewportManager->viewports[currentViewport]->viewportSize.y - 1.0f) * -1.0f;
+				float normalizedX = (2.0f * mouseX) / ViewportManager::GetInstance().viewports[currentViewport]->viewportSize.x - 1.0f;
+				float normalizedY = ((2.0f * mouseY) / ViewportManager::GetInstance().viewports[currentViewport]->viewportSize.y - 1.0f) * -1.0f;
 
 				glm::vec3 clipSpaceCoordinates(normalizedX, normalizedY, -1.0);
 				glm::vec4 homogenousClipCoordinates = glm::vec4(clipSpaceCoordinates, 1.0);
-				glm::mat4 invProjView = glm::inverse(viewportManager->viewports[currentViewport]->camera->cameraMatrix);
+				glm::mat4 invProjView = glm::inverse(ViewportManager::GetInstance().viewports[currentViewport]->camera->cameraMatrix);
 				glm::vec4 homogenousWorldCoordinates = invProjView * homogenousClipCoordinates;
 				glm::vec3 worldCoordinates = glm::vec3(homogenousWorldCoordinates) / homogenousWorldCoordinates.w;
 
-				glm::vec3 rayOrigin = viewportManager->viewports[currentViewport]->camera->Position;
+				glm::vec3 rayOrigin = ViewportManager::GetInstance().viewports[currentViewport]->camera->Position;
 				glm::vec3 rayDirection = glm::normalize(worldCoordinates - rayOrigin);
 
 				for (const auto& model : modelsInScene) {
@@ -535,7 +535,7 @@ namespace libCore
 
 		material->albedoColor = polygonColor;
 
-		material->albedoMap = assetsManager.GetTexture("default_albedo");
+		material->albedoMap = AssetsManager::GetInstance().GetTexture("default_albedo");
 		//material->normalMap = assetsManager.GetTexture("default_normal");
 		//material->metallicMap = assetsManager.GetTexture("default_metallic");
 		//material->roughnessMap = assetsManager.GetTexture("default_roughness");
@@ -560,11 +560,11 @@ namespace libCore
 		material->albedoColor.g = 1.0f;
 		material->albedoColor.b = 1.0f;
 
-		material->albedoMap = assetsManager.GetTexture("default_albedo");
-		material->normalMap = assetsManager.GetTexture("default_normal");
-		material->metallicMap = assetsManager.GetTexture("default_metallic");
-		material->roughnessMap = assetsManager.GetTexture("default_roughness");
-		material->aOMap = assetsManager.GetTexture("default_ao");
+		material->albedoMap = AssetsManager::GetInstance().GetTexture("default_albedo");
+		material->normalMap = AssetsManager::GetInstance().GetTexture("default_normal");
+		material->metallicMap = AssetsManager::GetInstance().GetTexture("default_metallic");
+		material->roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
+		material->aOMap = AssetsManager::GetInstance().GetTexture("default_ao");
 
 		modelBuild->materials.push_back(material);
 
@@ -587,11 +587,11 @@ namespace libCore
 		material->albedoColor.g = 1.0f;
 		material->albedoColor.b = 1.0f;
 
-		material->albedoMap = assetsManager.GetTexture("checker");
-		material->normalMap = assetsManager.GetTexture("default_normal");
-		material->metallicMap = assetsManager.GetTexture("default_metallic");
-		material->roughnessMap = assetsManager.GetTexture("default_roughness");
-		material->aOMap = assetsManager.GetTexture("default_ao");
+		material->albedoMap = AssetsManager::GetInstance().GetTexture("checker");
+		material->normalMap = AssetsManager::GetInstance().GetTexture("default_normal");
+		material->metallicMap = AssetsManager::GetInstance().GetTexture("default_metallic");
+		material->roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
+		material->aOMap = AssetsManager::GetInstance().GetTexture("default_ao");
 
 		modelBuild->materials.push_back(material);
 
@@ -612,11 +612,11 @@ namespace libCore
 		material->albedoColor.g = 1.0f;
 		material->albedoColor.b = 1.0f;
 
-		material->albedoMap = assetsManager.GetTexture("default_albedo");
-		material->normalMap = assetsManager.GetTexture("default_normal");
-		material->metallicMap = assetsManager.GetTexture("default_metallic");
-		material->roughnessMap = assetsManager.GetTexture("default_roughness");
-		material->aOMap = assetsManager.GetTexture("default_ao");
+		material->albedoMap = AssetsManager::GetInstance().GetTexture("default_albedo");
+		material->normalMap = AssetsManager::GetInstance().GetTexture("default_normal");
+		material->metallicMap = AssetsManager::GetInstance().GetTexture("default_metallic");
+		material->roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
+		material->aOMap = AssetsManager::GetInstance().GetTexture("default_ao");
 
 		modelBuild->materials.push_back(material);
 
@@ -638,11 +638,11 @@ namespace libCore
 		material->albedoColor.g = 1.0f;
 		material->albedoColor.b = 1.0f;
 
-		material->albedoMap = assetsManager.GetTexture("default_albedo");
-		material->normalMap = assetsManager.GetTexture("default_normal");
-		material->metallicMap = assetsManager.GetTexture("default_metallic");
-		material->roughnessMap = assetsManager.GetTexture("default_roughness");
-		material->aOMap = assetsManager.GetTexture("default_ao");
+		material->albedoMap = AssetsManager::GetInstance().GetTexture("default_albedo");
+		material->normalMap = AssetsManager::GetInstance().GetTexture("default_normal");
+		material->metallicMap = AssetsManager::GetInstance().GetTexture("default_metallic");
+		material->roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
+		material->aOMap = AssetsManager::GetInstance().GetTexture("default_ao");
 
 		modelBuild->materials.push_back(material);
 
@@ -680,7 +680,7 @@ namespace libCore
 			//--------------------------------------------------------
 
 			//--CHECK ImGizmo
-			guiLayer->checkGizmo(viewportManager->viewports[currentViewport]);
+			guiLayer->checkGizmo(ViewportManager::GetInstance().viewports[currentViewport]);
 			//--------------------------------------------------------
 
 			guiLayer->DrawHierarchyPanel(modelsInScene);
@@ -690,7 +690,7 @@ namespace libCore
 			//guiLayer->RenderCheckerMatrix(); //Panel para el editor de roofs
 
 			Renderer::getInstance().ShowControlsGUI();
-			viewportManager->DrawPanelGUI();
+			ViewportManager::GetInstance().DrawPanelGUI();
 
 			
 			//--------------------------------------------------------

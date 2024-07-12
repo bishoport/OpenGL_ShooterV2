@@ -8,6 +8,7 @@
 #include "Light.hpp"
 #include "../StraightSkeleton/Vector2d.h"
 #include "../tools/FreeTypeManager.h"
+#include "../ECS/Scene.h"
 
 
 namespace libCore
@@ -19,6 +20,8 @@ namespace libCore
         using KeyPressedFnc = std::function<void(int)>;
         using ImGUILoopFnc = std::function<void()>;
 
+
+
     public:
         //LIFE CYCLE
         bool InitializeEngine(const std::string& windowTitle, int initialWindowWidth, int initialWindowHeight, MainLoopFnc mainLoopFnc, CloseGlFnc closeGlFnc, ImGUILoopFnc imGUILoopFnc = [] {});
@@ -26,6 +29,8 @@ namespace libCore
         void begin();
         void StopMainLoop();
         void SetupInputCallbacks();
+
+
 
 
         //VIEWPORTS, UPDATE & RENDER
@@ -52,6 +57,8 @@ namespace libCore
             static EngineOpenGL instance;
             return instance;
         }
+
+
 
         // Función estática para obtener la ventana GLFW
         static GLFWwindow* GetWindow()
@@ -83,16 +90,10 @@ namespace libCore
         KeyPressedFnc g_keyPressedFnc;
         ImGUILoopFnc g_imGUILoopFnc;
 
-        libCore::ShaderManager shaderManager;
 
         bool running = false;
         bool useImGUI = true;
-        bool renderInImGUI = false;
-
-        
-
         bool mouseInImGUI = false;
-
         int windowWidth = 0;
         int windowHeight = 0;
 

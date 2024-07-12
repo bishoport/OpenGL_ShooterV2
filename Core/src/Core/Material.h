@@ -11,10 +11,7 @@ namespace libCore
     {
     public:
 
-        Material()
-        {
-
-        }
+        Material(){}
 
         Material(const std::string& matName)
         {

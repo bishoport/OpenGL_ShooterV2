@@ -258,7 +258,6 @@ namespace libCore
             {
                 EngineOpenGL::GetInstance().currentSelectedModelInScene->transform.setMatrix(entity_transform);
             }
-
         }
     }
 
@@ -741,7 +740,6 @@ namespace libCore
         ImGui::End();
     }
     //-----------------------------------------------------------------------------------------------------
-
 
     void GuiLayer::end()
     {

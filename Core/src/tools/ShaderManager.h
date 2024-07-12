@@ -4,21 +4,22 @@
 #include <string>
 #include <unordered_map>
 
-
 namespace libCore 
 {
-
-
     class ShaderManager {
     public:
 
+        static ShaderManager& GetInstance() {
+            static ShaderManager instance;
+            return instance;
+        }
+
         static void setShaderDataLoad(std::string shaderName, std::string V_shaderPath, std::string F_shaderPath);
-
         static void LoadAllShaders();
-
         static Shader* Get(const std::string& name);
 
     private:
+
         struct ShaderDataSource {
             Shader::ShaderType shaderType;
             std::string sourcePath;
@@ -54,8 +55,6 @@ namespace libCore
             }
         };
 
-
-        
 
         static void Load(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath, const std::string& geometryPath = "");
         

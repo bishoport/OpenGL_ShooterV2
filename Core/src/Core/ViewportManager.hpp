@@ -13,6 +13,11 @@ namespace libCore
 
     public:
 
+        static ViewportManager& GetInstance() {
+            static ViewportManager instance;
+            return instance;
+        }
+
         std::vector<Ref<Viewport>> viewports;
 
         void CreateViewport(std::string name, glm::vec3 cameraPosition, int viewportWidth, int viewportHeight, CAMERA_CONTROLLERS controller)
@@ -196,6 +201,10 @@ namespace libCore
             }
             ImGui::End();
         }
+
+
+        private:
+            ViewportManager() {};
     };
 }
 

@@ -3,7 +3,7 @@
 
 namespace libCore
 {
-	AssetsManager& assetsManager = AssetsManager::GetInstance();
+	//AssetsManager& assetsManager = AssetsManager::GetInstance();
 
 	void AssetsManager::LoadDefaultAssets()
 	{

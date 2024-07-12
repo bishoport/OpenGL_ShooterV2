@@ -33,5 +33,5 @@ namespace libCore
 	};
 
 	// Declaración externa de una referencia a AssetsManager
-	extern AssetsManager& assetsManager;
+	//extern AssetsManager& assetsManager;
 }

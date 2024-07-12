@@ -15,7 +15,15 @@ namespace libCore
     {
     public:
 
-        FreeTypeManager()
+
+        static FreeTypeManager& GetInstance() {
+            static FreeTypeManager instance;
+            return instance;
+        }
+
+
+
+        void init()
         {
             // FreeType
             // --------
@@ -163,6 +171,8 @@ namespace libCore
 
 
     private:/// Holds all state information relevant to a character as loaded using FreeType
+
+        FreeTypeManager() {};
 
         unsigned int VAO, VBO;
 
