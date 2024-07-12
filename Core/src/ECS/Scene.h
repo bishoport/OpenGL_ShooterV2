@@ -11,7 +11,7 @@ namespace libCore
 	class Scene {
 
 	public:
-
+		Scene();
 
 
 	public:
@@ -21,11 +21,13 @@ namespace libCore
 			return instance;
 		}
 
-
 		//--SCENE LIFE-CYCLE
 		void Init();
 		void Update(Timestep m_deltaTime);
 		void Render(Timestep m_deltaTime);
+		//-----------------------------------
+
+		
 
 	private:
 
@@ -33,7 +35,7 @@ namespace libCore
 
 
 	private:
-		Scene();
+		
 	};
 
 }

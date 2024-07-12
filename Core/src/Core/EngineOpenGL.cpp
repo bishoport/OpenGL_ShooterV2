@@ -59,16 +59,11 @@ namespace libCore
 	//--INIT & LIFE CYCLE
 	bool EngineOpenGL::InitializeEngine(const std::string& windowTitle,
 		int initialWindowWidth,
-		int initialWindowHeight,
-		MainLoopFnc mainLoodFnc,
-		CloseGlFnc closeGlFnc,
-		ImGUILoopFnc imGUILoopFnc)
+		int initialWindowHeight)
 	{
 		windowWidth = initialWindowWidth;
 		windowHeight = initialWindowHeight;
 
-		g_mainLoodFnc = mainLoodFnc;
-		g_closeGlFnc = closeGlFnc;
 
 		/* Initialize the library */
 		if (!glfwInit())
@@ -174,13 +169,13 @@ namespace libCore
 
 
 		// -- IMGUI
-		if (imGUILoopFnc && useImGUI == true)
+		if (useImGUI == true)
 		{
 			guiLayer = CreateScope<GuiLayer>(window, windowWidth, windowHeight);
 			guiLayer->SetCallBackFunc([this](const std::vector<Vector2d>& points, const std::vector<Vector2d>& holePoints) {
 				this->CreateRoof(points, holePoints);
 				});
-			g_imGUILoopFnc = imGUILoopFnc;
+			//g_imGUILoopFnc = imGUILoopFnc;
 		}
 		// -------------------------------------------------
 
@@ -317,10 +312,10 @@ namespace libCore
 			glfwSwapBuffers(window);
 		}
 
-		if (g_closeGlFnc)
-		{
-			g_closeGlFnc();
-		}
+		//if (g_closeGlFnc)
+		//{
+		//	g_closeGlFnc();
+		//}
 
 		glfwTerminate();
 	}

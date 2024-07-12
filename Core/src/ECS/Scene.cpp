@@ -4,9 +4,16 @@
 
 namespace libCore
 {
+
+	//--CONSTRUCTORS
 	Scene::Scene()
 	{
+
 	}
+	//-----------------------------------
+
+
+	//--LIFE-CYCLE
 	void Scene::Init()
 	{
 	}
@@ -16,4 +23,5 @@ namespace libCore
 	void Scene::Render(Timestep m_deltaTime)
 	{
 	}
+	//-----------------------------------
 }

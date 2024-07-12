@@ -6,10 +6,7 @@
 void MapEditor::Init()
 {
     // -- PREPARE ENGINE
-    bool ok = libCore::EngineOpenGL::GetInstance().InitializeEngine("MAP EDITOR", screenWidth, screenHeight,
-        std::bind(&MapEditor::LoopOpenGL, this, std::placeholders::_1),
-        std::bind(&MapEditor::OnCloseOpenGL, this),
-        std::bind(&MapEditor::LoopImGUI, this));
+    bool ok = libCore::EngineOpenGL::GetInstance().InitializeEngine("MAP EDITOR", screenWidth, screenHeight);
     if (!ok) return;
     //-----------------------------------------------------------------
 
@@ -148,10 +145,3 @@ void MapEditor::Init()
     libCore::EngineOpenGL::GetInstance().InitializeMainLoop();
     //------------------------------------------------------------------
 }
-
-
-
-
-void MapEditor::LoopOpenGL(libCore::Timestep deltaTime){}
-void MapEditor::LoopImGUI(){}
-void MapEditor::OnCloseOpenGL(){}

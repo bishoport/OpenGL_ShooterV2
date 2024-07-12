@@ -15,22 +15,14 @@ namespace libCore
 {
     class EngineOpenGL
     {
-        using MainLoopFnc = std::function<void(Timestep)>;
-        using CloseGlFnc = std::function<void()>;
-        using KeyPressedFnc = std::function<void(int)>;
-        using ImGUILoopFnc = std::function<void()>;
-
-
-
     public:
-        //LIFE CYCLE
-        bool InitializeEngine(const std::string& windowTitle, int initialWindowWidth, int initialWindowHeight, MainLoopFnc mainLoopFnc, CloseGlFnc closeGlFnc, ImGUILoopFnc imGUILoopFnc = [] {});
+
+        //ENGINE LIFE--CYCLE
+        bool InitializeEngine(const std::string& windowTitle, int initialWindowWidth, int initialWindowHeight);
         void InitializeMainLoop();
         void begin();
         void StopMainLoop();
         void SetupInputCallbacks();
-
-
 
 
         //VIEWPORTS, UPDATE & RENDER
@@ -68,8 +60,8 @@ namespace libCore
 
 
     public:
-        FreeTypeManager* freeTypeManager = nullptr;
 
+        //MOUSE PICKING & ImGizmo
         std::vector<Ref<Model>> modelsInRay;
         Ref<Model> currentSelectedModelInScene = nullptr;
         bool isSelectingObject = false;
@@ -82,13 +74,8 @@ namespace libCore
 
         std::vector<Ref<libCore::Model>> modelsInScene;
 
-        GLFWwindow* window;
-        Timestep m_deltaTime;
-
-        MainLoopFnc g_mainLoodFnc;
-        CloseGlFnc g_closeGlFnc;
-        KeyPressedFnc g_keyPressedFnc;
-        ImGUILoopFnc g_imGUILoopFnc;
+        GLFWwindow* window = nullptr;
+        Timestep m_deltaTime = 0.0f;
 
 
         bool running = false;
@@ -102,7 +89,7 @@ namespace libCore
 
 
         // Constructor privado para el patrón Singleton
-        EngineOpenGL() = default;
+        EngineOpenGL(){};
 
         // Deshabilitar copia y asignación
         EngineOpenGL(const EngineOpenGL&) = delete;

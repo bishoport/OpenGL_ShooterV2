@@ -13,9 +13,4 @@ private:
 
     int screenWidth = 1080;
     int screenHeight = 720;
-
-    void LoopOpenGL(libCore::Timestep deltaTime);
-    void LoopImGUI();
-    void OnCloseOpenGL();
-
 };
