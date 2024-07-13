@@ -162,7 +162,7 @@ namespace libCore {
 
                 // Bind the shadow framebuffer
                 viewport->framebuffer_shadowmap->bindFBO();
-                glViewport(0, 0, viewport->viewportSize.x, viewport->viewportSize.y);
+                glViewport(0, 0, static_cast<GLsizei>(viewport->viewportSize.x), static_cast<GLsizei>(viewport->viewportSize.y));
                 glClear(GL_DEPTH_BUFFER_BIT);
 
                 libCore::ShaderManager::Get("direct_light_depth_shadows")->use();
@@ -179,7 +179,7 @@ namespace libCore {
                 PopDebugGroup();
             }
 
-            glViewport(0, 0, viewport->viewportSize.x, viewport->viewportSize.y);
+            glViewport(0, 0, static_cast<GLsizei>(viewport->viewportSize.x), static_cast<GLsizei>(viewport->viewportSize.y));
             //--------------------------------------------------------------------------------
             //--------------------------------------------------------------------------------
 

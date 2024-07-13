@@ -44,6 +44,7 @@
     <ClInclude Include="src\Core\GuiLayer.h" />
     <ClInclude Include="src\ECS\EntityManager.hpp" />
     <ClInclude Include="src\ECS\Scene.h" />
+    <ClInclude Include="src\ECS\Scripts\MyScript.h" />
     <ClInclude Include="src\input\InputManager.h" />
     <ClInclude Include="src\input\KeyCodes.h" />
     <ClInclude Include="src\input\MouseButtonCodes.h" />

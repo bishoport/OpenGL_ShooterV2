@@ -135,7 +135,6 @@
     <ClCompile Include="src\MapEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="assets\Scripts\MyScript.h" />
     <ClInclude Include="src\MapEditor.h" />
   </ItemGroup>
   <ItemGroup>

@@ -255,7 +255,7 @@ namespace libCore
 	}
 	void EngineOpenGL::InitializeMainLoop()
 	{
-		Timestep lastFrameTime = glfwGetTime();
+		Timestep lastFrameTime = static_cast<float>(glfwGetTime());
 
 		running = true;
 
@@ -263,7 +263,7 @@ namespace libCore
 		while (!glfwWindowShouldClose(window) && running)
 		{
 			//DELTA TIME
-			Timestep currentFrameTime = glfwGetTime();
+			Timestep currentFrameTime = static_cast<float>(glfwGetTime());
 			m_deltaTime = currentFrameTime - lastFrameTime;
 			lastFrameTime = currentFrameTime;
 			//-------------------------------------------

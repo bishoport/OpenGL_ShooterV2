@@ -57,7 +57,7 @@ namespace libCore {
 
         void closeSetup() {
             if (!enableRBO && !drawBuffers.empty()) {
-                glDrawBuffers(drawBuffers.size(), drawBuffers.data());
+                glDrawBuffers(static_cast<GLsizei>(drawBuffers.size()), drawBuffers.data());
             }
             else {
                 glDrawBuffer(GL_NONE);

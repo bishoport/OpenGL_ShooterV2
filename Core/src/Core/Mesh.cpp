@@ -55,11 +55,11 @@ namespace libCore
         else if (drawLike == DRAW_GEOM_LIKE::LINE)
         {
             glLineWidth(1.0f);
-            glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_LINES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
         }
         else if (drawLike == DRAW_GEOM_LIKE::TRIANGLE)
         {
-            glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
         }
 
         VAO.Unbind();

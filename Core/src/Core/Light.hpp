@@ -220,7 +220,9 @@ namespace libCore
             else if (type == AREA)
             {
                 // Dibujar los puntos del área
-                glDrawArrays(GL_POINTS, 0, vertices.size());
+                glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(vertices.size()));
+
+
 
                 // Dibujar líneas entre los puntos para formar el polígono
                 std::vector<GLuint> indices;
@@ -235,7 +237,7 @@ namespace libCore
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
                 glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_DYNAMIC_DRAW);
 
-                glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0);
+                glDrawElements(GL_LINES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
 
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
                 glDeleteBuffers(1, &EBO);

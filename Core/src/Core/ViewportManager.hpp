@@ -24,8 +24,8 @@ namespace libCore
         {
             auto viewport = CreateRef<Viewport>();
             viewport->viewportName = name;
-            viewport->viewportSize.x = viewportWidth;
-            viewport->viewportSize.y = viewportHeight;
+            viewport->viewportSize.x = static_cast<float>(viewportWidth);
+            viewport->viewportSize.y = static_cast<float>(viewportHeight);
 
             // Camera
             if (controller == CAMERA_CONTROLLERS::FPS)
@@ -41,7 +41,7 @@ namespace libCore
 
             // G-Buffer
             auto gbo = CreateRef<GBO>();
-            gbo->init(viewport->viewportSize.x, viewport->viewportSize.y);
+            gbo->init(static_cast<int>(viewport->viewportSize.x), static_cast<int>(viewport->viewportSize.y));
             viewport->gBuffer = std::move(gbo);
             //----------------------------------------------------------
 
@@ -49,7 +49,7 @@ namespace libCore
 
             // F-Buffer Deferred + lighting
             auto fbo0 = CreateRef<FBO>();
-            fbo0->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RGB16, "F-Buffer Deferred-lighting", true, false, false);
+            fbo0->init(static_cast<int>(viewport->viewportSize.x), static_cast<int>(viewport->viewportSize.y), GL_RGB16, "F-Buffer Deferred-lighting", true, false, false);
             fbo0->addAttachment("color", GL_RGB16F, GL_RGB, GL_FLOAT, GL_COLOR_ATTACHMENT0);
             fbo0->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_ATTACHMENT);
             fbo0->closeSetup();
@@ -58,7 +58,7 @@ namespace libCore
 
             // F-Buffer Deferred + Forward 
             auto fbo1 = CreateRef<FBO>();
-            fbo1->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RGB8, "F-Buffer Deferred-Forward", true, false, false);
+            fbo1->init(static_cast<int>(viewport->viewportSize.x), static_cast<int>(viewport->viewportSize.y), GL_RGB8, "F-Buffer Deferred-Forward", true, false, false);
             fbo1->addAttachment("color", GL_RGB8, GL_RGB, GL_FLOAT, GL_COLOR_ATTACHMENT0);
             fbo1->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_ATTACHMENT);
             fbo1->closeSetup();
@@ -67,7 +67,7 @@ namespace libCore
 
             // F-Buffer Final
             auto fbo2 = CreateRef<FBO>();
-            fbo2->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RGB8, "F-Buffer Final", true, false, false);
+            fbo2->init(static_cast<int>(viewport->viewportSize.x), static_cast<int>(viewport->viewportSize.y), GL_RGB8, "F-Buffer Final", true, false, false);
             fbo2->addAttachment("color", GL_RGB8, GL_RGB, GL_FLOAT, GL_COLOR_ATTACHMENT0);
             fbo2->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_ATTACHMENT);
             fbo2->closeSetup();
@@ -76,7 +76,7 @@ namespace libCore
 
             // F-Buffer HDR
             auto fbo3 = CreateRef<FBO>();
-            fbo3->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RGB16F, "F-Buffer HDR", true, false, false); // Este buffer tiene una coma flotante más grande porque es para HDR
+            fbo3->init(static_cast<int>(viewport->viewportSize.x), static_cast<int>(viewport->viewportSize.y), GL_RGB16F, "F-Buffer HDR", true, false, false); // Este buffer tiene una coma flotante más grande porque es para HDR
             fbo3->addAttachment("color", GL_RGB16F, GL_RGB, GL_FLOAT, GL_COLOR_ATTACHMENT0);
             fbo3->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_ATTACHMENT);
             fbo3->closeSetup();
@@ -85,7 +85,7 @@ namespace libCore
 
             // F-Buffer SSAO
             auto fbo4 = CreateRef<FBO>();
-            fbo4->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RED, "F-Buffer SSAO", true, false, false);
+            fbo4->init(static_cast<int>(viewport->viewportSize.x), static_cast<int>(viewport->viewportSize.y), GL_RED, "F-Buffer SSAO", true, false, false);
             fbo4->addAttachment("color", GL_RED, GL_RED, GL_FLOAT, GL_COLOR_ATTACHMENT0);
             fbo4->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_ATTACHMENT);
             fbo4->closeSetup();
@@ -94,7 +94,7 @@ namespace libCore
 
             // F-Buffer SSAO-BLUR
             auto fbo5 = CreateRef<FBO>();
-            fbo5->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_RED, "F-Buffer SSAO-BLUR", true, false, false);
+            fbo5->init(static_cast<int>(viewport->viewportSize.x), static_cast<int>(viewport->viewportSize.y), GL_RED, "F-Buffer SSAO-BLUR", true, false, false);
             fbo5->addAttachment("color", GL_RED, GL_RED, GL_FLOAT, GL_COLOR_ATTACHMENT0);
             fbo5->addAttachment("depth", GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_ATTACHMENT);
             fbo5->closeSetup();
@@ -103,7 +103,7 @@ namespace libCore
 
             // F-Buffer ShadowMap
             auto fbo6 = CreateRef<FBO>();
-            fbo6->init(viewport->viewportSize.x, viewport->viewportSize.y, GL_DEPTH_COMPONENT, "F-Buffer ShadowMap", true, false, false);
+            fbo6->init(static_cast<int>(viewport->viewportSize.x), static_cast<int>(viewport->viewportSize.y), GL_DEPTH_COMPONENT, "F-Buffer ShadowMap", true, false, false);
             fbo6->addAttachment("depth", GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_ATTACHMENT);
             fbo6->closeSetup();
             viewport->framebuffer_shadowmap = std::move(fbo6);

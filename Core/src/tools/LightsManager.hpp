@@ -106,7 +106,7 @@ namespace libCore
 
 		// Método estático para agregar una luz
 		static void AddLight(const Ref<Light>& light) {
-			light->id = GetInstance().lights.size();
+			light->id = static_cast<int>(GetInstance().lights.size());
 			GetInstance().lights.push_back(light);
 		}
 

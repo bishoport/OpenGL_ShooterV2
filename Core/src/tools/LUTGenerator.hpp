@@ -5,7 +5,7 @@
 
 // Definir la constante M_PI_2
 #ifndef M_PI_2
-#define M_PI_2 1.5707963267948966 // π/2
+#define M_PI_2 1.5707963267948966f // π/2
 #endif
 
 
@@ -73,8 +73,8 @@ namespace libCore
 
 			for (int y = 0; y < size; ++y) {
 				for (int x = 0; x < size; ++x) {
-					float roughness = (float)x / (size - 1); // Rugosidad
-					float theta = (float)y / (size - 1) * M_PI_2; // Ángulo
+					float roughness = (float)x / (size - 1.0f); // Rugosidad
+					float theta = (float) y / (size - 1.0f) * M_PI_2; // Ángulo
 
 					// Aquí debes calcular la matriz M basada en tus necesidades
 					// Por simplicidad, inicializamos con una matriz de identidad

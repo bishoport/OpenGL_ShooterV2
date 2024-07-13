@@ -9,6 +9,7 @@
 #include <memory>
 #include <iostream>
 #include <windows.h>
+#include "Scripts/MyScript.h"
 
 namespace libCore {
 
@@ -113,12 +114,12 @@ namespace libCore {
         //--ACTUALIZADOR DE FUNCIONES UPDATES ANTES DEL RENDER DE LOS COMPONENTES
         void UpdateEntities(Timestep deltaTime) {
 
-            //// Inicializar y actualizar scripts
-            //auto scriptView = m_registry->view<ScriptComponent>();
-            //for (auto entity : scriptView) {
-            //    auto& scriptComponent = scriptView.get<ScriptComponent>(entity);
-            //    scriptComponent.Update(deltaTime.GetMilliseconds());
-            //}
+            // Inicializar y actualizar scripts
+            auto scriptView = m_registry->view<ScriptComponent>();
+            for (auto entity : scriptView) {
+                auto& scriptComponent = scriptView.get<ScriptComponent>(entity);
+                scriptComponent.Update(deltaTime.GetMilliseconds());
+            }
 
             auto view = m_registry->view<TransformComponent, MeshComponent>();
             for (auto entity : view) {
@@ -176,9 +177,9 @@ namespace libCore {
             transformComponent.transform = model->transform;
 
             // Asignar el ScriptComponent con ExampleScript
-            //auto& scriptComponent = m_registry->emplace<ScriptComponent>(entity);
-            //scriptComponent.instance = CreateRef<ExampleScript>();
-            //scriptComponent.instance->SetEntity(entity, m_registry);
+            auto& scriptComponent = m_registry->emplace<ScriptComponent>(entity);
+            scriptComponent.instance = CreateRef<MyScript>();
+            scriptComponent.instance->SetEntity(entity, m_registry);
 
             // Asignar los componentes de MaterialComponent si el modelo tiene materiales
             if (!model->materials.empty()) {
@@ -206,6 +207,7 @@ namespace libCore {
                 CreateEntityFromModel(child, entity);
             }
         }
+
 
         // Función de dibujo de entidades
         void DrawEntity(TransformComponent& transformComponent, MeshComponent& meshComponent, MaterialComponent& materialComponent, const std::string& shader)

@@ -369,13 +369,13 @@ namespace libCore
             }
 
 
-            //if (EntityManager::GetInstance().m_registry->has<ScriptComponent>(selectedEntity)) {
-            //    auto& scriptComponent = EntityManager::GetInstance().m_registry->get<ScriptComponent>(selectedEntity);
-            //    if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen)) {
-            //        ImGui::Text("Script Instance: %s", typeid(*scriptComponent.instance).name());
-            //        // Aquí puedes agregar más controles para interactuar con el script, si es necesario
-            //    }
-            //}
+            if (EntityManager::GetInstance().m_registry->has<ScriptComponent>(selectedEntity)) {
+                auto& scriptComponent = EntityManager::GetInstance().m_registry->get<ScriptComponent>(selectedEntity);
+                if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen)) {
+                    ImGui::Text("Script Instance: %s", typeid(*scriptComponent.instance).name());
+                    // Aquí puedes agregar más controles para interactuar con el script, si es necesario
+                }
+            }
         }
         else {
             ImGui::Text("No entity selected.");

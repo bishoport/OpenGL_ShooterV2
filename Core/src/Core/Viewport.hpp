@@ -63,23 +63,23 @@ namespace libCore
                     viewportPos.x = position.x;
                     viewportPos.y = viewportSize.y - position.y;
 
-                    gBuffer->resize(size.x, size.y);
+                    gBuffer->resize(static_cast<int>(size.x), static_cast<int>(size.y));
 
-                    framebuffer_deferred->resize(size.x, size.y);
-                    framebuffer_shadowmap->resize(size.x, size.y);
-                    framebuffer_forward->resize(size.x, size.y);
-                    framebuffer_final->resize(size.x, size.y);
-                    framebuffer_HDR->resize(size.x, size.y);
-                    framebuffer_SSAO->resize(size.x, size.y);
-                    framebuffer_SSAOBlur->resize(size.x, size.y);
+                    framebuffer_deferred->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                    framebuffer_shadowmap->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                    framebuffer_forward->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                    framebuffer_final->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                    framebuffer_HDR->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                    framebuffer_SSAO->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                    framebuffer_SSAOBlur->resize(static_cast<int>(size.x), static_cast<int>(size.y));
 
                     camera->width = static_cast<int>(size.x);
                     camera->height = static_cast<int>(size.y);
                 });
             EventManager::OnWindowResizeEvent().subscribe([this](const int width, const int height)
                 {
-                    viewportSize.x = width;
-                    viewportSize.y = height;
+                    viewportSize.x = static_cast<float>(width);
+                    viewportSize.y = static_cast<float>(height);
 
                     gBuffer->resize(width, height);
 
