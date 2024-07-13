@@ -11,6 +11,7 @@
 #include <glm/glm.hpp>
 #include "Itc_matrix_floats.hpp"
 #include "../tools/LUTGenerator.hpp"
+#include "../ECS/EntityManager.hpp"
 
 namespace libCore {
 
@@ -100,20 +101,9 @@ namespace libCore {
             glPopDebugGroup();
         }
 
-        // Función recursiva para dibujar los AABB de los modelos
-        void DrawModelAABB(const Ref<libCore::Model>& model, const std::string& shader) {
-            if (model->showAABB == true)
-            {
-                model->DrawAABB(shader);
-            }
-            // Llamada recursiva para los modelos hijos
-            for (const auto& child : model->childs) {
-                DrawModelAABB(child, shader);
-            }
-        }
 
 
-        void RenderViewport(const Ref<Viewport>& viewport, const Timestep& m_deltaTime, const std::vector<Ref<libCore::Model>>& modelsInScene) {
+        void RenderViewport(const Ref<Viewport>& viewport, const Timestep& m_deltaTime) { //, const std::vector<Ref<libCore::Model>>& modelsInScene
 
             if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_P)) 
             {
@@ -179,9 +169,11 @@ namespace libCore {
                 libCore::ShaderManager::Get("direct_light_depth_shadows")->setMat4("shadowMVP", directionalLight->shadowMVP);
 
                 // Draw the models in the scene
-                for (auto& modelContainer : modelsInScene) {
+                /*for (auto& modelContainer : modelsInScene) {
                     modelContainer->Draw("direct_light_depth_shadows");
-                }
+                }*/
+
+                EntityManager::GetInstance().DrawEntities("direct_light_depth_shadows");
 
                 viewport->framebuffer_shadowmap->unbindFBO();
                 PopDebugGroup();
@@ -217,11 +209,16 @@ namespace libCore {
                 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             }
 
+
+
             //// Dibujar los modelos en la escena
-            for (auto& modelContainer : modelsInScene) 
+            /*for (auto& modelContainer : modelsInScene) 
             {
                 modelContainer->Draw("geometryPass");
-            }
+            }*/
+
+            EntityManager::GetInstance().DrawEntities("geometryPass");
+
             // Desvinculamos el GBuffer
             viewport->gBuffer->unbindGBuffer();
             PopDebugGroup();
@@ -414,10 +411,7 @@ namespace libCore {
             //------------------------------------------------------------------------------------------
 
             //DEBUG AABB
-            for (auto& model : modelsInScene) {
-                DrawModelAABB(model, "debug");
-            }
-
+            EntityManager::GetInstance().DrawABBEntities("debug");
             //------------------------------------------------------------------------------------------
             
             // PASADA DE TEXTOS

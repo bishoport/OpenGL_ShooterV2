@@ -1,68 +1,117 @@
 #pragma once
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/euler_angles.hpp>
-#include <glm/gtx/matrix_decompose.hpp>
+#include "../Core/Transform.h"
+#include "../Core/Material.h"
+#include "../Core/Mesh.h"
+#include <entt.hpp>
+
+//#include "ScriptLibrary.h"
 
 namespace libCore
 {
-    struct Transform 
-    {
-        glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-        glm::quat rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-        glm::vec3 eulerAngles = glm::vec3(0.0f, 0.0f, 0.0f);
-        glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
 
-        Transform() {}
+    //class Script {
+    //public:
+    //    virtual ~Script() = default;
 
-        glm::mat4 getLocalModelMatrix() const {
-            glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), position);
-            glm::mat4 rotationMatrix = glm::toMat4(rotation);
-            glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), scale);
-            return translationMatrix * rotationMatrix * scaleMatrix;
-        }
+    //    // Métodos del ciclo de vida
+    //    virtual void Init() {}
+    //    virtual void Update(float deltaTime) {}
 
-        glm::mat4 getMatrix() const 
-        {
-            return getLocalModelMatrix();
-        }
+    //    // Métodos para establecer la entidad y el registro
+    //    void SetEntity(entt::entity entity, Ref<entt::registry> registry) {
+    //        m_Entity = entity;
+    //        m_Registry = registry;
+    //    }
 
-        glm::mat4 getRotationMatrix() const 
-        {
-            return glm::toMat4(rotation);
-        }
+    //    // Métodos para gestionar componentes
+    //    template<typename T>
+    //    T& GetComponent() {
+    //        return m_Registry->get<T>(m_Entity);
+    //    }
 
-        void setMatrix(const glm::mat4& matrix) {
-            glm::vec3 skew;
-            glm::vec4 perspective;
-            glm::decompose(matrix, scale, rotation, position, skew, perspective);
-            // Normalizar la rotación
-            rotation = glm::normalize(rotation);
-            // Actualizar ángulos de Euler
-            eulerAngles = glm::eulerAngles(rotation);
-        }
+    //    template<typename T>
+    //    bool HasComponent() {
+    //        return m_Registry->has<T>(m_Entity);
+    //    }
 
-        void updateRotationFromEulerAngles() {
-            rotation = glm::quat(eulerAngles);
-            rotation = glm::normalize(rotation);
-        }
-    };
+    //    template<typename T, typename... Args>
+    //    T& AddComponent(Args&&... args) {
+    //        return m_Registry->emplace<T>(m_Entity, std::forward<Args>(args)...);
+    //    }
+
+    //protected:
+    //    entt::entity m_Entity;
+    //    Ref<entt::registry> m_Registry;
+    //};
+
+
+    
+
 
     struct TransformComponent
     {
         Ref<Transform> transform;
-
-        TransformComponent(Ref<Transform> trans = nullptr)
-            : transform(trans) {}
     };
+
+    struct ParentComponent {
+        entt::entity parent = entt::null;
+    };
+
+    struct ChildComponent {
+        std::vector<entt::entity> children;
+    };
+
+    struct MeshComponent
+    {
+        Ref<Mesh> mesh;
+    };
+
 
     struct MaterialComponent 
     {
         Ref<Material> material;
-
-        MaterialComponent(Ref<Material> mat = nullptr)
-            : material(mat) {}
     };
 
+
+    //struct ScriptComponent {
+    //    Ref<Script> instance;
+
+    //    ScriptComponent() = default;
+    //    ScriptComponent(const ScriptComponent&) = default;
+    //    ScriptComponent(Ref<Script> script) : instance(script) {}
+
+    //    // Inicializar el script
+    //    void Init() {
+    //        if (instance) {
+    //            instance->Init();
+    //        }
+    //    }
+
+    //    // Actualizar el script
+    //    void Update(float deltaTime) {
+    //        if (instance) {
+    //            instance->Update(deltaTime);
+    //        }
+    //    }
+    //};
+
+
+
+    //class ExampleScript : public Script {
+    //public:
+    //    void Init() override {
+    //        // Inicialización del script
+    //    }
+
+    //    void Update(float deltaTime) override {
+    //        // Lógica de actualización del script
+    //        if (m_Registry && m_Registry->has<TransformComponent>(m_Entity)) {
+    //            //auto& transform = m_Registry->get<TransformComponent>(m_Entity).transform;
+    //            auto& transform = GetComponent<TransformComponent>().transform;
+    //            // Modificar la posición como ejemplo
+    //            transform->position.x += 0.01f * deltaTime;
+    //        }
+    //    }
+    //};
 }

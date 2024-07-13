@@ -3,6 +3,7 @@
 
 namespace libCore
 {
+    //MAIN MESH
     void Mesh::SetupMesh() {
         VAO.Bind();
 
@@ -42,7 +43,6 @@ namespace libCore
         CalculateAABB();
         PrepareAABB();
     }
-
     void Mesh::Draw()
     {
         VAO.Bind();
@@ -65,8 +65,7 @@ namespace libCore
         VAO.Unbind();
     }
 
-    
-
+    //--AABB
     void Mesh::CalculateAABB() {
         // Inicializar límites min y max
         minBounds = glm::vec3(std::numeric_limits<float>::max());
@@ -77,8 +76,6 @@ namespace libCore
             maxBounds = glm::max(maxBounds, vertex.position);
         }
     }
-
-
     void Mesh::PrepareAABB() {
         //-----------------------------------PREPARE BOUNDING BOX LOCAL-----------------------------------
         glCreateVertexArrays(1, &VAO_BB);
@@ -116,7 +113,6 @@ namespace libCore
         glVertexArrayAttribBinding(VAO_BB, 0, 0);
         //-------------------------------------------------------------------------------------------------
     }
-
     void Mesh::UpdateAABB(const glm::mat4& modelMatrix) {
         glm::vec3 localVertices[8] = {
             {minBounds.x, minBounds.y, minBounds.z}, {maxBounds.x, minBounds.y, minBounds.z},
@@ -141,8 +137,6 @@ namespace libCore
         worldMinBounds = newMin;
         worldMaxBounds = newMax;
     }
-
-
     void Mesh::DrawAABB() {
         // Dibuja la Bounding Box
         glLineWidth(5);
@@ -150,12 +144,9 @@ namespace libCore
         glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
-
-
     bool Mesh::IsPointInsideAABB(const glm::vec3& point) {
         return (point.x >= minBounds.x && point.x <= maxBounds.x) &&
             (point.y >= minBounds.y && point.y <= maxBounds.y) &&
             (point.z >= minBounds.z && point.z <= maxBounds.z);
     }
-
 }

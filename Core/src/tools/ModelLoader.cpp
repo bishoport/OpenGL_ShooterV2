@@ -102,7 +102,7 @@ namespace libCore
             
             processMaterials(mesh, scene, modelChild, importOptions);
 
-            modelParent->childs.push_back(modelChild);
+            modelParent->children.push_back(modelChild);
         }
 
 
@@ -115,7 +115,7 @@ namespace libCore
     {
         auto meshBuild = CreateRef<Mesh>();
 
-        modelBuild->transform.position = glm::vec3(finalTransform.a4, finalTransform.b4, finalTransform.c4);
+        modelBuild->transform->position = glm::vec3(finalTransform.a4, finalTransform.b4, finalTransform.c4);
 
         //Reset de la posicion original para que nos devuelva la matriz en la posicion 0,0,0
         finalTransform.a4 = 0.0;
@@ -395,7 +395,7 @@ namespace libCore
     {
         auto meshBuild = CreateRef<Mesh>();
 
-        modelBuild->transform.position = glm::vec3(finalTransform.a4, finalTransform.b4, finalTransform.c4);
+        modelBuild->transform->position = glm::vec3(finalTransform.a4, finalTransform.b4, finalTransform.c4);
 
         //Reset de la posicion original para que nos devuelva la matriz en la posicion 0,0,0
         finalTransform.a4 = 0.0;

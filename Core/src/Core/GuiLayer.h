@@ -36,9 +36,9 @@ namespace libCore
         void DrawViewports(std::vector<Ref<Viewport>> viewports);
 
 		//Panels
-        void DrawModelNode(const Ref<libCore::Model>& model);
-		void DrawHierarchyPanel(const std::vector<Ref<libCore::Model>>& modelsInScene);
-		void DrawInspectorPanel(const Ref<libCore::Model>& model);
+        void DrawSelectedEntityComponentsPanel();
+        void DrawEntityNode(entt::entity entity);
+		void DrawHierarchyPanel();
         void DrawLightsPanel(const std::vector<Ref<libCore::Light>>& lightsInScene);
         void DrawMaterialsPanel();
         void DrawMaterial(const Ref<Material> materialData);

@@ -4,6 +4,7 @@
 
 #include "Mesh.h"
 #include "Material.h"
+#include "Transform.h"
 #include "skeletal/AnimData.h"
 #include "../ECS/ECS.h"
 
@@ -13,22 +14,19 @@ namespace libCore
     {
     public:
 
-        bool showAABB = false;
+        Model()
+        {
+            transform = CreateRef<Transform>();
+        }
 
-        libCore::Transform transform;
+        Ref<Transform> transform;
         std::string name = "no_name_model";
 
         //--MODEL DATA
         Ref<Model> modelParent = nullptr;
-        std::vector<Ref<Model>> childs;
+        std::vector<Ref<Model>> children;
         std::vector<Ref<Mesh>> meshes;
         std::vector<Ref<Material>> materials;
-
-        //--METHODS
-        void Draw(const std::string& shader);
-        void DrawAABB(const std::string& shader);
-        void UpdateAABB();
-
 
 
         //--SKELETAL DATA
@@ -40,3 +38,5 @@ namespace libCore
         int& GetBoneCount() { return m_BoneCounter; }
     };
 }
+
+// childs;

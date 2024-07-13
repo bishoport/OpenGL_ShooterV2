@@ -7,6 +7,8 @@
 #include "../tools/LightsManager.hpp"
 #include "../tools/SkyBox.hpp"
 #include "../tools/MousePicker.hpp"
+#include "../tools/GameObjectManager.hpp"
+#include "../ECS/EntityManager.hpp"
 
 
 
@@ -172,10 +174,9 @@ namespace libCore
 		if (useImGUI == true)
 		{
 			guiLayer = CreateScope<GuiLayer>(window, windowWidth, windowHeight);
-			guiLayer->SetCallBackFunc([this](const std::vector<Vector2d>& points, const std::vector<Vector2d>& holePoints) {
+			/*guiLayer->SetCallBackFunc([this](const std::vector<Vector2d>& points, const std::vector<Vector2d>& holePoints) {
 				this->CreateRoof(points, holePoints);
-				});
-			//g_imGUILoopFnc = imGUILoopFnc;
+				});*/
 		}
 		// -------------------------------------------------
 
@@ -276,7 +277,6 @@ namespace libCore
 			UpdateBeforeRender();
 			//-------------------------------------------
 			
-
 			//--MAIN LOOP FUNCTION CALL
 			RenderViewports();
 			// -------------------------------------------
@@ -297,7 +297,7 @@ namespace libCore
 				guiLayer->begin();
 				guiLayer->renderMainMenuBar();
 				guiLayer->renderDockers();
-				DrawHierarchyPanel();
+				DrawImGUI();
 				guiLayer->end();
 			}
 			// -------------------------------------------
@@ -311,12 +311,6 @@ namespace libCore
 			// Intercambia los buffers
 			glfwSwapBuffers(window);
 		}
-
-		//if (g_closeGlFnc)
-		//{
-		//	g_closeGlFnc();
-		//}
-
 		glfwTerminate();
 	}
 	// -------------------------------------------------
@@ -331,7 +325,7 @@ namespace libCore
 	void EngineOpenGL::RenderViewports()
 	{
 		//RENDERING
-		Renderer::getInstance().RenderViewport(ViewportManager::GetInstance().viewports[currentViewport], m_deltaTime, modelsInScene);
+		Renderer::getInstance().RenderViewport(ViewportManager::GetInstance().viewports[currentViewport], m_deltaTime);
 		Renderer::getInstance().ShowViewportInQuad(ViewportManager::GetInstance().viewports[currentViewport]);
 		//-------------------------------------------
 	}
@@ -340,83 +334,6 @@ namespace libCore
 
 
 	//--UPDATES
-	bool rayIntersectsBoundingBox(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, glm::vec3 boxMin, glm::vec3 boxMax)
-	{
-		float tMin = (boxMin.x - rayOrigin.x) / rayDirection.x;
-		float tMax = (boxMax.x - rayOrigin.x) / rayDirection.x;
-
-		if (tMin > tMax) std::swap(tMin, tMax);
-
-		float tyMin = (boxMin.y - rayOrigin.y) / rayDirection.y;
-		float tyMax = (boxMax.y - rayOrigin.y) / rayDirection.y;
-
-		if (tyMin > tyMax) std::swap(tyMin, tyMax);
-
-		if ((tMin > tyMax) || (tyMin > tMax))
-			return false;
-
-		if (tyMin > tMin)
-			tMin = tyMin;
-
-		if (tyMax < tMax)
-			tMax = tyMax;
-
-		float tzMin = (boxMin.z - rayOrigin.z) / rayDirection.z;
-		float tzMax = (boxMax.z - rayOrigin.z) / rayDirection.z;
-
-		if (tzMin > tzMax) std::swap(tzMin, tzMax);
-
-		if ((tMin > tzMax) || (tzMin > tMax))
-			return false;
-
-		if (tzMin > tMin)
-			tMin = tzMin;
-
-		if (tzMax < tMax)
-			tMax = tzMax;
-
-		return true;
-	}
-	void UpdateModelAABB(const Ref<libCore::Model>& model) {
-		glm::mat4 modelMatrix = model->transform.getLocalModelMatrix();
-		for (const auto& mesh : model->meshes) {
-			mesh->UpdateAABB(modelMatrix);
-		}
-		// Llamada recursiva para los modelos hijos
-		for (const auto& child : model->childs) {
-			UpdateModelAABB(child);
-		}
-	}
-	void UpdateModelTransform(const Ref<libCore::Model>& model) {
-		model->transform.updateRotationFromEulerAngles();
-		// Llamada recursiva para los modelos hijos
-		for (const auto& child : model->childs) {
-			UpdateModelTransform(child);
-		}
-	}
-	void EngineOpenGL::checkRayModelIntersection(const Ref<libCore::Model>& model, const glm::vec3& rayOrigin, const glm::vec3& rayDirection, const glm::mat4& accumulatedTransform) {
-		
-		glm::mat4 modelMatrix = accumulatedTransform * model->transform.getLocalModelMatrix();
-
-		for (const auto& mesh : model->meshes) {
-			// Transformar AABB
-			glm::vec3 transformedMin = glm::vec3(modelMatrix * glm::vec4(mesh->minBounds, 1.0));
-			glm::vec3 transformedMax = glm::vec3(modelMatrix * glm::vec4(mesh->maxBounds, 1.0));
-
-			// Verificar la intersección del rayo con la AABB transformada
-			if (rayIntersectsBoundingBox(rayOrigin, rayDirection, transformedMin, transformedMax)) 
-			{
-				modelsInRay.push_back(model);
-				std::cout << "model " << model->name << std::endl;
-			}
-		}
-
-		// Recorrer modelos hijos
-		for (const auto& child : model->childs) {
-			checkRayModelIntersection(child, rayOrigin, rayDirection, modelMatrix);
-		}
-	}
-	
 	void EngineOpenGL::UpdateBeforeRender()
 	{
 		//--INPUT UPDATE
@@ -444,17 +361,10 @@ namespace libCore
 		}
 		//-------------------------------------------------------------------
 
-		//--UPDATE MODEL TRANSFORM
-		for (const auto& model : modelsInScene) {
-			UpdateModelTransform(model);
-		}
+		//--UPDATE ENTITIES WITH TRANSFORM & AABB
+		EntityManager::GetInstance().UpdateEntities(m_deltaTime);
 		//-------------------------------------------
-
-		//--UPDATE AABB
-		for (const auto& model : modelsInScene) {
-			UpdateModelAABB(model);
-		}
-		//-------------------------------------------
+		
 
 		//--MOUSE PICKING
 		if (mouseInImGUI == false && usingGizmo == false)
@@ -471,7 +381,7 @@ namespace libCore
 
 			if (InputManager::Instance().IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_LEFT) && isSelectingObject == false)
 			{
-				modelsInRay.clear();
+				EntityManager::GetInstance().entitiesInRay.clear();
 
 				float normalizedX = (2.0f * mouseX) / ViewportManager::GetInstance().viewports[currentViewport]->viewportSize.x - 1.0f;
 				float normalizedY = ((2.0f * mouseY) / ViewportManager::GetInstance().viewports[currentViewport]->viewportSize.y - 1.0f) * -1.0f;
@@ -485,16 +395,14 @@ namespace libCore
 				glm::vec3 rayOrigin = ViewportManager::GetInstance().viewports[currentViewport]->camera->Position;
 				glm::vec3 rayDirection = glm::normalize(worldCoordinates - rayOrigin);
 
-				for (const auto& model : modelsInScene) {
-					checkRayModelIntersection(model, rayOrigin, rayDirection, glm::mat4(1.0f));
-				}
+				EntityManager::GetInstance().CheckRayModelIntersection(rayOrigin, rayDirection, glm::mat4(1.0f));
 
-				if (modelsInRay.size() == 1) {
-					currentSelectedModelInScene = modelsInRay[0];
+				if (EntityManager::GetInstance().entitiesInRay.size() == 1) {
+					EntityManager::GetInstance().currentSelectedEntityInScene = EntityManager::GetInstance().entitiesInRay[0];
 					isSelectingObject = false; // No need to select, auto-selected
 					showModelSelectionCombo = false;
 				}
-				else if (modelsInRay.size() > 1) {
+				else if (EntityManager::GetInstance().entitiesInRay.size() > 1) {
 					isSelectingObject = true; // Multiple options, need to select
 					showModelSelectionCombo = true;
 				}
@@ -514,145 +422,35 @@ namespace libCore
 	//--CREADOR DE PREFABS
 	void EngineOpenGL::CreatePrefabExternalModel(ImportModelData importModelData)
 	{
-		modelsInScene.push_back(libCore::ModelLoader::LoadModel(importModelData));
+		EntityManager::GetInstance().CreatePrefabExternalModel(importModelData);
+		//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabExternalModel(importModelData));
 	}
 	void EngineOpenGL::CreatePrefabDot(const glm::vec3& pos, const glm::vec3& polygonColor)
 	{
-		auto modelBuild = CreateRef<Model>();
-		modelBuild->transform.position = pos;
-		modelBuild->name = "PRIMITIVE_DOT";
-		modelBuild->meshes.push_back(PrimitivesHelper::CreateDot());
-		
-
-		//--DEFAULT_MATERIAL
-		auto material = CreateRef<Material>();
-		material->materialName = "default_material";
-
-		material->albedoColor = polygonColor;
-
-		material->albedoMap = AssetsManager::GetInstance().GetTexture("default_albedo");
-		//material->normalMap = assetsManager.GetTexture("default_normal");
-		//material->metallicMap = assetsManager.GetTexture("default_metallic");
-		//material->roughnessMap = assetsManager.GetTexture("default_roughness");
-		//material->aOMap = assetsManager.GetTexture("default_ao");
-
-		modelBuild->materials.push_back(material);
-		modelsInScene.push_back(modelBuild);
+		//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabDot(pos,polygonColor));
 	}
 	void EngineOpenGL::CreatePrefabLine(const glm::vec3& point1, const glm::vec3& point2)
 	{
-		auto modelBuild = CreateRef<Model>();
-
-		modelBuild->name = "PRIMITIVE_LINE";
-		modelBuild->meshes.push_back(PrimitivesHelper::CreateLine(point1, point2));
-
-
-		//--DEFAULT_MATERIAL
-		auto material = CreateRef<Material>();
-		material->materialName = "default_material";
-
-		material->albedoColor.r = 1.0f;
-		material->albedoColor.g = 1.0f;
-		material->albedoColor.b = 1.0f;
-
-		material->albedoMap = AssetsManager::GetInstance().GetTexture("default_albedo");
-		material->normalMap = AssetsManager::GetInstance().GetTexture("default_normal");
-		material->metallicMap = AssetsManager::GetInstance().GetTexture("default_metallic");
-		material->roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
-		material->aOMap = AssetsManager::GetInstance().GetTexture("default_ao");
-
-		modelBuild->materials.push_back(material);
-
-		modelsInScene.push_back(modelBuild);
+		//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabLine(point1, point2));
 	}
 	void EngineOpenGL::CreateTriangle(const glm::vec3& pos1, const glm::vec3& pos2, const glm::vec3& pos3)
 	{
-		auto modelBuild = CreateRef<Model>();
-
-
-		modelBuild->name = "PRIMIVITE_TRIANGLE";
-		modelBuild->meshes.push_back(PrimitivesHelper::CreateTriangle(pos1, pos2, pos3));
-
-
-		//--DEFAULT_MATERIAL
-		auto material = CreateRef<Material>();
-		material->materialName = "default_material";
-
-		material->albedoColor.r = 1.0f;
-		material->albedoColor.g = 1.0f;
-		material->albedoColor.b = 1.0f;
-
-		material->albedoMap = AssetsManager::GetInstance().GetTexture("checker");
-		material->normalMap = AssetsManager::GetInstance().GetTexture("default_normal");
-		material->metallicMap = AssetsManager::GetInstance().GetTexture("default_metallic");
-		material->roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
-		material->aOMap = AssetsManager::GetInstance().GetTexture("default_ao");
-
-		modelBuild->materials.push_back(material);
-
-		modelsInScene.push_back(modelBuild);
+		//modelsInScene.push_back(GameObjectManager::getInstance().CreateTriangle(pos1, pos2, pos3));
 	}
 	void EngineOpenGL::CreatePrefabSphere(float radius, unsigned int sectorCount, unsigned int stackCount)
 	{
-		auto modelBuild = CreateRef<Model>();
-
-		modelBuild->name = "PRIMIVITE_SPHERE";
-		modelBuild->meshes.push_back(PrimitivesHelper::CreateSphere(0.01f, 6, 6));
-
-		//--DEFAULT_MATERIAL
-		auto material = CreateRef<Material>();
-		material->materialName = "default_material";
-
-		material->albedoColor.r = 1.0f;
-		material->albedoColor.g = 1.0f;
-		material->albedoColor.b = 1.0f;
-
-		material->albedoMap = AssetsManager::GetInstance().GetTexture("default_albedo");
-		material->normalMap = AssetsManager::GetInstance().GetTexture("default_normal");
-		material->metallicMap = AssetsManager::GetInstance().GetTexture("default_metallic");
-		material->roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
-		material->aOMap = AssetsManager::GetInstance().GetTexture("default_ao");
-
-		modelBuild->materials.push_back(material);
-
-		modelsInScene.push_back(modelBuild);
+		//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabSphere(radius, sectorCount, stackCount));
 	}
 	void EngineOpenGL::CreatePrefabCube(glm::vec3 position)
 	{
-		auto modelBuild = CreateRef<Model>();
-
-		modelBuild->name = "PRIMIVITE_CUBE";
-		modelBuild->meshes.push_back(PrimitivesHelper::CreateCube());
-		modelBuild->transform.position = position;
-
-		//--DEFAULT_MATERIAL
-		auto material = CreateRef<Material>();
-		material->materialName = "default_material";
-
-		material->albedoColor.r = 1.0f;
-		material->albedoColor.g = 1.0f;
-		material->albedoColor.b = 1.0f;
-
-		material->albedoMap = AssetsManager::GetInstance().GetTexture("default_albedo");
-		material->normalMap = AssetsManager::GetInstance().GetTexture("default_normal");
-		material->metallicMap = AssetsManager::GetInstance().GetTexture("default_metallic");
-		material->roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
-		material->aOMap = AssetsManager::GetInstance().GetTexture("default_ao");
-
-		modelBuild->materials.push_back(material);
-
-		modelsInScene.push_back(modelBuild);
-	}
-	void EngineOpenGL::CreateRoof(const std::vector<Vector2d>& points, const std::vector<Vector2d>& holes)
-	{
-		//modelsInScene.push_back(roofGenerator->GenerateRoof(points, holes));
+		//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabCube(position));
 	}
 	// -------------------------------------------------
 	// -------------------------------------------------
 
 
 	//--IMGUI
-	void EngineOpenGL::DrawHierarchyPanel()
+	void EngineOpenGL::DrawImGUI()
 	{
 		if (useImGUI)
 		{
@@ -663,11 +461,17 @@ namespace libCore
 			}
 			if (ImGui::BeginPopup("Select Model"))
 			{
-				for (const auto& model : modelsInRay) {
-					if (ImGui::Button(model->name.c_str())) {
-						currentSelectedModelInScene = model;
-						isSelectingObject = false; // Esta asignación cerrará el popup al finalizar el frame
-						ImGui::CloseCurrentPopup();
+				for (const auto& entity : EntityManager::GetInstance().entitiesInRay) {
+
+					if (libCore::EntityManager::GetInstance().m_registry->has<MeshComponent>(entity)) {
+
+						auto& meshComponent = libCore::EntityManager::GetInstance().m_registry->get<MeshComponent>(entity);
+						
+						if (ImGui::Button(meshComponent.mesh->meshName.c_str())) {
+							libCore::EntityManager::GetInstance().currentSelectedEntityInScene = entity;
+							isSelectingObject = false; // Esta asignación cerrará el popup al finalizar el frame
+							ImGui::CloseCurrentPopup();
+						}
 					}
 				}
 				ImGui::EndPopup();
@@ -678,8 +482,8 @@ namespace libCore
 			guiLayer->checkGizmo(ViewportManager::GetInstance().viewports[currentViewport]);
 			//--------------------------------------------------------
 
-			guiLayer->DrawHierarchyPanel(modelsInScene);
-			guiLayer->DrawInspectorPanel(currentSelectedModelInScene);
+			guiLayer->DrawHierarchyPanel();
+			guiLayer->DrawSelectedEntityComponentsPanel();
 			guiLayer->DrawLightsPanel(LightsManager::GetLights());
 			guiLayer->DrawMaterialsPanel();
 			//guiLayer->RenderCheckerMatrix(); //Panel para el editor de roofs

@@ -2,7 +2,6 @@
 
 #include "../LibCoreHeaders.h"
 #include "../Timestep.h"
-#include "entt.hpp"
 
 
 
@@ -30,7 +29,6 @@ namespace libCore
 		
 
 	private:
-
 
 
 

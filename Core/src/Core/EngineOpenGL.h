@@ -17,6 +17,13 @@ namespace libCore
     {
     public:
 
+        static EngineOpenGL& GetInstance()
+        {
+            static EngineOpenGL instance;
+            return instance;
+        }
+
+
         //ENGINE LIFE--CYCLE
         bool InitializeEngine(const std::string& windowTitle, int initialWindowWidth, int initialWindowHeight);
         void InitializeMainLoop();
@@ -38,17 +45,10 @@ namespace libCore
         void CreateTriangle(const glm::vec3& pos1, const glm::vec3& pos2, const glm::vec3& pos3);
         void CreatePrefabCube(glm::vec3 position);
         void CreatePrefabSphere(float radius, unsigned int sectorCount, unsigned int stackCount);
-        void CreateRoof(const std::vector<Vector2d>& points, const std::vector<Vector2d>& holes);
+        //void CreateRoof(const std::vector<Vector2d>& points, const std::vector<Vector2d>& holes);
 
-        //PANELS
-        void DrawHierarchyPanel();
-
-        // Función estática para obtener la instancia de EngineOpenGL
-        static EngineOpenGL& GetInstance()
-        {
-            static EngineOpenGL instance;
-            return instance;
-        }
+        //ImGUI
+        void DrawImGUI();
 
 
 
@@ -62,8 +62,6 @@ namespace libCore
     public:
 
         //MOUSE PICKING & ImGizmo
-        std::vector<Ref<Model>> modelsInRay;
-        Ref<Model> currentSelectedModelInScene = nullptr;
         bool isSelectingObject = false;
         bool showModelSelectionCombo = false;
         bool usingGizmo = false;
@@ -72,11 +70,10 @@ namespace libCore
 
         int currentViewport = 0; //Editor Camera by default
 
-        std::vector<Ref<libCore::Model>> modelsInScene;
+        Ref<Scene> currentScene = nullptr;
 
         GLFWwindow* window = nullptr;
         Timestep m_deltaTime = 0.0f;
-
 
         bool running = false;
         bool useImGUI = true;
@@ -84,8 +81,6 @@ namespace libCore
         int windowWidth = 0;
         int windowHeight = 0;
 
-        
-        void checkRayModelIntersection(const Ref<libCore::Model>& model, const glm::vec3& rayOrigin, const glm::vec3& rayDirection, const glm::mat4& accumulatedTransform);
 
 
         // Constructor privado para el patrón Singleton

@@ -4,6 +4,9 @@
 #include <imgui_internal.h>
 #include "../tools/LightsManager.hpp"
 #include "../tools/MaterialManager.hpp"
+#include "../ECS/EntityManager.hpp"
+
+#include "../ECS/ECS.h"
 
 namespace libCore
 {
@@ -125,6 +128,15 @@ namespace libCore
                 if (ImGui::MenuItem("Redo", "Ctrl+Y")) { /* Rehacer */ }
                 ImGui::EndMenu();
             }
+            if (ImGui::BeginMenu("Components"))
+            {
+                if (ImGui::MenuItem("Reload", "Ctrl+Z")) 
+                { 
+                    EntityManager::GetInstance().LoadAndUseDLL();
+                }
+
+                ImGui::EndMenu();
+            }
             ImGui::EndMainMenuBar();
         }
     }
@@ -214,7 +226,7 @@ namespace libCore
 
 
         //---------------------------ImGUIZMO------------------------------------------
-        if (EngineOpenGL::GetInstance().currentSelectedModelInScene != nullptr)
+        if (EntityManager::GetInstance().currentSelectedEntityInScene != entt::null)
         {
             ImGuizmo::SetOrthographic(false);
             ImGuizmo::SetDrawlist();
@@ -226,7 +238,10 @@ namespace libCore
             // Obtén las matrices correctas
             glm::mat4 camera_view = glm::lookAt(viewport->camera->Position, viewport->camera->Position + viewport->camera->Orientation, viewport->camera->Up);
             glm::mat4 camera_projection = viewport->camera->projection;
-            glm::mat4 entity_transform = EngineOpenGL::GetInstance().currentSelectedModelInScene->transform.getMatrix();
+
+            auto& transformComponent = EntityManager::GetInstance().GetComponent<TransformComponent>(EntityManager::GetInstance().currentSelectedEntityInScene);
+
+            glm::mat4 entity_transform = transformComponent.transform->getMatrix();
 
 
             switch (m_GizmoOperation)
@@ -256,104 +271,126 @@ namespace libCore
 
             if (ImGuizmo::IsUsing())
             {
-                EngineOpenGL::GetInstance().currentSelectedModelInScene->transform.setMatrix(entity_transform);
+                transformComponent.transform->setMatrix(entity_transform);
             }
         }
     }
 
     //PANELES PRINCIPALES
-    void GuiLayer::DrawModelNode(const Ref<libCore::Model>& model)
-    {
-        // Determinar los flags del nodo basado en si tiene hijos
-        int node_flags = ImGuiTreeNodeFlags_OpenOnArrow;
-        if (model->childs.empty() && model->meshes.empty()) {
-            node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen; // Nodo es una hoja si no tiene hijos ni mallas
-        }
+    void GuiLayer::DrawEntityNode(entt::entity entity) {
+        ImGui::PushID(static_cast<int>(entity));
 
-        bool opened = ImGui::TreeNodeEx(model.get(), node_flags, "%s", model->name.c_str());
-        if (opened) {
-            // Mostrar mallas del modelo, si tiene
-            for (const auto& mesh : model->meshes) {
-                ImGui::BulletText("Mesh: %s", mesh->meshName.c_str());
+        // Mostrar el ID de la entidad
+        if (ImGui::TreeNode((void*)(intptr_t)entity, "Entity %u", entity)) {
+            // Seleccionar la entidad al hacer clic
+            if (ImGui::IsItemClicked()) {
+                EntityManager::GetInstance().currentSelectedEntityInScene = entity;
             }
 
-            // Recursivamente dibujar los modelos hijos, si tiene
-            if (!model->childs.empty()) {
-                for (const auto& child : model->childs) {
-                    DrawModelNode(child); // Este llamado recursivo maneja tanto mallas como otros hijos
+            // Recorrer y mostrar hijos si existen
+            if (EntityManager::GetInstance().m_registry->has<ChildComponent>(entity)) {
+                auto& children = EntityManager::GetInstance().m_registry->get<ChildComponent>(entity).children;
+                for (auto child : children) {
+                    DrawEntityNode(child);
                 }
             }
 
             ImGui::TreePop();
         }
+
+        ImGui::PopID();
     }
-    void GuiLayer::DrawHierarchyPanel(const std::vector<Ref<libCore::Model>>& modelsInScene)
-    {
+    void GuiLayer::DrawHierarchyPanel() {
         ImGui::Begin("Hierarchy");
 
-        for (auto& model : modelsInScene)
-        {
-            DrawModelNode(model);
+        // Iterar sobre las entidades en el registro
+        auto view = EntityManager::GetInstance().m_registry->view<TransformComponent>();
+
+        for (auto entity : view) {
+            DrawEntityNode(entity);
         }
 
         ImGui::End();
     }
-    void libCore::GuiLayer::DrawInspectorPanel(const Ref<libCore::Model>& model)
+    void libCore::GuiLayer::DrawSelectedEntityComponentsPanel()
     {
-        ImGui::Begin("Inspector");
+        ImGui::Begin("Components");
 
-        if (model == nullptr) {
-            ImGui::Text("No model selected");
-            ImGui::End();
-            return;
+        entt::entity selectedEntity = EntityManager::GetInstance().currentSelectedEntityInScene;
+        if (selectedEntity != entt::null) {
+            // Mostrar los componentes de la entidad seleccionada
+            if (EntityManager::GetInstance().m_registry->has<TransformComponent>(selectedEntity)) {
+                auto& transformComponent = EntityManager::GetInstance().m_registry->get<TransformComponent>(selectedEntity);
+
+                if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
+                    auto& transform = transformComponent.transform;
+
+                    // Posición
+                    ImGui::Text("Position");
+                    ImGui::TextColored(ImVec4(1, 0, 0, 1), "X");
+                    ImGui::SameLine();
+                    ImGui::DragFloat("##PosX", &transform->position.x, 0.1f, -FLT_MAX, FLT_MAX, "X: %.2f");
+                    ImGui::TextColored(ImVec4(0, 1, 0, 1), "Y");
+                    ImGui::SameLine();
+                    ImGui::DragFloat("##PosY", &transform->position.y, 0.1f, -FLT_MAX, FLT_MAX, "Y: %.2f");
+                    ImGui::TextColored(ImVec4(0, 0, 1, 1), "Z");
+                    ImGui::SameLine();
+                    ImGui::DragFloat("##PosZ", &transform->position.z, 0.1f, -FLT_MAX, FLT_MAX, "Z: %.2f");
+
+                    // Rotación
+                    ImGui::Text("Rotation");
+                    ImGui::TextColored(ImVec4(1, 0, 0, 1), "X");
+                    ImGui::SameLine();
+                    ImGui::DragFloat("##RotX", &transform->eulerAngles.x, 0.1f, -360.0f, 360.0f, "X: %.2f");
+                    ImGui::TextColored(ImVec4(0, 1, 0, 1), "Y");
+                    ImGui::SameLine();
+                    ImGui::DragFloat("##RotY", &transform->eulerAngles.y, 0.1f, -360.0f, 360.0f, "Y: %.2f");
+                    ImGui::TextColored(ImVec4(0, 0, 1, 1), "Z");
+                    ImGui::SameLine();
+                    ImGui::DragFloat("##RotZ", &transform->eulerAngles.z, 0.1f, -360.0f, 360.0f, "Z: %.2f");
+
+                    // Escala
+                    ImGui::Text("Scale");
+                    ImGui::TextColored(ImVec4(1, 0, 0, 1), "X");
+                    ImGui::SameLine();
+                    ImGui::DragFloat("##ScaleX", &transform->scale.x, 0.01f, 0.0f, FLT_MAX, "X: %.2f");
+                    ImGui::TextColored(ImVec4(0, 1, 0, 1), "Y");
+                    ImGui::SameLine();
+                    ImGui::DragFloat("##ScaleY", &transform->scale.y, 0.01f, 0.0f, FLT_MAX, "Y: %.2f");
+                    ImGui::TextColored(ImVec4(0, 0, 1, 1), "Z");
+                    ImGui::SameLine();
+                    ImGui::DragFloat("##ScaleZ", &transform->scale.z, 0.01f, 0.0f, FLT_MAX, "Z: %.2f");
+                }
+            }
+
+            if (EntityManager::GetInstance().m_registry->has<MeshComponent>(selectedEntity)) {
+                auto& meshComponent = EntityManager::GetInstance().m_registry->get<MeshComponent>(selectedEntity);
+                ImGui::Checkbox("Show ABB", &meshComponent.mesh->showAABB);
+            }
+
+
+            //if (EntityManager::GetInstance().m_registry->has<ScriptComponent>(selectedEntity)) {
+            //    auto& scriptComponent = EntityManager::GetInstance().m_registry->get<ScriptComponent>(selectedEntity);
+            //    if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen)) {
+            //        ImGui::Text("Script Instance: %s", typeid(*scriptComponent.instance).name());
+            //        // Aquí puedes agregar más controles para interactuar con el script, si es necesario
+            //    }
+            //}
         }
-
-        if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
-        {
-            auto& transform = model->transform;
-
-            // Posición
-            ImGui::Text("Position");
-            ImGui::TextColored(ImVec4(1, 0, 0, 1), "X");
-            ImGui::SameLine();
-            ImGui::DragFloat("##PosX", &transform.position.x, 0.1f, -FLT_MAX, FLT_MAX, "X: %.2f");
-            ImGui::TextColored(ImVec4(0, 1, 0, 1), "Y");
-            ImGui::SameLine();
-            ImGui::DragFloat("##PosY", &transform.position.y, 0.1f, -FLT_MAX, FLT_MAX, "Y: %.2f");
-            ImGui::TextColored(ImVec4(0, 0, 1, 1), "Z");
-            ImGui::SameLine();
-            ImGui::DragFloat("##PosZ", &transform.position.z, 0.1f, -FLT_MAX, FLT_MAX, "Z: %.2f");
-
-            // Rotación
-            ImGui::Text("Rotation");
-            ImGui::TextColored(ImVec4(1, 0, 0, 1), "X");
-            ImGui::SameLine();
-            ImGui::DragFloat("##RotX", &transform.eulerAngles.x, 0.1f, -360.0f, 360.0f, "X: %.2f");
-            ImGui::TextColored(ImVec4(0, 1, 0, 1), "Y");
-            ImGui::SameLine();
-            ImGui::DragFloat("##RotY", &transform.eulerAngles.y, 0.1f, -360.0f, 360.0f, "Y: %.2f");
-            ImGui::TextColored(ImVec4(0, 0, 1, 1), "Z");
-            ImGui::SameLine();
-            ImGui::DragFloat("##RotZ", &transform.eulerAngles.z, 0.1f, -360.0f, 360.0f, "Z: %.2f");
-
-
-            // Escala
-            ImGui::Text("Scale");
-            ImGui::TextColored(ImVec4(1, 0, 0, 1), "X");
-            ImGui::SameLine();
-            ImGui::DragFloat("##ScaleX", &transform.scale.x, 0.01f, 0.0f, FLT_MAX, "X: %.2f");
-            ImGui::TextColored(ImVec4(0, 1, 0, 1), "Y");
-            ImGui::SameLine();
-            ImGui::DragFloat("##ScaleY", &transform.scale.y, 0.01f, 0.0f, FLT_MAX, "Y: %.2f");
-            ImGui::TextColored(ImVec4(0, 0, 1, 1), "Z");
-            ImGui::SameLine();
-            ImGui::DragFloat("##ScaleZ", &transform.scale.z, 0.01f, 0.0f, FLT_MAX, "Z: %.2f");
+        else {
+            ImGui::Text("No entity selected.");
         }
-
-        ImGui::Checkbox("Show AABB", &model->showAABB);
 
         ImGui::End();
     }
+
+
+
+
+
+
+
+
     void GuiLayer::DrawLightsPanel(const std::vector<Ref<libCore::Light>>& lightsInScene)
     {
         ImGui::Begin("Lights");

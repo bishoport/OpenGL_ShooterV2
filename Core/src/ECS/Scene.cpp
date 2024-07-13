@@ -8,7 +8,7 @@ namespace libCore
 	//--CONSTRUCTORS
 	Scene::Scene()
 	{
-
+		
 	}
 	//-----------------------------------
 
@@ -24,4 +24,8 @@ namespace libCore
 	{
 	}
 	//-----------------------------------
+
+
+	//--Models Creator
+
 }
