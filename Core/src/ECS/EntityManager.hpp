@@ -9,12 +9,47 @@
 #include <memory>
 #include <iostream>
 #include <windows.h>
+
 #include "Scripts/MyScript.h"
+#include "../Timestep.h"
 
-namespace libCore {
+namespace libCore 
+{
 
-    //// Define el tipo de función para la creación de scripts
-    //typedef libCore::Script* (*CreateScriptFunc)();
+
+    /*class Entity {
+
+    public:
+
+        Entity() = default;
+
+        Entity(entt::entity handle): m_EntityHandle(handle) {}
+
+        template<typename T, typename... Args>
+        T& AddComponent(Args&&... args);
+
+        template<typename T>
+        T& GetComponent();
+
+        template<typename T>
+        bool HasComponent() const;
+
+        template<typename T>
+        void RemoveComponent();
+
+        operator bool() const { return m_EntityHandle != entt::null; }
+        operator entt::entity() const { return m_EntityHandle; }
+        operator uint32_t() const { return (uint32_t)m_EntityHandle; }
+
+        entt::entity GetHandle() const { return m_EntityHandle; }
+
+    private:
+        entt::entity m_EntityHandle{ entt::null };
+    };*/
+
+
+
+
 
     class EntityManager {
     public:
@@ -25,65 +60,93 @@ namespace libCore {
             return instance;
         }
 
-        void LoadAndUseDLL() {
-            //// Cargar la DLL
-            //HMODULE hModule = LoadLibrary(L"ScriptLibrary.dll");
-            //if (!hModule) {
-            //    std::cerr << "No se pudo cargar la DLL" << std::endl;
-            //    return;
-            //}
-
-            //// Obtener la dirección de la función de creación de instancia
-            //CreateScriptFunc createExampleScript = (CreateScriptFunc)GetProcAddress(hModule, "CreateExampleScript");
-            //if (!createExampleScript) {
-            //    std::cerr << "No se pudo obtener la dirección de CreateExampleScript" << std::endl;
-            //    FreeLibrary(hModule);
-            //    return;
-            //}
-
-            //// Usar la función para crear una instancia de ExampleScript
-            //libCore::Script* scriptInstance = createExampleScript();
-            //if (!scriptInstance) {
-            //    std::cerr << "No se pudo crear la instancia del script" << std::endl;
-            //    FreeLibrary(hModule);
-            //    return;
-            //}
-
-            //// Configurar la entidad y el registro
-            //auto registry = libCore::EntityManager::GetInstance().m_registry;
-            //entt::entity entity = registry->create();
-
-            //scriptInstance->SetEntity(entity, registry);
-
-            //// Asignar ScriptComponent con la instancia creada
-            //auto& scriptComponent = registry->emplace<libCore::ScriptComponent>(entity);
-            //scriptComponent.instance.reset(scriptInstance);
-
-            //// Inicializar y actualizar el script
-            //scriptComponent.Init();
-            //scriptComponent.Update(0.016f); // Ejemplo de actualización con deltaTime
-
-            //// Liberar la DLL cuando ya no se necesite
-            //FreeLibrary(hModule);
-        }
-
-
-
         //--ENTITY COLLECTIONS
         Ref<entt::registry> m_registry = CreateRef<entt::registry>();
         std::vector<entt::entity> entitiesInRay;
-        entt::entity currentSelectedEntityInScene;
+        entt::entity currentSelectedEntityInScene = entt::null;
+
 
 
         //--CREADOR DE ENTITIES
-        void CreatePrefabExternalModel(ImportModelData importModelData) {
+        entt::entity CreateEmptyGameObject()
+        {
+            entt::entity entity = m_registry->create();
+            // Asignar el componente TransformComponent
+            auto& transformComponent = m_registry->emplace<TransformComponent>(entity);
+            return entity;
+        }
+        
+        void CreateExternalModelGameObject(ImportModelData importModelData) {
             Ref<Model> model = ModelLoader::LoadModel(importModelData);
-            CreateEntityFromModel(model, entt::null);
+            CreateGameObjectFromModel(model, entt::null);
             model.reset();
         }
 
+        void CreateCubeGameObject(glm::vec3 position = glm::vec3(0.0f,0.0f,0.0f))
+        {
+                // Crear una nueva entidad para el modelo
+                entt::entity gameObject = CreateEmptyGameObject();
+                
+                //Transform Component
+                auto& transformComponent = GetComponent<TransformComponent>(gameObject);
+                transformComponent.transform->position = position;
+
+                //Mesh Component
+                auto& meshComponent = AddComponent<MeshComponent>(gameObject);
+                meshComponent.mesh = PrimitivesHelper::CreateCube();
+                meshComponent.mesh->meshName = "PRIMIVITE_CUBE";
+
+            	//Material Component
+                auto& materialComponent = AddComponent<MaterialComponent>(gameObject);
+                materialComponent.material->materialName = "default_material";
+            	materialComponent.material->albedoColor.r = 1.0f;
+            	materialComponent.material->albedoColor.g = 1.0f;
+            	materialComponent.material->albedoColor.b = 1.0f;
+            	materialComponent.material->albedoMap    = AssetsManager::GetInstance().GetTexture("default_albedo");
+            	materialComponent.material->normalMap    = AssetsManager::GetInstance().GetTexture("default_normal");
+            	materialComponent.material->metallicMap  = AssetsManager::GetInstance().GetTexture("default_metallic");
+            	materialComponent.material->roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
+            	materialComponent.material->aOMap        = AssetsManager::GetInstance().GetTexture("default_ao");
+        }
+
+        void CreateSphereGameObject(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), float radius = 0.01f, int sectorCount = 6, int stackCount = 6)
+        {
+            // Crear una nueva entidad para el modelo
+            entt::entity gameObject = CreateEmptyGameObject();
+
+            //Transform Component
+            auto& transformComponent = GetComponent<TransformComponent>(gameObject);
+            transformComponent.transform->position = position;
+
+            //Mesh Component
+            auto& meshComponent = AddComponent<MeshComponent>(gameObject);
+            meshComponent.mesh = PrimitivesHelper::CreateSphere(radius, sectorCount, stackCount);
+            meshComponent.mesh->meshName = "PRIMIVITE_SPHERE";
+
+            //Material Component
+            auto& materialComponent = AddComponent<MaterialComponent>(gameObject);
+            materialComponent.material->materialName = "default_material";
+            materialComponent.material->albedoColor.r = 1.0f;
+            materialComponent.material->albedoColor.g = 1.0f;
+            materialComponent.material->albedoColor.b = 1.0f;
+            materialComponent.material->albedoMap = AssetsManager::GetInstance().GetTexture("default_albedo");
+            materialComponent.material->normalMap = AssetsManager::GetInstance().GetTexture("default_normal");
+            materialComponent.material->metallicMap = AssetsManager::GetInstance().GetTexture("default_metallic");
+            materialComponent.material->roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
+            materialComponent.material->aOMap = AssetsManager::GetInstance().GetTexture("default_ao");
+        }
+        //------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
         //--PINTADOR DE ENTITIES
-        void DrawEntities(const std::string& shader) {
+        void DrawGameObjects(const std::string& shader) {
             auto view = m_registry->view<TransformComponent, MeshComponent, MaterialComponent>();
             for (auto entity : view) {
                 auto& transform = view.get<TransformComponent>(entity);
@@ -91,10 +154,10 @@ namespace libCore {
                 auto& material = view.get<MaterialComponent>(entity);
 
                 // Aquí llamamos a la función de dibujo de tu motor gráfico
-                DrawEntity(transform, mesh, material, shader);
+                DrawOneGameObject(transform, mesh, material, shader);
             }
         }
-        void DrawABBEntities(const std::string& shader) {
+        void DrawABBGameObjectMeshComponent(const std::string& shader) {
             auto view = m_registry->view<TransformComponent, MeshComponent>();
             for (auto entity : view) {
                 auto& transform = view.get<TransformComponent>(entity);
@@ -109,10 +172,12 @@ namespace libCore {
                 } 
             }
         }
+        //------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------
 
 
         //--ACTUALIZADOR DE FUNCIONES UPDATES ANTES DEL RENDER DE LOS COMPONENTES
-        void UpdateEntities(Timestep deltaTime) {
+        void UpdateGameObjects(Timestep deltaTime) {
 
             // Inicializar y actualizar scripts
             auto scriptView = m_registry->view<ScriptComponent>();
@@ -121,15 +186,38 @@ namespace libCore {
                 scriptComponent.Update(deltaTime.GetMilliseconds());
             }
 
-            auto view = m_registry->view<TransformComponent, MeshComponent>();
-            for (auto entity : view) {
-                auto& transformComponent = view.get<TransformComponent>(entity);
-                auto& meshComponent = view.get<MeshComponent>(entity);
+
+            // Crear una vista para las entidades con los componentes TransformComponent
+            auto trasnformView = m_registry->view<TransformComponent>();
+
+            // Recorrer todas las entidades y actualizar sus transformaciones acumuladas
+            for (auto entity : trasnformView) {
+                auto& transformComponent = trasnformView.get<TransformComponent>(entity);
+
+                if (HasComponent<ParentComponent>(entity)) {
+                    auto& parentComponent = GetComponent<ParentComponent>(entity);
+                    auto& parentTransformComponent = GetComponent<TransformComponent>(parentComponent.parent);
+
+                    transformComponent.accumulatedTransform = parentTransformComponent.accumulatedTransform * transformComponent.transform->getLocalModelMatrix();
+                }
+                else {
+                    transformComponent.accumulatedTransform = transformComponent.transform->getLocalModelMatrix();
+                }
 
                 transformComponent.transform->updateRotationFromEulerAngles();
-                meshComponent.mesh->UpdateAABB(transformComponent.transform->getLocalModelMatrix());
+            }
+
+            // Actualizar AABBs después de que todas las transformaciones acumuladas estén calculadas
+            auto meshView = m_registry->view<TransformComponent, MeshComponent>();
+            for (auto entity : meshView) {
+                auto& transformComponent = meshView.get<TransformComponent>(entity);
+                auto& meshComponent = meshView.get<MeshComponent>(entity);
+
+                meshComponent.mesh->UpdateAABB(transformComponent.accumulatedTransform);
             }
         }
+        //------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------
 
         
         //--MOUSE CHECKER
@@ -153,13 +241,32 @@ namespace libCore {
                 }
             }
         }
+        //------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------
 
 
-        // Función genérica para obtener un componente de una entidad
+
+        //--COMPONENTS HANDLERS
         template<typename T>
         T& GetComponent(entt::entity entity) {
             return m_registry->get<T>(entity);
         }
+        template<typename T>
+        bool HasComponent(entt::entity entity) {
+            return m_registry->has<T>(entity);
+        }
+        template<typename T, typename... Args>
+        T& AddComponent(entt::entity entity, Args&&... args) {
+            return m_registry->emplace<T>(entity, std::forward<Args>(args)...);
+        }
+        template<typename T>
+        void RemoveComponent(entt::entity entity) {
+            m_registry->remove<T>(entity);
+        }
+        //------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------
+
+
 
 
     private:
@@ -168,18 +275,13 @@ namespace libCore {
 
 
         // Función recursiva para crear entidades desde un modelo y sus hijos
-        void CreateEntityFromModel(Ref<Model> model, entt::entity parent) {
+        void CreateGameObjectFromModel(Ref<Model> model, entt::entity parent) 
+        {
             // Crear una nueva entidad para el modelo
-            entt::entity entity = m_registry->create();
-
-            // Asignar el componente TransformComponent
-            auto& transformComponent = m_registry->emplace<TransformComponent>(entity);
+            entt::entity entity = CreateEmptyGameObject();
+            auto& transformComponent = GetComponent<TransformComponent>(entity);
             transformComponent.transform = model->transform;
 
-            // Asignar el ScriptComponent con ExampleScript
-            auto& scriptComponent = m_registry->emplace<ScriptComponent>(entity);
-            scriptComponent.instance = CreateRef<MyScript>();
-            scriptComponent.instance->SetEntity(entity, m_registry);
 
             // Asignar los componentes de MaterialComponent si el modelo tiene materiales
             if (!model->materials.empty()) {
@@ -204,29 +306,37 @@ namespace libCore {
 
             // Recorrer y crear entidades para los hijos del modelo
             for (auto& child : model->children) {
-                CreateEntityFromModel(child, entity);
+                CreateGameObjectFromModel(child, entity);
             }
+
+
+            // Asignar el ScriptComponent con ExampleScript
+            //auto& scriptComponent = m_registry->emplace<ScriptComponent>(entity);
+            //scriptComponent.instance = CreateRef<MyScript>();
+            //scriptComponent.instance->SetEntity(entity, m_registry);
         }
 
 
-        // Función de dibujo de entidades
-        void DrawEntity(TransformComponent& transformComponent, MeshComponent& meshComponent, MaterialComponent& materialComponent, const std::string& shader)
+        // Función de dibujo de GameObjects
+        void DrawOneGameObject(TransformComponent& transformComponent, MeshComponent& meshComponent, MaterialComponent& materialComponent, const std::string& shader)
         {
-            //VALUES
+            // Valores
             libCore::ShaderManager::Get(shader)->setVec3("albedoColor", materialComponent.material->albedoColor);
             libCore::ShaderManager::Get(shader)->setFloat("normalStrength", materialComponent.material->normalStrength);
             libCore::ShaderManager::Get(shader)->setFloat("metallicValue", materialComponent.material->metallicValue);
             libCore::ShaderManager::Get(shader)->setFloat("roughnessValue", materialComponent.material->roughnessValue);
 
-            //TEXTURES
+            // Texturas
             materialComponent.material->albedoMap->Bind(shader);
             materialComponent.material->normalMap->Bind(shader);
             materialComponent.material->metallicMap->Bind(shader);
             materialComponent.material->roughnessMap->Bind(shader);
-            
-            libCore::ShaderManager::Get(shader)->setMat4("model", transformComponent.transform->getMatrix());
+
+            // Usar la transformación acumulada
+            libCore::ShaderManager::Get(shader)->setMat4("model", transformComponent.accumulatedTransform);
             meshComponent.mesh->Draw();
-        } 
+        }
+
 
 
 
@@ -297,6 +407,7 @@ namespace libCore {
 //
 //	return modelBuild;
 //}
+
 //Ref<Model> CreatePrefabLine(const glm::vec3& point1, const glm::vec3& point2)
 //{
 //	auto modelBuild = CreateRef<Model>();

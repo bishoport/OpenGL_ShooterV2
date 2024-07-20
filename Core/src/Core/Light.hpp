@@ -2,10 +2,6 @@
 
 #include "../LibCoreHeaders.h"
 #include "../ECS/ECS.h"
-#include <vector>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 namespace libCore
 {
@@ -221,7 +217,6 @@ namespace libCore
             {
                 // Dibujar los puntos del área
                 glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(vertices.size()));
-
 
 
                 // Dibujar líneas entre los puntos para formar el polígono

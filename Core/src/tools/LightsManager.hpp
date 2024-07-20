@@ -39,8 +39,6 @@ namespace libCore
 			return light;
 		}
 
-		
-
 		static void CreateDirectionalLight()
 		{
 			GetInstance().directionalLight = CreateRef<Light>(LightType::DIRECTIONAL);

@@ -41,10 +41,11 @@
     <ClInclude Include="src\Core\Viewport.hpp" />
     <ClInclude Include="src\Core\ViewportManager.hpp" />
     <ClInclude Include="src\ECS\ECS.h" />
-    <ClInclude Include="src\Core\GuiLayer.h" />
+    <ClInclude Include="src\GUI\GuiLayer.h" />
     <ClInclude Include="src\ECS\EntityManager.hpp" />
     <ClInclude Include="src\ECS\Scene.h" />
     <ClInclude Include="src\ECS\Scripts\MyScript.h" />
+    <ClInclude Include="src\GUI\AssetsPanel.h" />
     <ClInclude Include="src\input\InputManager.h" />
     <ClInclude Include="src\input\KeyCodes.h" />
     <ClInclude Include="src\input\MouseButtonCodes.h" />
@@ -93,6 +94,7 @@
     <ClInclude Include="src\tools\MaterialManager.hpp" />
     <ClInclude Include="src\tools\ModelLoader.h" />
     <ClInclude Include="src\tools\MousePicker.hpp" />
+    <ClInclude Include="src\ECS\PrefabManager.h" />
     <ClInclude Include="src\tools\PrimitivesHelper.h" />
     <ClInclude Include="src\tools\Raycast.h" />
     <ClInclude Include="src\tools\RoofGenerator.hpp" />
@@ -125,8 +127,10 @@
     <ClCompile Include="src\Core\Texture.cpp" />
     <ClCompile Include="src\Core\VAO.cpp" />
     <ClCompile Include="src\Core\VBO.cpp" />
-    <ClCompile Include="src\Core\GuiLayer.cpp" />
+    <ClCompile Include="src\GUI\GuiLayer.cpp" />
+    <ClCompile Include="src\ECS\PrefabManager.cpp" />
     <ClCompile Include="src\ECS\Scene.cpp" />
+    <ClCompile Include="src\GUI\AssetsPanel.cpp" />
     <ClCompile Include="src\input\InputManager.cpp" />
     <ClCompile Include="src\StraightSkeleton\CircularList.cpp" />
     <ClCompile Include="src\StraightSkeleton\CircularNode.cpp" />

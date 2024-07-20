@@ -1,6 +1,6 @@
 #include "EngineOpenGL.h"
 #include "../input/InputManager.h"
-#include "GuiLayer.h"
+#include "../GUI/GuiLayer.h"
 #include "ViewportManager.hpp"
 #include "Renderer.hpp"
 #include "../tools/RoofGenerator.hpp"
@@ -243,16 +243,16 @@ namespace libCore
 	{
 		running = false;
 	}
-	void EngineOpenGL::begin()
-	{
-		if (useImGUI)
-		{
-			// Start the Dear ImGui frame
-			ImGui_ImplOpenGL3_NewFrame();
-			ImGui_ImplGlfw_NewFrame();
-			ImGui::NewFrame();
-		}
-	}
+	//void EngineOpenGL::begin()
+	//{
+	//	if (useImGUI)
+	//	{
+	//		// Start the Dear ImGui frame
+	//		ImGui_ImplOpenGL3_NewFrame();
+	//		ImGui_ImplGlfw_NewFrame();
+	//		ImGui::NewFrame();
+	//	}
+	//}
 	void EngineOpenGL::InitializeMainLoop()
 	{
 		Timestep lastFrameTime = static_cast<float>(glfwGetTime());
@@ -294,11 +294,13 @@ namespace libCore
 					mouseInImGUI = false;
 				}
 
-				guiLayer->begin();
-				guiLayer->renderMainMenuBar();
-				guiLayer->renderDockers();
-				DrawImGUI();
-				guiLayer->end();
+				guiLayer->Draw(useImGUI);
+
+				//guiLayer->begin();
+				//guiLayer->renderMainMenuBar();
+				//guiLayer->renderDockers();
+				//DrawImGUI();
+				//guiLayer->end();
 			}
 			// -------------------------------------------
 
@@ -362,24 +364,24 @@ namespace libCore
 		//-------------------------------------------------------------------
 
 		//--UPDATE ENTITIES WITH TRANSFORM & AABB
-		EntityManager::GetInstance().UpdateEntities(m_deltaTime);
+		EntityManager::GetInstance().UpdateGameObjects(m_deltaTime);
 		//-------------------------------------------
 		
 
 		//--MOUSE PICKING
 		if (mouseInImGUI == false && usingGizmo == false)
 		{
-			if (isSelectingObject == true)
+			if (guiLayer->isSelectingObject == true)
 			{
 				return;
 			}
 
-			isSelectingObject = false;
+			guiLayer->isSelectingObject = false;
 
 			float mouseX, mouseY;
 			std::tie(mouseX, mouseY) = InputManager::Instance().GetMousePosition();
 
-			if (InputManager::Instance().IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_LEFT) && isSelectingObject == false)
+			if (InputManager::Instance().IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_LEFT) && guiLayer->isSelectingObject == false)
 			{
 				EntityManager::GetInstance().entitiesInRay.clear();
 
@@ -399,16 +401,16 @@ namespace libCore
 
 				if (EntityManager::GetInstance().entitiesInRay.size() == 1) {
 					EntityManager::GetInstance().currentSelectedEntityInScene = EntityManager::GetInstance().entitiesInRay[0];
-					isSelectingObject = false; // No need to select, auto-selected
-					showModelSelectionCombo = false;
+					guiLayer->isSelectingObject = false; // No need to select, auto-selected
+					guiLayer->showModelSelectionCombo = false;
 				}
 				else if (EntityManager::GetInstance().entitiesInRay.size() > 1) {
-					isSelectingObject = true; // Multiple options, need to select
-					showModelSelectionCombo = true;
+					guiLayer->isSelectingObject = true; // Multiple options, need to select
+					guiLayer->showModelSelectionCombo = true;
 				}
 				else {
-					isSelectingObject = false; // No selection
-					showModelSelectionCombo = false;
+					guiLayer->isSelectingObject = false; // No selection
+					guiLayer->showModelSelectionCombo = false;
 				}
 			}
 		}
@@ -422,7 +424,7 @@ namespace libCore
 	//--CREADOR DE PREFABS
 	void EngineOpenGL::CreatePrefabExternalModel(ImportModelData importModelData)
 	{
-		EntityManager::GetInstance().CreatePrefabExternalModel(importModelData);
+		EntityManager::GetInstance().CreateExternalModelGameObject(importModelData);
 		//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabExternalModel(importModelData));
 	}
 	void EngineOpenGL::CreatePrefabDot(const glm::vec3& pos, const glm::vec3& polygonColor)
@@ -450,51 +452,49 @@ namespace libCore
 
 
 	//--IMGUI
-	void EngineOpenGL::DrawImGUI()
-	{
-		if (useImGUI)
-		{
-			//--SELECT MODEL FROM RAY POPUP
-			if (isSelectingObject == true)
-			{
-				ImGui::OpenPopup("Select Model");
-			}
-			if (ImGui::BeginPopup("Select Model"))
-			{
-				for (const auto& entity : EntityManager::GetInstance().entitiesInRay) {
+	//void EngineOpenGL::DrawImGUI()
+	//{
+		//if (useImGUI)
+		//{
+		//	//--SELECT MODEL FROM RAY POPUP
+		//	if (isSelectingObject == true)
+		//	{
+		//		ImGui::OpenPopup("Select Model");
+		//	}
+		//	if (ImGui::BeginPopup("Select Model"))
+		//	{
+		//		for (const auto& entity : EntityManager::GetInstance().entitiesInRay) {
 
-					if (libCore::EntityManager::GetInstance().m_registry->has<MeshComponent>(entity)) {
+		//			if (libCore::EntityManager::GetInstance().m_registry->has<MeshComponent>(entity)) {
 
-						auto& meshComponent = libCore::EntityManager::GetInstance().m_registry->get<MeshComponent>(entity);
-						
-						if (ImGui::Button(meshComponent.mesh->meshName.c_str())) {
-							libCore::EntityManager::GetInstance().currentSelectedEntityInScene = entity;
-							isSelectingObject = false; // Esta asignación cerrará el popup al finalizar el frame
-							ImGui::CloseCurrentPopup();
-						}
-					}
-				}
-				ImGui::EndPopup();
-			}
-			//--------------------------------------------------------
+		//				auto& meshComponent = libCore::EntityManager::GetInstance().m_registry->get<MeshComponent>(entity);
+		//				
+		//				if (ImGui::Button(meshComponent.mesh->meshName.c_str())) {
+		//					libCore::EntityManager::GetInstance().currentSelectedEntityInScene = entity;
+		//					isSelectingObject = false; // Esta asignación cerrará el popup al finalizar el frame
+		//					ImGui::CloseCurrentPopup();
+		//				}
+		//			}
+		//		}
+		//		ImGui::EndPopup();
+		//	}
+		//	//--------------------------------------------------------
 
-			//--CHECK ImGizmo
-			guiLayer->checkGizmo(ViewportManager::GetInstance().viewports[currentViewport]);
-			//--------------------------------------------------------
+		//	//--CHECK ImGizmo
+		//	guiLayer->checkGizmo(ViewportManager::GetInstance().viewports[currentViewport]);
+		//	//--------------------------------------------------------
 
-			guiLayer->DrawHierarchyPanel();
-			guiLayer->DrawSelectedEntityComponentsPanel();
-			guiLayer->DrawLightsPanel(LightsManager::GetLights());
-			guiLayer->DrawMaterialsPanel();
-			//guiLayer->RenderCheckerMatrix(); //Panel para el editor de roofs
+		//	guiLayer->DrawHierarchyPanel();
+		//	guiLayer->DrawSelectedEntityComponentsPanel();
+		//	guiLayer->DrawLightsPanel(LightsManager::GetLights());
+		//	guiLayer->DrawMaterialsPanel();
+		//	//guiLayer->RenderCheckerMatrix(); //Panel para el editor de roofs
 
-			Renderer::getInstance().ShowControlsGUI();
-			ViewportManager::GetInstance().DrawPanelGUI();
-
-			
-			//--------------------------------------------------------
-		}
-	}
+		//	Renderer::getInstance().ShowControlsGUI();
+		//	ViewportManager::GetInstance().DrawPanelGUI();
+		//	//--------------------------------------------------------
+		//}
+	//}
 	// -------------------------------------------------
 	// -------------------------------------------------
 }

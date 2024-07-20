@@ -12,14 +12,20 @@
 #include "imgui/imgui_impl_opengl3.h"
 #include "../Timestep.h"
 #include "../tools/Camera.h"
-#include "Viewport.hpp"
+#include "../Core/Viewport.hpp"
 #include "../StraightSkeleton/Vector2d.h"
+
+#include "AssetsPanel.h"
 
 namespace libCore
 {
     class GuiLayer {
 
     public:
+
+        bool drawImGUI = true;
+        bool isSelectingObject = false;
+        bool showModelSelectionCombo = false;
 
         using CallbackFromGuiLayer = std::function<void(const std::vector<Vector2d>&, const std::vector<Vector2d>&)>;
 
@@ -28,12 +34,11 @@ namespace libCore
         ~GuiLayer();
 
         void begin();
+        void Draw(bool _drawImGUI);
         void end();
         void renderDockers();
         void renderMainMenuBar();
 
-        //Viewports
-        void DrawViewports(std::vector<Ref<Viewport>> viewports);
 
 		//Panels
         void DrawSelectedEntityComponentsPanel();
@@ -66,5 +71,9 @@ namespace libCore
         struct Point {
             float x, y;
         };
+
+
+        //PANELS
+        Scope<AssetsPanel> assetsPanel = nullptr;
     };	
 }

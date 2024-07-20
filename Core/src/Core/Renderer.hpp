@@ -173,7 +173,7 @@ namespace libCore {
                     modelContainer->Draw("direct_light_depth_shadows");
                 }*/
 
-                EntityManager::GetInstance().DrawEntities("direct_light_depth_shadows");
+                EntityManager::GetInstance().DrawGameObjects("direct_light_depth_shadows");
 
                 viewport->framebuffer_shadowmap->unbindFBO();
                 PopDebugGroup();
@@ -217,7 +217,7 @@ namespace libCore {
                 modelContainer->Draw("geometryPass");
             }*/
 
-            EntityManager::GetInstance().DrawEntities("geometryPass");
+            EntityManager::GetInstance().DrawGameObjects("geometryPass");
 
             // Desvinculamos el GBuffer
             viewport->gBuffer->unbindGBuffer();
@@ -411,7 +411,7 @@ namespace libCore {
             //------------------------------------------------------------------------------------------
 
             //DEBUG AABB
-            EntityManager::GetInstance().DrawABBEntities("debug");
+            EntityManager::GetInstance().DrawABBGameObjectMeshComponent("debug");
             //------------------------------------------------------------------------------------------
             
             // PASADA DE TEXTOS

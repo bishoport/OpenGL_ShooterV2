@@ -47,6 +47,5 @@ namespace libCore
             rotation = glm::quat(eulerAngles);
             rotation = glm::normalize(rotation);
         }
-
     };
 }

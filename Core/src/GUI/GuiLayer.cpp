@@ -1,12 +1,14 @@
 ﻿#include "GuiLayer.h"
+
 #include "../tools/ShaderManager.h"
 #include <imGizmo/ImGuizmo.h>
 #include <imgui_internal.h>
+
 #include "../tools/LightsManager.hpp"
 #include "../tools/MaterialManager.hpp"
 #include "../ECS/EntityManager.hpp"
-
-#include "../ECS/ECS.h"
+#include "../Core/ViewportManager.hpp"
+#include "../Core/Renderer.hpp"
 
 namespace libCore
 {
@@ -62,6 +64,9 @@ namespace libCore
 
         // Despu�s de cargar las fuentes, llama a esta funci�n
         //ImGui_ImplOpenGL3_CreateFontsTexture();
+
+        //--PANELS
+        assetsPanel = CreateScope<AssetsPanel>();
     }
 
     //Aqui llega la funcion para que el editor de Roofs devuelva a quien sea, la matriz de footPrints
@@ -83,6 +88,68 @@ namespace libCore
         ImGui::NewFrame();
         ImGuizmo::BeginFrame();
     }
+
+    void GuiLayer::Draw(bool _drawImGUI)
+    {
+        drawImGUI = _drawImGUI;
+
+        begin();
+        renderMainMenuBar();
+        renderDockers();
+
+
+        if (drawImGUI)
+        {
+            //--SELECT MODEL FROM RAY POPUP
+            if (isSelectingObject == true)
+            {
+                ImGui::OpenPopup("Select Model");
+            }
+            if (ImGui::BeginPopup("Select Model"))
+            {
+                for (const auto& entity : EntityManager::GetInstance().entitiesInRay) {
+
+                    if (libCore::EntityManager::GetInstance().m_registry->has<MeshComponent>(entity)) {
+
+                        auto& meshComponent = libCore::EntityManager::GetInstance().m_registry->get<MeshComponent>(entity);
+
+                        if (ImGui::Button(meshComponent.mesh->meshName.c_str())) {
+                            libCore::EntityManager::GetInstance().currentSelectedEntityInScene = entity;
+                            isSelectingObject = false; // Esta asignación cerrará el popup al finalizar el frame
+                            ImGui::CloseCurrentPopup();
+                        }
+                    }
+                }
+                ImGui::EndPopup();
+            }
+            //--------------------------------------------------------
+
+            //--CHECK ImGizmo
+            checkGizmo(ViewportManager::GetInstance().viewports[EngineOpenGL::GetInstance().currentViewport]);
+            //--------------------------------------------------------
+
+            DrawHierarchyPanel();
+            DrawSelectedEntityComponentsPanel();
+            DrawLightsPanel(LightsManager::GetLights());
+            DrawMaterialsPanel();
+            //guiLayer->RenderCheckerMatrix(); //Panel para el editor de roofs
+
+            Renderer::getInstance().ShowControlsGUI();
+            ViewportManager::GetInstance().DrawPanelGUI();
+            //--------------------------------------------------------
+
+
+            //-------------------------------------------ASSETS PANEL--------------------------------------
+            assetsPanel->OnImGuiRender();
+            //------------------------------------------------------------------------------------------------
+        }
+
+        end();
+    }
+
+
+
+
 
     void GuiLayer::renderDockers()
     {
@@ -128,11 +195,15 @@ namespace libCore
                 if (ImGui::MenuItem("Redo", "Ctrl+Y")) { /* Rehacer */ }
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Components"))
+            if (ImGui::BeginMenu("GameObjects"))
             {
-                if (ImGui::MenuItem("Reload", "Ctrl+Z")) 
+                if (ImGui::MenuItem("Cube")) 
                 { 
-                    EntityManager::GetInstance().LoadAndUseDLL();
+                    EntityManager::GetInstance().CreateCubeGameObject();
+                }
+                else if (ImGui::MenuItem("Sphere"))
+                {
+                    EntityManager::GetInstance().CreateSphereGameObject();
                 }
 
                 ImGui::EndMenu();
@@ -141,61 +212,10 @@ namespace libCore
         }
     }
 
-    void GuiLayer::DrawViewports(std::vector<Ref<Viewport>> viewports)
-    {
-        for (auto& viewport : viewports)
-        {
-            std::string windowTitle = viewport->viewportName;
-            ImGui::Begin(windowTitle.c_str(), nullptr);
 
-            // Obtener los tamaños y posiciones actuales de la ventana
-            ImVec2 currentViewportSize = ImGui::GetWindowSize();
-            ImVec2 currentViewportPos = ImGui::GetWindowPos();
 
-            // Verificar si se está arrastrando la ventana
-            bool isCurrentlyDragging = ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows) && ImGui::IsMouseDragging(ImGuiMouseButton_Left);
 
-            // Verificar si el tamaño ha cambiado
-            bool isCurrentlyResizing = currentViewportSize.x != viewport->previousViewportSize.x || currentViewportSize.y != viewport->previousViewportSize.y;
 
-            // Detectar cuándo se comienza a mover o redimensionar
-            if (!viewport->isMoving && isCurrentlyDragging)
-            {
-                viewport->isMoving = true;
-            }
-            if (!viewport->isResizing && isCurrentlyResizing)
-            {
-                viewport->isResizing = true;
-            }
-
-            // Detectar cuándo termina el movimiento o el redimensionamiento
-            if (viewport->isMoving && !isCurrentlyDragging)
-            {
-                viewport->isMoving = false;
-                EventManager::OnPanelResizedEvent().trigger(viewport->viewportName, glm::vec2(currentViewportSize.x, currentViewportSize.y),
-                    glm::vec2(currentViewportPos.x, currentViewportPos.y));
-            }
-            if (viewport->isResizing && !isCurrentlyResizing)
-            {
-                viewport->isResizing = false;
-                EventManager::OnPanelResizedEvent().trigger(viewport->viewportName, glm::vec2(currentViewportSize.x, currentViewportSize.y),
-                    glm::vec2(currentViewportPos.x, currentViewportPos.y));
-            }
-
-            // Actualiza los valores anteriores
-            viewport->previousViewportSize = currentViewportSize;
-            viewport->previousViewportPos = currentViewportPos;
-
-            // Actualiza los valores actuales en el viewport
-            viewport->viewportSize = currentViewportSize;
-            viewport->viewportPos = currentViewportPos;
-
-            // Renderiza la imagen
-            ImGui::Image((void*)(intptr_t)viewport->framebuffer_final->getTexture("color"), ImVec2(viewport->viewportSize.x, viewport->viewportSize.y), ImVec2(0, 1), ImVec2(1, 0), ImColor(255, 255, 255, 255));
-            viewport->mouseInviewport = false;
-            ImGui::End();
-        }
-    }
 
     void printMatrix(const glm::mat4& mat, const std::string& name) {
         const float* m = glm::value_ptr(mat);
@@ -206,9 +226,22 @@ namespace libCore
         std::cout << m[12] << ", " << m[13] << ", " << m[14] << ", " << m[15] << std::endl;
     }
 
+
+
+
     //--UPDATES
     void GuiLayer::checkGizmo(const Ref<Viewport>& viewport)
     {
+        static bool useLocalTransform = true; // Variable para controlar el modo de transformación
+
+        // ImGui button to toggle transform mode
+        ImGui::Begin("Gizmo Controls");
+        if (ImGui::Button(useLocalTransform ? "Switch to Global" : "Switch to Local"))
+        {
+            useLocalTransform = !useLocalTransform;
+        }
+        ImGui::End();
+
         //--INPUTS TOOLS
         if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_T))
         {
@@ -223,7 +256,6 @@ namespace libCore
             m_GizmoOperation = GizmoOperation::Scale;
         }
         //------------------------------------------------------------------------------
-
 
         //---------------------------ImGUIZMO------------------------------------------
         if (EntityManager::GetInstance().currentSelectedEntityInScene != entt::null)
@@ -243,20 +275,21 @@ namespace libCore
 
             glm::mat4 entity_transform = transformComponent.transform->getMatrix();
 
+            ImGuizmo::MODE transformMode = useLocalTransform ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
 
             switch (m_GizmoOperation)
             {
             case GizmoOperation::Translate:
                 ImGuizmo::Manipulate(glm::value_ptr(camera_view), glm::value_ptr(camera_projection),
-                    ImGuizmo::TRANSLATE, ImGuizmo::LOCAL, glm::value_ptr(entity_transform));
+                    ImGuizmo::TRANSLATE, transformMode, glm::value_ptr(entity_transform));
                 break;
             case GizmoOperation::Rotate3D:
                 ImGuizmo::Manipulate(glm::value_ptr(camera_view), glm::value_ptr(camera_projection),
-                    ImGuizmo::ROTATE, ImGuizmo::LOCAL, glm::value_ptr(entity_transform));
+                    ImGuizmo::ROTATE, transformMode, glm::value_ptr(entity_transform));
                 break;
             case GizmoOperation::Scale:
                 ImGuizmo::Manipulate(glm::value_ptr(camera_view), glm::value_ptr(camera_projection),
-                    ImGuizmo::SCALE, ImGuizmo::LOCAL, glm::value_ptr(entity_transform));
+                    ImGuizmo::SCALE, transformMode, glm::value_ptr(entity_transform));
                 break;
             }
 
@@ -275,36 +308,16 @@ namespace libCore
             }
         }
     }
+    //-------------------------------------------------------------------------------
+ 
 
-    //PANELES PRINCIPALES
-    void GuiLayer::DrawEntityNode(entt::entity entity) {
-        ImGui::PushID(static_cast<int>(entity));
-
-        // Mostrar el ID de la entidad
-        if (ImGui::TreeNode((void*)(intptr_t)entity, "Entity %u", entity)) {
-            // Seleccionar la entidad al hacer clic
-            if (ImGui::IsItemClicked()) {
-                EntityManager::GetInstance().currentSelectedEntityInScene = entity;
-            }
-
-            // Recorrer y mostrar hijos si existen
-            if (EntityManager::GetInstance().m_registry->has<ChildComponent>(entity)) {
-                auto& children = EntityManager::GetInstance().m_registry->get<ChildComponent>(entity).children;
-                for (auto child : children) {
-                    DrawEntityNode(child);
-                }
-            }
-
-            ImGui::TreePop();
-        }
-
-        ImGui::PopID();
-    }
+    //--HIREARCHY PANEL
     void GuiLayer::DrawHierarchyPanel() {
+
         ImGui::Begin("Hierarchy");
 
-        // Iterar sobre las entidades en el registro
-        auto view = EntityManager::GetInstance().m_registry->view<TransformComponent>();
+        // Iterar sobre las entidades raíz (aquellas que no tienen un ParentComponent)
+        auto view = EntityManager::GetInstance().m_registry->view<TransformComponent>(entt::exclude<ParentComponent>);
 
         for (auto entity : view) {
             DrawEntityNode(entity);
@@ -312,13 +325,62 @@ namespace libCore
 
         ImGui::End();
     }
+    void GuiLayer::DrawEntityNode(entt::entity entity) {
+        ImGui::PushID(static_cast<int>(entity));
+
+        // Verificar si la entidad es padre o hijo
+        bool isParent = EntityManager::GetInstance().m_registry->has<ChildComponent>(entity);
+        bool isChild = EntityManager::GetInstance().m_registry->has<ParentComponent>(entity);
+
+        std::string nodeName    = "Entity " + std::to_string(static_cast<int>(entity));
+        if (isParent) nodeName += " (Parent)";
+        if (isChild) nodeName  += " (Child)";
+
+        // Comprobar si la entidad está seleccionada
+        bool isSelected = EntityManager::GetInstance().currentSelectedEntityInScene == entity;
+
+        // Mostrar el ID de la entidad
+        if (isParent) {
+            // La entidad tiene hijos, por lo que es desplegable
+            if (ImGui::TreeNode((void*)(intptr_t)entity, "%s", nodeName.c_str())) {
+
+                // Seleccionar la entidad al hacer clic
+                if (ImGui::IsItemClicked()) {
+                    EntityManager::GetInstance().currentSelectedEntityInScene = entity;
+                }
+
+                // Recorrer y mostrar hijos
+                auto& children = EntityManager::GetInstance().m_registry->get<ChildComponent>(entity).children;
+                for (auto child : children) {
+                    DrawEntityNode(child);
+                }
+
+                ImGui::TreePop();
+            }
+        }
+        else {
+            // La entidad no tiene hijos, usar ImGui::Selectable
+            if (ImGui::Selectable(nodeName.c_str(), isSelected)) {
+                EntityManager::GetInstance().currentSelectedEntityInScene = entity;
+            }
+        }
+
+        ImGui::PopID();
+    }
+    //-------------------------------------------------------------------------------
+    
+
+    //--INSPECTOR PANEL
     void libCore::GuiLayer::DrawSelectedEntityComponentsPanel()
     {
-        ImGui::Begin("Components");
+        ImGui::Begin("Inspector");
 
-        entt::entity selectedEntity = EntityManager::GetInstance().currentSelectedEntityInScene;
-        if (selectedEntity != entt::null) {
-            // Mostrar los componentes de la entidad seleccionada
+
+        if (EntityManager::GetInstance().currentSelectedEntityInScene != entt::null) {
+            
+            entt::entity selectedEntity = EntityManager::GetInstance().currentSelectedEntityInScene;
+
+            //--TRANSFORM_COMPONENT
             if (EntityManager::GetInstance().m_registry->has<TransformComponent>(selectedEntity)) {
                 auto& transformComponent = EntityManager::GetInstance().m_registry->get<TransformComponent>(selectedEntity);
 
@@ -362,13 +424,47 @@ namespace libCore
                     ImGui::DragFloat("##ScaleZ", &transform->scale.z, 0.01f, 0.0f, FLT_MAX, "Z: %.2f");
                 }
             }
-
+            //--MESH_COMPONENT
             if (EntityManager::GetInstance().m_registry->has<MeshComponent>(selectedEntity)) {
                 auto& meshComponent = EntityManager::GetInstance().m_registry->get<MeshComponent>(selectedEntity);
                 ImGui::Checkbox("Show ABB", &meshComponent.mesh->showAABB);
             }
+            //--MATERIA_COMPONENT
+            if (EntityManager::GetInstance().m_registry->has<MaterialComponent>(selectedEntity)) {
 
+                auto& materialComponent = EntityManager::GetInstance().m_registry->get<MaterialComponent>(selectedEntity);
+                auto& material = *materialComponent.material;
 
+                if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen)) {
+                    ImGui::Text("Material Name: %s", material.materialName.c_str());
+                    ImGui::Text("Shader Name: %s", material.shaderName.c_str());
+
+                    // Manipulate material values
+                    ImGui::ColorEdit3("Albedo Color", (float*)&materialComponent.material->albedoColor);
+                    ImGui::DragFloat("Normal Strength", &materialComponent.material->normalStrength, 0.1f, -10.0f, 10.0f);
+                    ImGui::DragFloat("Metallic Value", &materialComponent.material->metallicValue, 0.1f, 0.0f, 10.0f);
+                    ImGui::DragFloat("Roughness Value", &materialComponent.material->roughnessValue, 0.1f, 0.0f, 10.0f);
+
+                    // Display material textures
+                    if (materialComponent.material->albedoMap && materialComponent.material->albedoMap->IsValid()) {
+                        ImGui::Text("Albedo Map");
+                        ImGui::Image((void*)(intptr_t)materialComponent.material->albedoMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
+                    }
+                    if (materialComponent.material->normalMap && materialComponent.material->normalMap->IsValid()) {
+                        ImGui::Text("Normal Map");
+                        ImGui::Image((void*)(intptr_t)materialComponent.material->normalMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
+                    }
+                    if (materialComponent.material->metallicMap && materialComponent.material->metallicMap->IsValid()) {
+                        ImGui::Text("Metallic Map");
+                        ImGui::Image((void*)(intptr_t)materialComponent.material->metallicMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
+                    }
+                    if (materialComponent.material->roughnessMap && materialComponent.material->roughnessMap->IsValid()) {
+                        ImGui::Text("Roughness Map");
+                        ImGui::Image((void*)(intptr_t)materialComponent.material->roughnessMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
+                    }
+                }
+            }
+            //--SCRIPT_COMPONENT
             if (EntityManager::GetInstance().m_registry->has<ScriptComponent>(selectedEntity)) {
                 auto& scriptComponent = EntityManager::GetInstance().m_registry->get<ScriptComponent>(selectedEntity);
                 if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -383,14 +479,10 @@ namespace libCore
 
         ImGui::End();
     }
+    //-------------------------------------------------------------------------------
 
 
-
-
-
-
-
-
+    //--GLOBAL LIGHT´s PANEL (ESTO CAMBIARÁ)
     void GuiLayer::DrawLightsPanel(const std::vector<Ref<libCore::Light>>& lightsInScene)
     {
         ImGui::Begin("Lights");
@@ -575,7 +667,8 @@ namespace libCore
     }
     //-----------------------------------------------------------------------------------------------------
     
-    //MATERIALS
+
+    //--GLOBAL MATERIAL PANEL
     void GuiLayer::DrawMaterialsPanel() {
         ImGui::Begin("Materials In Scene"); // Comienza el panel de materiales
 
@@ -638,6 +731,7 @@ namespace libCore
         }
     }
     //-----------------------------------------------------------------------------------------------------
+
 
     //Especial para el editor de Roofs
     void GuiLayer::RenderCheckerMatrix() {

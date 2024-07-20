@@ -27,7 +27,7 @@ namespace libCore
         //ENGINE LIFE--CYCLE
         bool InitializeEngine(const std::string& windowTitle, int initialWindowWidth, int initialWindowHeight);
         void InitializeMainLoop();
-        void begin();
+        //void begin();
         void StopMainLoop();
         void SetupInputCallbacks();
 
@@ -62,13 +62,14 @@ namespace libCore
     public:
 
         //MOUSE PICKING & ImGizmo
-        bool isSelectingObject = false;
-        bool showModelSelectionCombo = false;
+        //bool isSelectingObject = false;
+        //bool showModelSelectionCombo = false;
         bool usingGizmo = false;
 
+        int currentViewport = 0; //Editor Camera by default
     private:
 
-        int currentViewport = 0; //Editor Camera by default
+        
 
         Ref<Scene> currentScene = nullptr;
 

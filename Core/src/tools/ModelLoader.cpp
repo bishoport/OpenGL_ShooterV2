@@ -19,15 +19,10 @@ namespace libCore
         return path.substr(lastSlash + 1);
     }
 
-
-
-
-
-
     Ref<Model> ModelLoader::LoadModel(ImportModelData importOptions)
     {
         auto modelParent = CreateRef<Model>();
-             modelParent->skeletal = importOptions.skeletal;
+             modelParent->skeletal = false;// importOptions.skeletal;
 
         Assimp::Importer importer;
         std::string completePath = importOptions.filePath + importOptions.fileName;
@@ -44,8 +39,10 @@ namespace libCore
 
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
             std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-            return modelParent;
+            return modelParent;  //--> lo deolvemos vacio
         }
+
+
 
         aiMatrix4x4 nodeTransform = scene->mRootNode->mTransformation;
         modelParent->name = importOptions.fileName;

@@ -132,7 +132,7 @@
     <ClInclude Include="src\tools\SkeletalModelLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\GuiLayer.h">
+    <ClInclude Include="src\GUI\GuiLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\tools\EventManager.h">
@@ -306,6 +306,12 @@
     <ClInclude Include="src\ECS\Scripts\MyScript.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\ECS\PrefabManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\AssetsPanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\input\InputManager.cpp">
@@ -371,7 +377,7 @@
     <ClCompile Include="src\tools\SkeletalModelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\GuiLayer.cpp">
+    <ClCompile Include="src\GUI\GuiLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\EngineOpenGL.cpp">
@@ -474,6 +480,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="vendor\imGizmo\ImGuizmo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ECS\PrefabManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\AssetsPanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

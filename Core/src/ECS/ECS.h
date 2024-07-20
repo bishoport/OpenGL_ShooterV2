@@ -3,13 +3,11 @@
 #include "../Core/Transform.h"
 #include "../Core/Material.h"
 #include "../Core/Mesh.h"
+#include "../Core/Light.hpp"
 #include <entt.hpp>
-
-//#include "ScriptLibrary.h"
 
 namespace libCore
 {
-
     class Script {
     public:
         virtual ~Script() = default;
@@ -45,13 +43,10 @@ namespace libCore
         Ref<entt::registry> m_Registry;
     };
 
-
-    
-
-
     struct TransformComponent
     {
-        Ref<Transform> transform;
+        Ref<Transform> transform = CreateRef<Transform>();
+        glm::mat4 accumulatedTransform = glm::mat4(1.0f); // Transformación acumulada
     };
 
     struct ParentComponent {
@@ -64,17 +59,70 @@ namespace libCore
 
     struct MeshComponent
     {
-        Ref<Mesh> mesh;
+        Ref<Mesh> mesh = CreateRef<Mesh>();
     };
-
 
     struct MaterialComponent 
     {
-        Ref<Material> material;
+        Ref<Material> material = CreateRef<Material>();
+    };
+
+    struct LightComponent
+    {
+        Ref<Light> light;
+    };
+
+    struct DirectionalLightComponent
+    {
+        bool showDebug = false;
+        glm::vec3 color;
+        float intensity = 2.0f; // Añadido para controlar la intensidad de la luz
+
+        //--DIRECTIONAL LIGHT--------------------------------
+        glm::vec3 ambient = glm::vec3(1.0f, 1.0f, 1.0f);
+        glm::vec3 diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+        glm::vec3 specular = glm::vec3(1.0f, 1.0f, 1.0f);
+
+        glm::vec3 direction = glm::vec3(0.0f, -10.0f, 0.0f);
+        float currentSceneRadius = 10.0f;
+        float sceneRadiusOffset = 10.0f;
+
+        // Shadow values
+        int shadowMapResolution = 1024;
+
+        glm::mat4 shadowMVP = glm::mat4(1.0f);
+        bool drawShadows = false;
+        float near_plane = 0.1f, far_plane = 100.0f;
+        float shadowIntensity = 0.5f;
+        bool usePoisonDisk = false;
+        float orthoLeft = -10.0f;
+        float orthoRight = 10.0f;
+        float orthoBottom = -10.0f;
+        float orthoTop = 10.0f;
+
+        float orthoNear = 0.1f;
+        float orthoNearOffset = 0.0f;
+        float orthoFar = 100.0f;
+        float orthoFarOffset = 0.0f;
+
+        float angleX = 0.0f;
+        float angleY = 0.0f;
+
+        glm::mat4 shadowBias = glm::mat4(
+            0.5, 0.0, 0.0, 0.0,
+            0.0, 0.5, 0.0, 0.0,
+            0.0, 0.0, 0.5, 0.0,
+            0.5, 0.5, 0.5, 1.0
+        );
+        //--SCENE BOUNDS
+        std::pair<glm::vec3, float> SceneBounds = { glm::vec3(0.0f), 30.0f };
+
+        //---------------------------------------------------
     };
 
 
     struct ScriptComponent {
+
         Ref<Script> instance;
 
         ScriptComponent() = default;
@@ -95,26 +143,4 @@ namespace libCore
             }
         }
     };
-
-
-
-
-
-
-    //class ExampleScript : public Script {
-    //public:
-    //    void Init() override {
-    //        // Inicialización del script
-    //    }
-
-    //    void Update(float deltaTime) override {
-    //        // Lógica de actualización del script
-    //        if (m_Registry && m_Registry->has<TransformComponent>(m_Entity)) {
-    //            //auto& transform = m_Registry->get<TransformComponent>(m_Entity).transform;
-    //            auto& transform = GetComponent<TransformComponent>().transform;
-    //            // Modificar la posición como ejemplo
-    //            transform->position.x += 0.01f * deltaTime;
-    //        }
-    //    }
-    //};
 }

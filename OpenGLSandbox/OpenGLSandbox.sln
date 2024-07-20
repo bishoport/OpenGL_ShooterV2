@@ -10,11 +10,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MapEditor", "..\MapEditor\M
 		{5748CA62-055B-4D1E-829A-AFEB04DA882E} = {5748CA62-055B-4D1E-829A-AFEB04DA882E}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScriptBuilder", "..\ScriptBuilder\ScriptBuilder.vcxproj", "{FE256636-50CE-42B2-A108-5210ACC39794}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5748CA62-055B-4D1E-829A-AFEB04DA882E} = {5748CA62-055B-4D1E-829A-AFEB04DA882E}
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -39,14 +34,6 @@ Global
 		{A090787D-0DAF-4D3F-B1CC-B0F597B8FE34}.Release|x64.Build.0 = Release|x64
 		{A090787D-0DAF-4D3F-B1CC-B0F597B8FE34}.Release|x86.ActiveCfg = Release|Win32
 		{A090787D-0DAF-4D3F-B1CC-B0F597B8FE34}.Release|x86.Build.0 = Release|Win32
-		{FE256636-50CE-42B2-A108-5210ACC39794}.Debug|x64.ActiveCfg = Debug|x64
-		{FE256636-50CE-42B2-A108-5210ACC39794}.Debug|x64.Build.0 = Debug|x64
-		{FE256636-50CE-42B2-A108-5210ACC39794}.Debug|x86.ActiveCfg = Debug|Win32
-		{FE256636-50CE-42B2-A108-5210ACC39794}.Debug|x86.Build.0 = Debug|Win32
-		{FE256636-50CE-42B2-A108-5210ACC39794}.Release|x64.ActiveCfg = Release|x64
-		{FE256636-50CE-42B2-A108-5210ACC39794}.Release|x64.Build.0 = Release|x64
-		{FE256636-50CE-42B2-A108-5210ACC39794}.Release|x86.ActiveCfg = Release|Win32
-		{FE256636-50CE-42B2-A108-5210ACC39794}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
