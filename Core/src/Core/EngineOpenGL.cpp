@@ -171,13 +171,7 @@ namespace libCore
 
 
 		// -- IMGUI
-		if (useImGUI == true)
-		{
-			guiLayer = CreateScope<GuiLayer>(window, windowWidth, windowHeight);
-			/*guiLayer->SetCallBackFunc([this](const std::vector<Vector2d>& points, const std::vector<Vector2d>& holePoints) {
-				this->CreateRoof(points, holePoints);
-				});*/
-		}
+		guiLayer = CreateScope<GuiLayer>(window, windowWidth, windowHeight);
 		// -------------------------------------------------
 
 		// --InputManager
@@ -243,16 +237,6 @@ namespace libCore
 	{
 		running = false;
 	}
-	//void EngineOpenGL::begin()
-	//{
-	//	if (useImGUI)
-	//	{
-	//		// Start the Dear ImGui frame
-	//		ImGui_ImplOpenGL3_NewFrame();
-	//		ImGui_ImplGlfw_NewFrame();
-	//		ImGui::NewFrame();
-	//	}
-	//}
 	void EngineOpenGL::InitializeMainLoop()
 	{
 		Timestep lastFrameTime = static_cast<float>(glfwGetTime());
@@ -282,27 +266,17 @@ namespace libCore
 			// -------------------------------------------
 
 			//-- ImGUI
-			if (useImGUI)
+			if (ImGui::IsAnyItemHovered() || ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
 			{
-				// En tu bucle principal o en el manejo de eventos
-				if (ImGui::IsAnyItemHovered() || ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
-				{
-					mouseInImGUI = true;
-				}
-				else
-				{
-					mouseInImGUI = false;
-				}
-
-				guiLayer->Draw(useImGUI);
-
-				//guiLayer->begin();
-				//guiLayer->renderMainMenuBar();
-				//guiLayer->renderDockers();
-				//DrawImGUI();
-				//guiLayer->end();
+				mouseInImGUI = true;
 			}
+			else
+			{
+				mouseInImGUI = false;
+			}
+			guiLayer->Draw();
 			// -------------------------------------------
+
 
 			//END INPUT UPDATE
 			InputManager::Instance().EndFrame();
@@ -341,17 +315,28 @@ namespace libCore
 		//--INPUT UPDATE
 		InputManager::Instance().Update();
 
-		if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F1))
-		{
-			useImGUI = !useImGUI;
-		}
-		if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_1))
+		if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F1)) //Editor
 		{
 			currentViewport = 0;
+			engineState = EDITOR;
 		}
-		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_2))
+		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F2)) //Editor Play
+		{
+			currentViewport = 0;
+			engineState = EDITOR_PLAY;
+		}
+		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F3)) //Play
 		{
 			currentViewport = 1;
+			engineState = PLAY;
+		}
+		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_ESCAPE)) //BACK TO EDITOR MODE WITH ESC FROM PLAY MODE
+		{
+			if (engineState == PLAY)
+			{
+				currentViewport = 0;
+				engineState = EDITOR;
+			}
 		}
 		//-------------------------------------------------------------------
 
@@ -368,49 +353,52 @@ namespace libCore
 		//-------------------------------------------
 		
 
-		//--MOUSE PICKING
-		if (mouseInImGUI == false && usingGizmo == false)
+		if (engineState == EDITOR || engineState == EDITOR_PLAY)
 		{
-			if (guiLayer->isSelectingObject == true)
+			//--MOUSE PICKING
+			if (mouseInImGUI == false && usingGizmo == false)
 			{
-				return;
-			}
-
-			guiLayer->isSelectingObject = false;
-
-			float mouseX, mouseY;
-			std::tie(mouseX, mouseY) = InputManager::Instance().GetMousePosition();
-
-			if (InputManager::Instance().IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_LEFT) && guiLayer->isSelectingObject == false)
-			{
-				EntityManager::GetInstance().entitiesInRay.clear();
-
-				float normalizedX = (2.0f * mouseX) / ViewportManager::GetInstance().viewports[currentViewport]->viewportSize.x - 1.0f;
-				float normalizedY = ((2.0f * mouseY) / ViewportManager::GetInstance().viewports[currentViewport]->viewportSize.y - 1.0f) * -1.0f;
-
-				glm::vec3 clipSpaceCoordinates(normalizedX, normalizedY, -1.0);
-				glm::vec4 homogenousClipCoordinates = glm::vec4(clipSpaceCoordinates, 1.0);
-				glm::mat4 invProjView = glm::inverse(ViewportManager::GetInstance().viewports[currentViewport]->camera->cameraMatrix);
-				glm::vec4 homogenousWorldCoordinates = invProjView * homogenousClipCoordinates;
-				glm::vec3 worldCoordinates = glm::vec3(homogenousWorldCoordinates) / homogenousWorldCoordinates.w;
-
-				glm::vec3 rayOrigin = ViewportManager::GetInstance().viewports[currentViewport]->camera->Position;
-				glm::vec3 rayDirection = glm::normalize(worldCoordinates - rayOrigin);
-
-				EntityManager::GetInstance().CheckRayModelIntersection(rayOrigin, rayDirection, glm::mat4(1.0f));
-
-				if (EntityManager::GetInstance().entitiesInRay.size() == 1) {
-					EntityManager::GetInstance().currentSelectedEntityInScene = EntityManager::GetInstance().entitiesInRay[0];
-					guiLayer->isSelectingObject = false; // No need to select, auto-selected
-					guiLayer->showModelSelectionCombo = false;
+				if (guiLayer->isSelectingObject == true)
+				{
+					return;
 				}
-				else if (EntityManager::GetInstance().entitiesInRay.size() > 1) {
-					guiLayer->isSelectingObject = true; // Multiple options, need to select
-					guiLayer->showModelSelectionCombo = true;
-				}
-				else {
-					guiLayer->isSelectingObject = false; // No selection
-					guiLayer->showModelSelectionCombo = false;
+
+				guiLayer->isSelectingObject = false;
+
+				float mouseX, mouseY;
+				std::tie(mouseX, mouseY) = InputManager::Instance().GetMousePosition();
+
+				if (InputManager::Instance().IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_LEFT) && guiLayer->isSelectingObject == false)
+				{
+					EntityManager::GetInstance().entitiesInRay.clear();
+
+					float normalizedX = (2.0f * mouseX) / ViewportManager::GetInstance().viewports[currentViewport]->viewportSize.x - 1.0f;
+					float normalizedY = ((2.0f * mouseY) / ViewportManager::GetInstance().viewports[currentViewport]->viewportSize.y - 1.0f) * -1.0f;
+
+					glm::vec3 clipSpaceCoordinates(normalizedX, normalizedY, -1.0);
+					glm::vec4 homogenousClipCoordinates = glm::vec4(clipSpaceCoordinates, 1.0);
+					glm::mat4 invProjView = glm::inverse(ViewportManager::GetInstance().viewports[currentViewport]->camera->cameraMatrix);
+					glm::vec4 homogenousWorldCoordinates = invProjView * homogenousClipCoordinates;
+					glm::vec3 worldCoordinates = glm::vec3(homogenousWorldCoordinates) / homogenousWorldCoordinates.w;
+
+					glm::vec3 rayOrigin = ViewportManager::GetInstance().viewports[currentViewport]->camera->Position;
+					glm::vec3 rayDirection = glm::normalize(worldCoordinates - rayOrigin);
+
+					EntityManager::GetInstance().CheckRayModelIntersection(rayOrigin, rayDirection, glm::mat4(1.0f));
+
+					if (EntityManager::GetInstance().entitiesInRay.size() == 1) {
+						EntityManager::GetInstance().currentSelectedEntityInScene = EntityManager::GetInstance().entitiesInRay[0];
+						guiLayer->isSelectingObject = false; // No need to select, auto-selected
+						guiLayer->showModelSelectionCombo = false;
+					}
+					else if (EntityManager::GetInstance().entitiesInRay.size() > 1) {
+						guiLayer->isSelectingObject = true; // Multiple options, need to select
+						guiLayer->showModelSelectionCombo = true;
+					}
+					else {
+						guiLayer->isSelectingObject = false; // No selection
+						guiLayer->showModelSelectionCombo = false;
+					}
 				}
 			}
 		}
@@ -418,37 +406,38 @@ namespace libCore
 	}
 	// -------------------------------------------------
 	// -------------------------------------------------
+}
 
 
 
-	//--CREADOR DE PREFABS
-	void EngineOpenGL::CreatePrefabExternalModel(ImportModelData importModelData)
-	{
-		EntityManager::GetInstance().CreateExternalModelGameObject(importModelData);
-		//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabExternalModel(importModelData));
-	}
-	void EngineOpenGL::CreatePrefabDot(const glm::vec3& pos, const glm::vec3& polygonColor)
-	{
-		//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabDot(pos,polygonColor));
-	}
-	void EngineOpenGL::CreatePrefabLine(const glm::vec3& point1, const glm::vec3& point2)
-	{
-		//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabLine(point1, point2));
-	}
-	void EngineOpenGL::CreateTriangle(const glm::vec3& pos1, const glm::vec3& pos2, const glm::vec3& pos3)
-	{
-		//modelsInScene.push_back(GameObjectManager::getInstance().CreateTriangle(pos1, pos2, pos3));
-	}
-	void EngineOpenGL::CreatePrefabSphere(float radius, unsigned int sectorCount, unsigned int stackCount)
-	{
-		//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabSphere(radius, sectorCount, stackCount));
-	}
-	void EngineOpenGL::CreatePrefabCube(glm::vec3 position)
-	{
-		//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabCube(position));
-	}
-	// -------------------------------------------------
-	// -------------------------------------------------
+
+	////--CREADOR DE PREFABS
+	//void EngineOpenGL::CreatePrefabExternalModel(ImportModelData importModelData)
+	//{
+	//	EntityManager::GetInstance().CreateExternalModelGameObject(importModelData);
+	//}
+	//void EngineOpenGL::CreatePrefabDot(const glm::vec3& pos, const glm::vec3& polygonColor)
+	//{
+	//	//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabDot(pos,polygonColor));
+	//}
+	//void EngineOpenGL::CreatePrefabLine(const glm::vec3& point1, const glm::vec3& point2)
+	//{
+	//	//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabLine(point1, point2));
+	//}
+	//void EngineOpenGL::CreateTriangle(const glm::vec3& pos1, const glm::vec3& pos2, const glm::vec3& pos3)
+	//{
+	//	//modelsInScene.push_back(GameObjectManager::getInstance().CreateTriangle(pos1, pos2, pos3));
+	//}
+	//void EngineOpenGL::CreatePrefabSphere(float radius, unsigned int sectorCount, unsigned int stackCount)
+	//{
+	//	//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabSphere(radius, sectorCount, stackCount));
+	//}
+	//void EngineOpenGL::CreatePrefabCube(glm::vec3 position)
+	//{
+	//	//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabCube(position));
+	//}
+	//// -------------------------------------------------
+	//// -------------------------------------------------
 
 
 	//--IMGUI
@@ -497,4 +486,4 @@ namespace libCore
 	//}
 	// -------------------------------------------------
 	// -------------------------------------------------
-}
+

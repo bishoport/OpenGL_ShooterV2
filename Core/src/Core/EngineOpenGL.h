@@ -13,6 +13,13 @@
 
 namespace libCore
 {
+    enum EngineStates
+    {
+        EDITOR,
+        EDITOR_PLAY,
+        PLAY
+    };
+
     class EngineOpenGL
     {
     public:
@@ -25,6 +32,7 @@ namespace libCore
 
 
         //ENGINE LIFE--CYCLE
+        EngineStates engineState = EngineStates::EDITOR;
         bool InitializeEngine(const std::string& windowTitle, int initialWindowWidth, int initialWindowHeight);
         void InitializeMainLoop();
         //void begin();
@@ -77,7 +85,7 @@ namespace libCore
         Timestep m_deltaTime = 0.0f;
 
         bool running = false;
-        bool useImGUI = true;
+
         bool mouseInImGUI = false;
         int windowWidth = 0;
         int windowHeight = 0;

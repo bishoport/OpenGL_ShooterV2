@@ -7,6 +7,9 @@
 
 namespace libCore
 {
+
+	
+
 	class Scene {
 
 	public:
@@ -14,6 +17,9 @@ namespace libCore
 
 
 	public:
+
+		
+
 		// Método para obtener la instancia de la clase
 		static Scene& GetInstance() {
 			static Scene instance;
@@ -26,10 +32,8 @@ namespace libCore
 		void Render(Timestep m_deltaTime);
 		//-----------------------------------
 
-		
 
 	private:
-
 
 
 	private:

@@ -12,6 +12,7 @@
 
 namespace libCore
 {
+    //--CONSTRUCTOR
     GuiLayer::GuiLayer(GLFWwindow* window, float window_W, float window_H)
     {
         m_window_W = window_W;
@@ -68,37 +69,29 @@ namespace libCore
         //--PANELS
         assetsPanel = CreateScope<AssetsPanel>();
     }
-
-    //Aqui llega la funcion para que el editor de Roofs devuelva a quien sea, la matriz de footPrints
-    void libCore::GuiLayer::SetCallBackFunc(CallbackFromGuiLayer callbackFromGuiLayerFunc)
-    {
-        m_callbackFromGuiLayerFunc = callbackFromGuiLayerFunc;
-    }
-
     GuiLayer::~GuiLayer() {
         // Cleanup
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
     }
+    //-------------------------------------------------------------------------------
+    
 
+    //--LIFE-CYCLE
     void GuiLayer::begin() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         ImGuizmo::BeginFrame();
     }
-
-    void GuiLayer::Draw(bool _drawImGUI)
+    void GuiLayer::Draw()
     {
-        drawImGUI = _drawImGUI;
-
         begin();
         renderMainMenuBar();
         renderDockers();
 
-
-        if (drawImGUI)
+        if (EngineOpenGL::GetInstance().engineState == EDITOR || EngineOpenGL::GetInstance().engineState == EDITOR_PLAY)
         {
             //--SELECT MODEL FROM RAY POPUP
             if (isSelectingObject == true)
@@ -132,7 +125,7 @@ namespace libCore
             DrawSelectedEntityComponentsPanel();
             DrawLightsPanel(LightsManager::GetLights());
             DrawMaterialsPanel();
-            //guiLayer->RenderCheckerMatrix(); //Panel para el editor de roofs
+            //RenderCheckerMatrix(); //Panel para el editor de roofs
 
             Renderer::getInstance().ShowControlsGUI();
             ViewportManager::GetInstance().DrawPanelGUI();
@@ -141,16 +134,19 @@ namespace libCore
 
             //-------------------------------------------ASSETS PANEL--------------------------------------
             assetsPanel->OnImGuiRender();
-            //------------------------------------------------------------------------------------------------
+            //------------------------------------------------------------------------------------------------ 
+
+            //-------------------------------------------TOOLBAR PANEL--------------------------------------
+            DrawToolBarEditor();
+            //------------------------------------------------------------------------------------------------ 
+        }
+        else if (EngineOpenGL::GetInstance().engineState == PLAY)
+        {
+
         }
 
         end();
     }
-
-
-
-
-
     void GuiLayer::renderDockers()
     {
         // Configuración del Docking
@@ -176,7 +172,10 @@ namespace libCore
         //ImGui::End();
         ImGui::PopStyleColor(); // Revert the transparent background color
     }
+    //-------------------------------------------------------------------------------
 
+
+    //--TOP MAIN MENU & TOOLBAR
     void GuiLayer::renderMainMenuBar() {
 
         // Barra de menu principal
@@ -197,13 +196,37 @@ namespace libCore
             }
             if (ImGui::BeginMenu("GameObjects"))
             {
-                if (ImGui::MenuItem("Cube")) 
-                { 
+                // Basic Shapes Section
+                ImGui::TextColored(ImVec4(1, 1, 1, 1), "Basic Shapes");
+                ImGui::Separator();
+
+                if (ImGui::MenuItem("Cube"))
+                {
                     EntityManager::GetInstance().CreateCubeGameObject();
                 }
-                else if (ImGui::MenuItem("Sphere"))
+                if (ImGui::MenuItem("Sphere"))
                 {
                     EntityManager::GetInstance().CreateSphereGameObject();
+                }
+
+                // Lights Section
+                ImGui::Spacing();
+                ImGui::Spacing();
+                ImGui::Spacing();
+                ImGui::TextColored(ImVec4(1, 1, 1, 1), "Lights");
+                ImGui::Separator();
+
+                if (ImGui::MenuItem("Directional Light"))
+                {
+                    libCore::LightsManager::CreateDirectionalLight();
+                }
+                if (ImGui::MenuItem("Point Light"))
+                {
+                    //libCore::LightsManager::CreatePointLight();
+                }
+                if (ImGui::MenuItem("Spot Light"))
+                {
+                    //libCore::LightsManager::CreateSpotLight();
                 }
 
                 ImGui::EndMenu();
@@ -211,21 +234,24 @@ namespace libCore
             ImGui::EndMainMenuBar();
         }
     }
-
-
-
-
-
-
-    void printMatrix(const glm::mat4& mat, const std::string& name) {
-        const float* m = glm::value_ptr(mat);
-        std::cout << name << " Matrix:" << std::endl;
-        std::cout << m[0] << ", " << m[1] << ", " << m[2] << ", " << m[3] << std::endl;
-        std::cout << m[4] << ", " << m[5] << ", " << m[6] << ", " << m[7] << std::endl;
-        std::cout << m[8] << ", " << m[9] << ", " << m[10] << ", " << m[11] << std::endl;
-        std::cout << m[12] << ", " << m[13] << ", " << m[14] << ", " << m[15] << std::endl;
+    void GuiLayer::DrawToolBarEditor()
+    {
+        if (ImGui::Begin("Engine State")) {
+            if (ImGui::Button("Editor")) {
+                EngineOpenGL::GetInstance().engineState = EngineStates::EDITOR;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Editor Play")) {
+                EngineOpenGL::GetInstance().engineState = EngineStates::EDITOR_PLAY;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Play")) {
+                EngineOpenGL::GetInstance().engineState = EngineStates::PLAY;
+            }
+        }
+        ImGui::End();
     }
-
+    //-------------------------------------------------------------------------------
 
 
 
@@ -371,14 +397,15 @@ namespace libCore
     
 
     //--INSPECTOR PANEL
-    void libCore::GuiLayer::DrawSelectedEntityComponentsPanel()
+    void GuiLayer::DrawSelectedEntityComponentsPanel()
     {
         ImGui::Begin("Inspector");
 
-
         if (EntityManager::GetInstance().currentSelectedEntityInScene != entt::null) {
-            
+
             entt::entity selectedEntity = EntityManager::GetInstance().currentSelectedEntityInScene;
+
+            DrawComponentEditor(selectedEntity);
 
             //--TRANSFORM_COMPONENT
             if (EntityManager::GetInstance().m_registry->has<TransformComponent>(selectedEntity)) {
@@ -429,9 +456,8 @@ namespace libCore
                 auto& meshComponent = EntityManager::GetInstance().m_registry->get<MeshComponent>(selectedEntity);
                 ImGui::Checkbox("Show ABB", &meshComponent.mesh->showAABB);
             }
-            //--MATERIA_COMPONENT
+            //--MATERIAL_COMPONENT
             if (EntityManager::GetInstance().m_registry->has<MaterialComponent>(selectedEntity)) {
-
                 auto& materialComponent = EntityManager::GetInstance().m_registry->get<MaterialComponent>(selectedEntity);
                 auto& material = *materialComponent.material;
 
@@ -468,8 +494,38 @@ namespace libCore
             if (EntityManager::GetInstance().m_registry->has<ScriptComponent>(selectedEntity)) {
                 auto& scriptComponent = EntityManager::GetInstance().m_registry->get<ScriptComponent>(selectedEntity);
                 if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen)) {
-                    ImGui::Text("Script Instance: %s", typeid(*scriptComponent.instance).name());
+                    ImGui::Text("Script Instance: %s", scriptComponent.instance ? typeid(*scriptComponent.instance).name() : "None");
                     // Aquí puedes agregar más controles para interactuar con el script, si es necesario
+
+                    // Si instance es nullptr, muestra la opción para asignar un script
+                    if (!scriptComponent.instance) {
+                        const auto& creators = ScriptFactory::GetInstance().GetCreators();
+                        static std::string selectedScript;
+                        std::vector<std::string> scriptNames;
+                        for (const auto& pair : creators) {
+                            scriptNames.push_back(pair.first);
+                        }
+
+                        if (ImGui::BeginCombo("Assign Script", selectedScript.c_str())) {
+                            for (const auto& scriptName : scriptNames) {
+                                bool isSelected = (selectedScript == scriptName);
+                                if (ImGui::Selectable(scriptName.c_str(), isSelected)) {
+                                    selectedScript = scriptName;
+                                }
+                                if (isSelected) {
+                                    ImGui::SetItemDefaultFocus();
+                                }
+                            }
+                            ImGui::EndCombo();
+                        }
+
+                        if (ImGui::Button("Assign") && !selectedScript.empty()) {
+                            scriptComponent.instance = ScriptFactory::GetInstance().CreateScript(selectedScript);
+                            scriptComponent.instance->SetEntity(selectedEntity, EntityManager::GetInstance().m_registry);
+                            //scriptComponent.OnAssign(); // Inicializar el script
+                            selectedScript.clear(); // Limpiar la selección después de asignar el script
+                        }
+                    }
                 }
             }
         }
@@ -732,6 +788,57 @@ namespace libCore
     }
     //-----------------------------------------------------------------------------------------------------
 
+    //--SCRIPTS-EDITOR PANEL
+    void GuiLayer::DrawComponentEditor(entt::entity entity) {
+        auto& entityManager = EntityManager::GetInstance();
+
+        static std::string selectedComponent;
+
+        // Lista de todos los componentes disponibles, incluyendo ScriptComponent
+        std::vector<std::string> componentNames = {
+            "TransformComponent", "MeshComponent", "MaterialComponent",
+            "LightComponent", "DirectionalLightComponent", "ScriptComponent"
+        };
+
+        // ComboBox para seleccionar el componente
+        if (ImGui::BeginCombo("Components", selectedComponent.c_str())) {
+            for (const auto& componentName : componentNames) {
+                bool isSelected = (selectedComponent == componentName);
+                if (ImGui::Selectable(componentName.c_str(), isSelected)) {
+                    selectedComponent = componentName;
+                }
+                if (isSelected) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+
+        // Botón para agregar el componente a la entidad
+        if (ImGui::Button("Add Component") && !selectedComponent.empty()) {
+            if (selectedComponent == "TransformComponent") {
+                entityManager.AddComponent<TransformComponent>(entity);
+            }
+            else if (selectedComponent == "MeshComponent") {
+                entityManager.AddComponent<MeshComponent>(entity);
+            }
+            else if (selectedComponent == "MaterialComponent") {
+                entityManager.AddComponent<MaterialComponent>(entity);
+            }
+            else if (selectedComponent == "LightComponent") {
+                entityManager.AddComponent<LightComponent>(entity);
+            }
+            else if (selectedComponent == "DirectionalLightComponent") {
+                entityManager.AddComponent<DirectionalLightComponent>(entity);
+            }
+            else if (selectedComponent == "ScriptComponent") {
+                entityManager.AddComponent<ScriptComponent>(entity);
+            }
+            selectedComponent.clear(); // Limpiar la selección después de agregar el componente
+        }
+    }
+    //-----------------------------------------------------------------------------------------------------
+
 
     //Especial para el editor de Roofs
     void GuiLayer::RenderCheckerMatrix() {
@@ -870,7 +977,13 @@ namespace libCore
 
         ImGui::End();
     }
+        //Aqui llega la funcion para que el editor de Roofs devuelva a quien sea, la matriz de footPrints
+    void GuiLayer::SetCallBackFunc(CallbackFromGuiLayer callbackFromGuiLayerFunc)
+    {
+        m_callbackFromGuiLayerFunc = callbackFromGuiLayerFunc;
+    }
     //-----------------------------------------------------------------------------------------------------
+
 
     void GuiLayer::end()
     {
@@ -889,6 +1002,15 @@ namespace libCore
             ImGui::RenderPlatformWindowsDefault();
             glfwMakeContextCurrent(backup_current_context);
         }
+    }
+
+    void printMatrix(const glm::mat4& mat, const std::string& name) {
+        const float* m = glm::value_ptr(mat);
+        std::cout << name << " Matrix:" << std::endl;
+        std::cout << m[0] << ", " << m[1] << ", " << m[2] << ", " << m[3] << std::endl;
+        std::cout << m[4] << ", " << m[5] << ", " << m[6] << ", " << m[7] << std::endl;
+        std::cout << m[8] << ", " << m[9] << ", " << m[10] << ", " << m[11] << std::endl;
+        std::cout << m[12] << ", " << m[13] << ", " << m[14] << ", " << m[15] << std::endl;
     }
 }
 

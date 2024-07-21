@@ -9,7 +9,7 @@
 #include <memory>
 #include <iostream>
 #include <windows.h>
-
+#include "../Core/EngineOpenGL.h"
 #include "Scripts/MyScript.h"
 #include "../Timestep.h"
 
@@ -107,6 +107,8 @@ namespace libCore
             	materialComponent.material->metallicMap  = AssetsManager::GetInstance().GetTexture("default_metallic");
             	materialComponent.material->roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
             	materialComponent.material->aOMap        = AssetsManager::GetInstance().GetTexture("default_ao");
+
+                //AddComponentWithScript<ScriptComponent, MyScript>(gameObject);
         }
 
         void CreateSphereGameObject(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), float radius = 0.01f, int sectorCount = 6, int stackCount = 6)
@@ -177,22 +179,25 @@ namespace libCore
 
 
         //--ACTUALIZADOR DE FUNCIONES UPDATES ANTES DEL RENDER DE LOS COMPONENTES
-        void UpdateGameObjects(Timestep deltaTime) {
+        void UpdateGameObjects(Timestep deltaTime) 
+        {
 
-            // Inicializar y actualizar scripts
-            auto scriptView = m_registry->view<ScriptComponent>();
-            for (auto entity : scriptView) {
-                auto& scriptComponent = scriptView.get<ScriptComponent>(entity);
-                scriptComponent.Update(deltaTime.GetMilliseconds());
+            //-SCRIPTS Comp.
+            if (EngineOpenGL::GetInstance().engineState == EDITOR_PLAY || EngineOpenGL::GetInstance().engineState == PLAY)
+            {
+                // Inicializar y actualizar scripts
+                auto scriptView = m_registry->view<ScriptComponent>();
+                for (auto entity : scriptView) {
+                    auto& scriptComponent = scriptView.get<ScriptComponent>(entity);
+                    scriptComponent.Update(deltaTime.GetMilliseconds());
+                }
             }
+            //-------------------------------------------------------------------------------------------------------------------
 
-
-            // Crear una vista para las entidades con los componentes TransformComponent
-            auto trasnformView = m_registry->view<TransformComponent>();
-
-            // Recorrer todas las entidades y actualizar sus transformaciones acumuladas
-            for (auto entity : trasnformView) {
-                auto& transformComponent = trasnformView.get<TransformComponent>(entity);
+            //-TRANSFORM Comp. (Actualizamos matrices para los objetos NON-STATIC)
+            auto transformCompView = m_registry->view<TransformComponent>();
+            for (auto entity : transformCompView) {
+                auto& transformComponent = GetComponent<TransformComponent>(entity);// transformCompView.get<TransformComponent>(entity);
 
                 if (HasComponent<ParentComponent>(entity)) {
                     auto& parentComponent = GetComponent<ParentComponent>(entity);
@@ -206,6 +211,8 @@ namespace libCore
 
                 transformComponent.transform->updateRotationFromEulerAngles();
             }
+            //-------------------------------------------------------------------------------------------------------------------
+
 
             // Actualizar AABBs después de que todas las transformaciones acumuladas estén calculadas
             auto meshView = m_registry->view<TransformComponent, MeshComponent>();
@@ -259,6 +266,14 @@ namespace libCore
         T& AddComponent(entt::entity entity, Args&&... args) {
             return m_registry->emplace<T>(entity, std::forward<Args>(args)...);
         }
+        // Método plantilla para agregar un componente con script
+        template<typename ScriptType>
+        ScriptComponent& AddComponentWithScript(entt::entity entity, const std::string& scriptName) {
+            auto& scriptComponent = m_registry->emplace<ScriptComponent>(entity);
+            scriptComponent.instance = ScriptFactory::GetInstance().CreateScript(scriptName);
+            scriptComponent.instance->SetEntity(entity, m_registry);
+            return scriptComponent;
+        }
         template<typename T>
         void RemoveComponent(entt::entity entity) {
             m_registry->remove<T>(entity);
@@ -271,8 +286,15 @@ namespace libCore
 
     private:
         // Constructor privado para el patrón Singleton
-        EntityManager() {}
+        EntityManager() { 
+            RegisterScripts();
+        }
 
+
+        void RegisterScripts() {
+            ScriptFactory::GetInstance().RegisterScript<MyScript>("MyScript");
+            // Registra otros scripts aquí
+        }
 
         // Función recursiva para crear entidades desde un modelo y sus hijos
         void CreateGameObjectFromModel(Ref<Model> model, entt::entity parent) 
@@ -308,12 +330,6 @@ namespace libCore
             for (auto& child : model->children) {
                 CreateGameObjectFromModel(child, entity);
             }
-
-
-            // Asignar el ScriptComponent con ExampleScript
-            //auto& scriptComponent = m_registry->emplace<ScriptComponent>(entity);
-            //scriptComponent.instance = CreateRef<MyScript>();
-            //scriptComponent.instance->SetEntity(entity, m_registry);
         }
 
 

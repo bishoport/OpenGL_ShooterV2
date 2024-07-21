@@ -41,6 +41,7 @@
     <ClInclude Include="src\Core\Viewport.hpp" />
     <ClInclude Include="src\Core\ViewportManager.hpp" />
     <ClInclude Include="src\ECS\ECS.h" />
+    <ClInclude Include="src\ECS\ScriptFactory.h" />
     <ClInclude Include="src\GUI\GuiLayer.h" />
     <ClInclude Include="src\ECS\EntityManager.hpp" />
     <ClInclude Include="src\ECS\Scene.h" />

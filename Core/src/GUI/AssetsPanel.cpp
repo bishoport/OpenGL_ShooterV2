@@ -147,7 +147,9 @@ namespace libCore {
 			ImGui::Checkbox("Invert UV", &importOptions.invertUV);
 			ImGui::Checkbox("Rotate 90 degrees on X-axis", &importOptions.rotate90);
 			ImGui::SliderFloat("Scale", &importOptions.globalScaleFactor, 0.01f, 10.0f, "%.1f", ImGuiSliderFlags_None);
+			ImGui::Separator();
 
+			ImGui::Checkbox("Lights", &importOptions.processLights);
 
 			// Botón de Aceptar
 			if (ImGui::Button("Accept")) {

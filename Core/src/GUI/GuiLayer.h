@@ -34,7 +34,7 @@ namespace libCore
         ~GuiLayer();
 
         void begin();
-        void Draw(bool _drawImGUI);
+        void Draw();
         void end();
         void renderDockers();
         void renderMainMenuBar();
@@ -49,6 +49,8 @@ namespace libCore
         void DrawMaterial(const Ref<Material> materialData);
         void ShowTexture(const char* label, Ref<Texture> texture);
         void RenderCheckerMatrix();
+        void DrawComponentEditor(entt::entity entity);
+        void DrawToolBarEditor();
 
         void checkGizmo(const Ref<Viewport>& viewport);
 

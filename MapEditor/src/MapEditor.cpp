@@ -129,7 +129,7 @@ void MapEditor::Init()
     
 
     // -- EXTRA LIGHTS
-    //libCore::LightsManager::CreateDirectionalLight();
+    /*libCore::LightsManager::CreateDirectionalLight();*/
     //libCore::LightsManager::CreateLight(true, libCore::LightType::POINT, glm::vec3(0.0f, 15.0f, 0.0f));
     //libCore::LightsManager::CreateLight(true, libCore::LightType::AREA, glm::vec3(5.0f, 15.0f, 0.0f));
     //------------------------------------------------------------------
