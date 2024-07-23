@@ -244,6 +244,7 @@ namespace libCore
 
         // Verificar si el material ya existe en el MaterialManager
         auto existingMaterial = MaterialManager::getInstance().getMaterial(materialName);
+        
         Ref<Material> material;
 
         if (existingMaterial) {
@@ -252,8 +253,8 @@ namespace libCore
         }
         else {
             // Crear un nuevo material
-            material = CreateRef<Material>();
-            material->materialName = materialName;
+            material = CreateRef<Material>(materialName);
+            //material->materialName = materialName;
 
             // Obtener el color difuso del material
             aiColor3D color(1.f, 1.f, 1.f);

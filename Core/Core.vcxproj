@@ -25,6 +25,7 @@
     <ClInclude Include="src\Core\IBL.h" />
     <ClInclude Include="src\Core\Itc_matrix_floats.hpp" />
     <ClInclude Include="src\Core\Light.hpp" />
+    <ClInclude Include="src\Core\Lights\DirectionalLight.h" />
     <ClInclude Include="src\Core\Material.h" />
     <ClInclude Include="src\Core\Mesh.h" />
     <ClInclude Include="src\Core\Model.h" />
@@ -41,7 +42,7 @@
     <ClInclude Include="src\Core\Viewport.hpp" />
     <ClInclude Include="src\Core\ViewportManager.hpp" />
     <ClInclude Include="src\ECS\ECS.h" />
-    <ClInclude Include="src\ECS\ScriptFactory.h" />
+    <ClInclude Include="src\ECS\SerializatorManager.h" />
     <ClInclude Include="src\GUI\GuiLayer.h" />
     <ClInclude Include="src\ECS\EntityManager.hpp" />
     <ClInclude Include="src\ECS\Scene.h" />
@@ -89,13 +90,11 @@
     <ClInclude Include="src\tools\EventManager.h" />
     <ClInclude Include="src\tools\FPSCamera.h" />
     <ClInclude Include="src\tools\FreeTypeManager.h" />
-    <ClInclude Include="src\tools\GameObjectManager.hpp" />
     <ClInclude Include="src\tools\LightsManager.hpp" />
     <ClInclude Include="src\tools\LUTGenerator.hpp" />
     <ClInclude Include="src\tools\MaterialManager.hpp" />
     <ClInclude Include="src\tools\ModelLoader.h" />
     <ClInclude Include="src\tools\MousePicker.hpp" />
-    <ClInclude Include="src\ECS\PrefabManager.h" />
     <ClInclude Include="src\tools\PrimitivesHelper.h" />
     <ClInclude Include="src\tools\Raycast.h" />
     <ClInclude Include="src\tools\RoofGenerator.hpp" />
@@ -129,7 +128,6 @@
     <ClCompile Include="src\Core\VAO.cpp" />
     <ClCompile Include="src\Core\VBO.cpp" />
     <ClCompile Include="src\GUI\GuiLayer.cpp" />
-    <ClCompile Include="src\ECS\PrefabManager.cpp" />
     <ClCompile Include="src\ECS\Scene.cpp" />
     <ClCompile Include="src\GUI\AssetsPanel.cpp" />
     <ClCompile Include="src\input\InputManager.cpp" />
@@ -276,7 +274,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)vendor\earcut\include;$(ProjectDir)vendor;$(ProjectDir)vendor\imgui;$(ProjectDir)vendor\freetype-2.13.2\include;C:\Produccion\PROPIOS\OpenGL_DEV\OpenGLSandbox\ScriptBuilder;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Produccion\PROPIOS\OpenGL_DEV\OpenGLSandbox\Core\vendor\yaml-cpp\include;$(ProjectDir)vendor\earcut\include;$(ProjectDir)vendor;$(ProjectDir)vendor\imgui;$(ProjectDir)vendor\freetype-2.13.2\include;C:\Produccion\PROPIOS\OpenGL_DEV\OpenGLSandbox\ScriptBuilder;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -284,10 +282,11 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;freetype.lib;assimp-vc143-mtd.lib</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;freetype.lib;assimp-vc143-mtd.lib;yaml-cppd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

@@ -10,48 +10,44 @@ namespace libCore
     class Material
     {
     public:
-
-        Material(){}
-
-        Material(const std::string& matName)
+        // Constructor predeterminado
+        Material()
+            : materialName("default_material"), shaderName("default"),
+              albedoColor(1.0f, 1.0f, 1.0f), normalStrength(1.0f),
+              metallicValue(0.0f), roughnessValue(0.7f), aoValue(1.0f)
         {
-            materialName = matName;
-
-            //--ALBEDO
             albedoMap = AssetsManager::GetInstance().GetTexture("default_albedo");
-            //-------------------
-
-            //--NORMAL
             normalMap = AssetsManager::GetInstance().GetTexture("default_normal");
-            //-------------------
-
-
-            //--METALLIC
             metallicMap = AssetsManager::GetInstance().GetTexture("default_metallic");
-            //-------------------
-
-
-            //--ROUGHNESS
             roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
-            //-------------------
         }
 
-        std::string materialName = "none";
-        std::string shaderName = "default";
+        Material(const std::string& matName)
+            : materialName(matName), shaderName("default"),
+              albedoColor(1.0f, 1.0f, 1.0f), normalStrength(1.0f),
+              metallicValue(0.0f), roughnessValue(0.8f), aoValue(1.0f)
+        {
+            albedoMap = AssetsManager::GetInstance().GetTexture("default_albedo");
+            normalMap = AssetsManager::GetInstance().GetTexture("default_normal");
+            metallicMap = AssetsManager::GetInstance().GetTexture("default_metallic");
+            roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
+        }
 
-        //VALUES
-        glm::vec3 albedoColor = glm::vec3(1.0f, 1.0f, 1.0f);
-        float normalStrength  = 1.0f;
-        float metallicValue   = 0.0f;
-        float roughnessValue  = 8.0f;
-        float aoValue         = 1.0f;
+        std::string materialName;
+        std::string shaderName;
 
-        //TEXTURES
+        // Valores
+        glm::vec3 albedoColor;
+        float normalStrength;
+        float metallicValue;
+        float roughnessValue;
+        float aoValue;
+
+        // Texturas
         Ref<Texture> albedoMap;
         Ref<Texture> normalMap;
         Ref<Texture> metallicMap;
         Ref<Texture> roughnessMap;
         Ref<Texture> aOMap;
-        //-------------------------------------------------------
     };
 }

@@ -7,6 +7,7 @@ namespace fs = std::filesystem;
 
 namespace libCore
 {
+
     Ref<Texture> TextureManager::LoadTexture(const char* directoryPath, const char* fileName, TEXTURE_TYPES type, GLuint slot)
     {
         // Función auxiliar para buscar la textura recursivamente en subcarpetas

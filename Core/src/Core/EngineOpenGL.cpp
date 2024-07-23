@@ -7,9 +7,9 @@
 #include "../tools/LightsManager.hpp"
 #include "../tools/SkyBox.hpp"
 #include "../tools/MousePicker.hpp"
-#include "../tools/GameObjectManager.hpp"
 #include "../ECS/EntityManager.hpp"
 
+#include "../ECS/Scene.h"
 
 
 
@@ -17,8 +17,7 @@ namespace libCore
 {
 	//--MANAGERS
 	Scope<GuiLayer> guiLayer = nullptr; //esto se declara en el cpp porque si se pone en el h, hay errores de includes cíclicos
-	//Scope<ViewportManager> viewportManager = nullptr; //esto se declara en el cpp porque si se pone en el h, hay errores de includes cíclicos
-	//Scope<RoofGenerator> roofGenerator = nullptr;
+	
 	// -------------------------------------------------
 	// -------------------------------------------------
 	
@@ -165,30 +164,32 @@ namespace libCore
 
 		//-STENCIL MOUSE PICKING
 		ShaderManager::setShaderDataLoad("stencil", shadersDirectory + "Stencil.vert", shadersDirectory + "Stencil.frag");
-		
+			
 		ShaderManager::LoadAllShaders();
 		//-----------------------------------------------------------------
+
+
+		// -- ASSETS MANAGER (load Default Assets)
+		AssetsManager::GetInstance().LoadDefaultAssets();
+		MaterialManager::getInstance().CreateDefaultMaterial();
+		//---------------------------------------------------------------------------
 
 
 		// -- IMGUI
 		guiLayer = CreateScope<GuiLayer>(window, windowWidth, windowHeight);
 		// -------------------------------------------------
 
-		// --InputManager
-		//InputManager::Instance().subscribe();
-		//---------------------------------------------------------------------------
+		// -- SCENE
+		currentScene = CreateScope<Scene>();
+		// -------------------------------------------------
+		
 
-		// -- ViewportManager
-		//viewportManager = CreateScope<ViewportManager>();
-		//---------------------------------------------------------------------------
-		 		
+
 		//-- FREETYPE
 		FreeTypeManager::GetInstance().init();
 		//---------------------------------------------------------------------------
 
-		// -- ASSETS MANAGER (load Default Assets)
-		AssetsManager::GetInstance().LoadDefaultAssets();
-		//---------------------------------------------------------------------------
+		
 
 		//-- ROOF GENERATOR
 		//roofGenerator = CreateScope<RoofGenerator>();
@@ -407,83 +408,3 @@ namespace libCore
 	// -------------------------------------------------
 	// -------------------------------------------------
 }
-
-
-
-
-	////--CREADOR DE PREFABS
-	//void EngineOpenGL::CreatePrefabExternalModel(ImportModelData importModelData)
-	//{
-	//	EntityManager::GetInstance().CreateExternalModelGameObject(importModelData);
-	//}
-	//void EngineOpenGL::CreatePrefabDot(const glm::vec3& pos, const glm::vec3& polygonColor)
-	//{
-	//	//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabDot(pos,polygonColor));
-	//}
-	//void EngineOpenGL::CreatePrefabLine(const glm::vec3& point1, const glm::vec3& point2)
-	//{
-	//	//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabLine(point1, point2));
-	//}
-	//void EngineOpenGL::CreateTriangle(const glm::vec3& pos1, const glm::vec3& pos2, const glm::vec3& pos3)
-	//{
-	//	//modelsInScene.push_back(GameObjectManager::getInstance().CreateTriangle(pos1, pos2, pos3));
-	//}
-	//void EngineOpenGL::CreatePrefabSphere(float radius, unsigned int sectorCount, unsigned int stackCount)
-	//{
-	//	//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabSphere(radius, sectorCount, stackCount));
-	//}
-	//void EngineOpenGL::CreatePrefabCube(glm::vec3 position)
-	//{
-	//	//modelsInScene.push_back(GameObjectManager::getInstance().CreatePrefabCube(position));
-	//}
-	//// -------------------------------------------------
-	//// -------------------------------------------------
-
-
-	//--IMGUI
-	//void EngineOpenGL::DrawImGUI()
-	//{
-		//if (useImGUI)
-		//{
-		//	//--SELECT MODEL FROM RAY POPUP
-		//	if (isSelectingObject == true)
-		//	{
-		//		ImGui::OpenPopup("Select Model");
-		//	}
-		//	if (ImGui::BeginPopup("Select Model"))
-		//	{
-		//		for (const auto& entity : EntityManager::GetInstance().entitiesInRay) {
-
-		//			if (libCore::EntityManager::GetInstance().m_registry->has<MeshComponent>(entity)) {
-
-		//				auto& meshComponent = libCore::EntityManager::GetInstance().m_registry->get<MeshComponent>(entity);
-		//				
-		//				if (ImGui::Button(meshComponent.mesh->meshName.c_str())) {
-		//					libCore::EntityManager::GetInstance().currentSelectedEntityInScene = entity;
-		//					isSelectingObject = false; // Esta asignación cerrará el popup al finalizar el frame
-		//					ImGui::CloseCurrentPopup();
-		//				}
-		//			}
-		//		}
-		//		ImGui::EndPopup();
-		//	}
-		//	//--------------------------------------------------------
-
-		//	//--CHECK ImGizmo
-		//	guiLayer->checkGizmo(ViewportManager::GetInstance().viewports[currentViewport]);
-		//	//--------------------------------------------------------
-
-		//	guiLayer->DrawHierarchyPanel();
-		//	guiLayer->DrawSelectedEntityComponentsPanel();
-		//	guiLayer->DrawLightsPanel(LightsManager::GetLights());
-		//	guiLayer->DrawMaterialsPanel();
-		//	//guiLayer->RenderCheckerMatrix(); //Panel para el editor de roofs
-
-		//	Renderer::getInstance().ShowControlsGUI();
-		//	ViewportManager::GetInstance().DrawPanelGUI();
-		//	//--------------------------------------------------------
-		//}
-	//}
-	// -------------------------------------------------
-	// -------------------------------------------------
-

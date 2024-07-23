@@ -12,6 +12,7 @@
 #include "../Core/EngineOpenGL.h"
 #include "Scripts/MyScript.h"
 #include "../Timestep.h"
+#include "../tools/MaterialManager.hpp"
 
 namespace libCore 
 {
@@ -94,24 +95,14 @@ namespace libCore
                 //Mesh Component
                 auto& meshComponent = AddComponent<MeshComponent>(gameObject);
                 meshComponent.mesh = PrimitivesHelper::CreateCube();
-                meshComponent.mesh->meshName = "PRIMIVITE_CUBE";
+                
 
             	//Material Component
                 auto& materialComponent = AddComponent<MaterialComponent>(gameObject);
-                materialComponent.material->materialName = "default_material";
-            	materialComponent.material->albedoColor.r = 1.0f;
-            	materialComponent.material->albedoColor.g = 1.0f;
-            	materialComponent.material->albedoColor.b = 1.0f;
-            	materialComponent.material->albedoMap    = AssetsManager::GetInstance().GetTexture("default_albedo");
-            	materialComponent.material->normalMap    = AssetsManager::GetInstance().GetTexture("default_normal");
-            	materialComponent.material->metallicMap  = AssetsManager::GetInstance().GetTexture("default_metallic");
-            	materialComponent.material->roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
-            	materialComponent.material->aOMap        = AssetsManager::GetInstance().GetTexture("default_ao");
-
-                //AddComponentWithScript<ScriptComponent, MyScript>(gameObject);
+                materialComponent.material = MaterialManager::getInstance().getMaterial("default_material");
         }
 
-        void CreateSphereGameObject(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), float radius = 0.01f, int sectorCount = 6, int stackCount = 6)
+        void CreateSphereGameObject(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), float radius = 1.0f, int sectorCount = 12, int stackCount = 12)
         {
             // Crear una nueva entidad para el modelo
             entt::entity gameObject = CreateEmptyGameObject();
@@ -127,22 +118,10 @@ namespace libCore
 
             //Material Component
             auto& materialComponent = AddComponent<MaterialComponent>(gameObject);
-            materialComponent.material->materialName = "default_material";
-            materialComponent.material->albedoColor.r = 1.0f;
-            materialComponent.material->albedoColor.g = 1.0f;
-            materialComponent.material->albedoColor.b = 1.0f;
-            materialComponent.material->albedoMap = AssetsManager::GetInstance().GetTexture("default_albedo");
-            materialComponent.material->normalMap = AssetsManager::GetInstance().GetTexture("default_normal");
-            materialComponent.material->metallicMap = AssetsManager::GetInstance().GetTexture("default_metallic");
-            materialComponent.material->roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
-            materialComponent.material->aOMap = AssetsManager::GetInstance().GetTexture("default_ao");
+            materialComponent.material = MaterialManager::getInstance().getMaterial("default_material");
         }
         //------------------------------------------------------------------------------------
         //------------------------------------------------------------------------------------
-
-
-
-
 
 
 
@@ -181,7 +160,6 @@ namespace libCore
         //--ACTUALIZADOR DE FUNCIONES UPDATES ANTES DEL RENDER DE LOS COMPONENTES
         void UpdateGameObjects(Timestep deltaTime) 
         {
-
             //-SCRIPTS Comp.
             if (EngineOpenGL::GetInstance().engineState == EDITOR_PLAY || EngineOpenGL::GetInstance().engineState == PLAY)
             {

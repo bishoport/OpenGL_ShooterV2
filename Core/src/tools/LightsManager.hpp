@@ -77,13 +77,12 @@ namespace libCore
 				{
 					numAreaLights++;
 				}
-
-				libCore::ShaderManager::Get(shader)->setInt("numPointLights", numPointLights);
-				libCore::ShaderManager::Get(shader)->setInt("numSpotLights", numSpotLights);
-				libCore::ShaderManager::Get(shader)->setInt("numAreaLights", numAreaLights);
-
 				lights[i]->SetLightDataToShader(shader);
 			}
+
+			libCore::ShaderManager::Get(shader)->setInt("numPointLights", numPointLights);
+			libCore::ShaderManager::Get(shader)->setInt("numSpotLights", numSpotLights);
+			libCore::ShaderManager::Get(shader)->setInt("numAreaLights", numAreaLights);
 		}
 
 		static void DrawDebugLights(const std::string& shader)

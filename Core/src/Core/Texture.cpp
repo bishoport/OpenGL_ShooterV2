@@ -7,6 +7,7 @@ namespace libCore
 {
     Texture::Texture(const char* image, TEXTURE_TYPES type, GLuint slot)
     {
+        texturePath = image;
         m_type = type;
         // Stores the width, height, and the number of color channels of the image
         int widthImg, heightImg, numColCh;
@@ -69,6 +70,9 @@ namespace libCore
         glBindTexture(GL_TEXTURE_2D, 0);
         stbi_image_free(bytes);
     }
+
+
+
 
     void Texture::Bind(const std::string& shader)
     {

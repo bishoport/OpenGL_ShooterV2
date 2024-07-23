@@ -21,10 +21,16 @@ namespace libCore
         void operator=(MaterialManager const&) = delete;
 
 
+        void CreateDefaultMaterial()
+        {
+            //--DEFAULT_MATERIAL
+            auto material = CreateRef<Material>("default_material");
+            addMaterial(material);
+        }
+
         void CreateEmptyMaterial(const std::string& matName)
         {
-            Ref <Material> material = std::make_shared<Material>(matName);
-            material->materialName = matName;
+            Ref <Material> material =CreateRef<Material>(matName);
             addMaterial(material);
         }
 
@@ -63,9 +69,10 @@ namespace libCore
         std::unordered_map<std::string, Ref<Material>> materials;
         static char materialNameBuffer[128];
     private:
-        MaterialManager() {} // Constructor privado
-        
-        
+        MaterialManager() // Constructor privado
+        {
+            
+        }  
     };
 }
 

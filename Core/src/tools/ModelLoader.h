@@ -27,56 +27,6 @@ namespace libCore
 	};
 
 
-	//struct ModelContainer
-	//{
-	//	std::string name;
-	//	std::vector<Ref<Model>> models;
-	//	bool skeletal = false;
-
-	//	std::vector<Ref<Light>> lights;
-
-	//	void Draw(const std::string& shader)
-	//	{
-	//		for (auto& model : models)
-	//		{
-	//			
-	//			model->Draw(shader);
-	//		}
-	//	}
-
-	//	void DrawAABB(const std::string& shader)
-	//	{
-	//		for (auto& model : models)
-	//		{
-
-	//			model->DrawAABB(shader);
-	//		}
-	//	}
-
-	//	Ref<Model> UnifyMeshes() {
-	//		auto unifiedModel = CreateRef<Model>();
-
-	//		for (const auto& model : models) {
-	//			unifiedModel->meshes.insert(unifiedModel->meshes.end(), model->meshes.begin(), model->meshes.end());
-	//			// Unir los mapas de huesos.
-	//			for (const auto& [boneName, boneInfo] : model->GetBoneInfoMap()) {
-	//				if (unifiedModel->GetBoneInfoMap().find(boneName) == unifiedModel->GetBoneInfoMap().end()) {
-	//					unifiedModel->GetBoneInfoMap()[boneName] = boneInfo;
-	//				}
-	//			}
-	//			unifiedModel->GetBoneCount() += model->GetBoneCount();
-	//		}
-	//		return unifiedModel;
-	//	}
-	//};
-
-
-
-
-
-
-
-
 
 	class ModelLoader 
 	{

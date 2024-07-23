@@ -23,7 +23,6 @@ namespace libCore
     class EngineOpenGL
     {
     public:
-
         static EngineOpenGL& GetInstance()
         {
             static EngineOpenGL instance;
@@ -35,7 +34,6 @@ namespace libCore
         EngineStates engineState = EngineStates::EDITOR;
         bool InitializeEngine(const std::string& windowTitle, int initialWindowWidth, int initialWindowHeight);
         void InitializeMainLoop();
-        //void begin();
         void StopMainLoop();
         void SetupInputCallbacks();
 
@@ -46,20 +44,6 @@ namespace libCore
         void RenderViewports();
 
 
-        //GENERACION DE PRIMITIVAS
-        void CreatePrefabExternalModel(ImportModelData importModelData);
-        void CreatePrefabDot(const glm::vec3& pos, const glm::vec3& polygonColor);
-        void CreatePrefabLine(const glm::vec3& point1, const glm::vec3& point2);
-        void CreateTriangle(const glm::vec3& pos1, const glm::vec3& pos2, const glm::vec3& pos3);
-        void CreatePrefabCube(glm::vec3 position);
-        void CreatePrefabSphere(float radius, unsigned int sectorCount, unsigned int stackCount);
-        //void CreateRoof(const std::vector<Vector2d>& points, const std::vector<Vector2d>& holes);
-
-        //ImGUI
-        void DrawImGUI();
-
-
-
         // Función estática para obtener la ventana GLFW
         static GLFWwindow* GetWindow()
         {
@@ -68,19 +52,11 @@ namespace libCore
 
 
     public:
-
-        //MOUSE PICKING & ImGizmo
-        //bool isSelectingObject = false;
-        //bool showModelSelectionCombo = false;
         bool usingGizmo = false;
-
         int currentViewport = 0; //Editor Camera by default
+        Scope<Scene> currentScene = nullptr;
+
     private:
-
-        
-
-        Ref<Scene> currentScene = nullptr;
-
         GLFWwindow* window = nullptr;
         Timestep m_deltaTime = 0.0f;
 

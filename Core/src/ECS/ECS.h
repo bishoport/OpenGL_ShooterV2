@@ -8,6 +8,7 @@
 #include <string>
 #include <unordered_map>
 #include <functional>
+#include "../Core/Lights/DirectionalLight.h"
 
 namespace libCore
 {
@@ -67,7 +68,7 @@ namespace libCore
 
     struct MaterialComponent
     {
-        Ref<Material> material = CreateRef<Material>();
+        Ref<Material> material;
     };
 
     struct LightComponent
@@ -77,51 +78,11 @@ namespace libCore
 
     struct DirectionalLightComponent
     {
-        bool showDebug = false;
-        glm::vec3 color;
-        float intensity = 2.0f; // Añadido para controlar la intensidad de la luz
-
-        //--DIRECTIONAL LIGHT--------------------------------
-        glm::vec3 ambient = glm::vec3(1.0f, 1.0f, 1.0f);
-        glm::vec3 diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
-        glm::vec3 specular = glm::vec3(1.0f, 1.0f, 1.0f);
-
-        glm::vec3 direction = glm::vec3(0.0f, -10.0f, 0.0f);
-        float currentSceneRadius = 10.0f;
-        float sceneRadiusOffset = 10.0f;
-
-        // Shadow values
-        int shadowMapResolution = 1024;
-
-        glm::mat4 shadowMVP = glm::mat4(1.0f);
-        bool drawShadows = false;
-        float near_plane = 0.1f, far_plane = 100.0f;
-        float shadowIntensity = 0.5f;
-        bool usePoisonDisk = false;
-        float orthoLeft = -10.0f;
-        float orthoRight = 10.0f;
-        float orthoBottom = -10.0f;
-        float orthoTop = 10.0f;
-
-        float orthoNear = 0.1f;
-        float orthoNearOffset = 0.0f;
-        float orthoFar = 100.0f;
-        float orthoFarOffset = 0.0f;
-
-        float angleX = 0.0f;
-        float angleY = 0.0f;
-
-        glm::mat4 shadowBias = glm::mat4(
-            0.5, 0.0, 0.0, 0.0,
-            0.0, 0.5, 0.0, 0.0,
-            0.0, 0.0, 0.5, 0.0,
-            0.5, 0.5, 0.5, 1.0
-        );
-        //--SCENE BOUNDS
-        std::pair<glm::vec3, float> SceneBounds = { glm::vec3(0.0f), 30.0f };
-
-        //---------------------------------------------------
+        Ref<DirectionalLight> directionalLight = CreateRef<DirectionalLight>();
     };
+
+
+
 
     struct ScriptComponent {
 

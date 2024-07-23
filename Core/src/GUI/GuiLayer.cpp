@@ -181,19 +181,21 @@ namespace libCore
         // Barra de menu principal
         if (ImGui::BeginMainMenuBar())
         {
-            if (ImGui::BeginMenu("File"))
+            if (ImGui::BeginMenu("Scene"))
             {
-                if (ImGui::MenuItem("Open", "Ctrl+O")) { /* Abrir archivo */ }
-                if (ImGui::MenuItem("Save", "Ctrl+S")) { /* Guardar archivo */ }
+                if (ImGui::MenuItem("New Scene")) { /* Abrir archivo */ }
+                if (ImGui::MenuItem("Open Scene")) 
+                {
+                    EngineOpenGL::GetInstance().currentScene->DeserializeScene();
+                }
+                if (ImGui::MenuItem("Save Scene")) 
+                {
+                    EngineOpenGL::GetInstance().currentScene->SerializeScene();
+                }
                 //if (ImGui::MenuItem("Exit", "Ctrl+Q")) { glfwSetWindowShouldClose(window, true); }
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Edit"))
-            {
-                if (ImGui::MenuItem("Undo", "Ctrl+Z")) { /* Deshacer */ }
-                if (ImGui::MenuItem("Redo", "Ctrl+Y")) { /* Rehacer */ }
-                ImGui::EndMenu();
-            }
+          
             if (ImGui::BeginMenu("GameObjects"))
             {
                 // Basic Shapes Section
@@ -222,11 +224,11 @@ namespace libCore
                 }
                 if (ImGui::MenuItem("Point Light"))
                 {
-                    //libCore::LightsManager::CreatePointLight();
+                    libCore::LightsManager::CreateLight(true, libCore::LightType::POINT, glm::vec3(0.0f, 0.0f, 0.0f));
                 }
-                if (ImGui::MenuItem("Spot Light"))
+                if (ImGui::MenuItem("Area Light"))
                 {
-                    //libCore::LightsManager::CreateSpotLight();
+                    libCore::LightsManager::CreateLight(true, libCore::LightType::AREA, glm::vec3(0.0f, 0.0f, 0.0f));
                 }
 
                 ImGui::EndMenu();

@@ -169,10 +169,6 @@ namespace libCore {
                 libCore::ShaderManager::Get("direct_light_depth_shadows")->setMat4("shadowMVP", directionalLight->shadowMVP);
 
                 // Draw the models in the scene
-                /*for (auto& modelContainer : modelsInScene) {
-                    modelContainer->Draw("direct_light_depth_shadows");
-                }*/
-
                 EntityManager::GetInstance().DrawGameObjects("direct_light_depth_shadows");
 
                 viewport->framebuffer_shadowmap->unbindFBO();
@@ -296,6 +292,8 @@ namespace libCore {
 
 
 
+
+
             //--------------------------------------------------------------------------------
             //-----------------------LIGHTING PASS--------------------------------------------
             //--------------------------------------------------------------------------------
@@ -322,7 +320,7 @@ namespace libCore {
             //ALL Lights
             LightsManager::GetInstance().SetLightDataInShader("lightingPass");
 
-            //DIRECTIONAL Light
+            //-DIRECTIONAL Light
             if (LightsManager::GetInstance().GetDirectionalLight() != nullptr)
             {
                 libCore::ShaderManager::Get("lightingPass")->setMat4("lightSpaceMatrix", directionalLight->shadowMVP);
@@ -334,10 +332,10 @@ namespace libCore {
             libCore::ShaderManager::Get("lightingPass")->setVec3("viewPos", viewport->camera->Position);
             libCore::ShaderManager::Get("lightingPass")->setFloat("F0Factor", F0Factor);
 
-            //AREA LIGHT
+
+            //-AREA LIGHT
             libCore::ShaderManager::Get("lightingPass")->setInt("LTC1", 6);
             libCore::ShaderManager::Get("lightingPass")->setInt("LTC2", 7);
-
             glActiveTexture(GL_TEXTURE6);
             glBindTexture(GL_TEXTURE_2D, mLTC.mat1);
             glActiveTexture(GL_TEXTURE7);
@@ -345,7 +343,7 @@ namespace libCore {
             //----------------------------------------------------------------------------------------------
 
 
-
+            //-IBL
             libCore::ShaderManager::Get("lightingPass")->setBool("useIBL", iblEnabled);
             libCore::ShaderManager::Get("lightingPass")->setFloat("iblIntensity", iblIntensity);
             libCore::ShaderManager::Get("lightingPass")->setInt("irradianceMap", 8);
@@ -359,6 +357,8 @@ namespace libCore {
             glActiveTexture(GL_TEXTURE10);
             glBindTexture(GL_TEXTURE_2D, ibl->brdfLUTTexture);
             //----------------------------------------------------------------------------------------------
+
+
 
             // SHADOW MAP
             if (LightsManager::GetInstance().GetDirectionalLight() != nullptr)
@@ -453,8 +453,6 @@ namespace libCore {
             {
                 if (directionalLight->drawShadows) {
                     viewport->framebuffer_shadowmap->bindTexture("depth", 3);
-                    //glActiveTexture(GL_TEXTURE3);
-                    //glBindTexture(GL_TEXTURE_2D, directionalLight->shadowTex);
                 }
             }
             libCore::ShaderManager::Get("combinePass")->setInt("deferredTexture", 0);
@@ -481,6 +479,9 @@ namespace libCore {
             libCore::ShaderManager::Get("colorQuadFBO")->setInt("screenTexture", 0);
             renderQuad();
         }
+
+
+
 
         void ShowControlsGUI() {
             // Global Ilumination Controls
@@ -538,6 +539,9 @@ namespace libCore {
             
             ImGui::End();
         }
+
+
+
 
     private:
         Renderer() {} // Constructor privado

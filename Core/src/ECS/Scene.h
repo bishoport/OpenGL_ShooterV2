@@ -4,40 +4,27 @@
 #include "../Timestep.h"
 
 
+namespace libCore {
 
-namespace libCore
-{
+    class Scene {
 
-	
+    public:
 
-	class Scene {
+        std::string sceneName = "new_scene";
 
-	public:
-		Scene();
+        Scene();
+        static Scene& GetInstance() {
+            static Scene instance;
+            return instance;
+        }
 
+        //--SCENE LIFE-CYCLE
+        void Init();
+        void Update(Timestep m_deltaTime);
+        void Render(Timestep m_deltaTime);
+        void SerializeScene();
+        void DeserializeScene();
 
-	public:
-
-		
-
-		// Método para obtener la instancia de la clase
-		static Scene& GetInstance() {
-			static Scene instance;
-			return instance;
-		}
-
-		//--SCENE LIFE-CYCLE
-		void Init();
-		void Update(Timestep m_deltaTime);
-		void Render(Timestep m_deltaTime);
-		//-----------------------------------
-
-
-	private:
-
-
-	private:
-		
-	};
-
+    private:
+    };
 }

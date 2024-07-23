@@ -1,0 +1,60 @@
+Scene: Untitled
+Entities:
+  - Entity: 1
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 0
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: turbina
+        ShaderName: default
+        AlbedoColor:
+          - 0.800000012
+          - 0.800000012
+          - 0.800000012
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.800000012
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_BaseColor.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_OpenGL_Normal.png
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_Metallic.png
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_Roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+  - Entity: 0
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 0
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
