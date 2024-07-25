@@ -19,17 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\AABB.h" />
     <ClInclude Include="src\Core\EBO.h" />
     <ClInclude Include="src\Core\EngineOpenGL.h" />
     <ClInclude Include="src\Core\GBO.hpp" />
     <ClInclude Include="src\Core\IBL.h" />
+    <ClInclude Include="src\Core\Image.h" />
     <ClInclude Include="src\Core\Itc_matrix_floats.hpp" />
     <ClInclude Include="src\Core\Light.hpp" />
     <ClInclude Include="src\Core\Lights\DirectionalLight.h" />
     <ClInclude Include="src\Core\Material.h" />
     <ClInclude Include="src\Core\Mesh.h" />
     <ClInclude Include="src\Core\Model.h" />
-    <ClInclude Include="src\Core\OBB.hpp" />
     <ClInclude Include="src\Core\Renderer.hpp" />
     <ClInclude Include="src\Core\skeletal\animation.h" />
     <ClInclude Include="src\Core\skeletal\animator.h" />
@@ -37,6 +38,7 @@
     <ClInclude Include="src\Core\skeletal\bone.h" />
     <ClInclude Include="src\Core\Texture.h" />
     <ClInclude Include="src\Core\Transform.h" />
+    <ClInclude Include="src\Core\UUID.h" />
     <ClInclude Include="src\Core\VAO.h" />
     <ClInclude Include="src\Core\VBO.h" />
     <ClInclude Include="src\Core\Viewport.hpp" />
@@ -120,11 +122,13 @@
     <ClInclude Include="vendor\imgui\imstb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\AABB.cpp" />
     <ClCompile Include="src\Core\EBO.cpp" />
     <ClCompile Include="src\Core\EngineOpenGL.cpp" />
     <ClCompile Include="src\Core\IBL.cpp" />
     <ClCompile Include="src\Core\Mesh.cpp" />
     <ClCompile Include="src\Core\Texture.cpp" />
+    <ClCompile Include="src\Core\UUID.cpp" />
     <ClCompile Include="src\Core\VAO.cpp" />
     <ClCompile Include="src\Core\VBO.cpp" />
     <ClCompile Include="src\GUI\GuiLayer.cpp" />

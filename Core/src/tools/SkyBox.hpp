@@ -60,7 +60,7 @@ namespace libCore {
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 
-            cubemapTexture = libCore::TextureManager::LoadImagesForCubemap(faces);
+            cubemapTexture = TextureManager::getInstance().LoadImagesForCubemap(faces);
 
         }
 

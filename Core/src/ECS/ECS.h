@@ -9,6 +9,8 @@
 #include <unordered_map>
 #include <functional>
 #include "../Core/Lights/DirectionalLight.h"
+#include "../Core/AABB.h"
+#include "../Core/UUID.h"
 
 namespace libCore
 {
@@ -47,6 +49,24 @@ namespace libCore
         Ref<entt::registry> m_Registry;
     };
 
+    struct IDComponent {
+        UUID ID;
+
+        IDComponent() = default;
+        IDComponent(const IDComponent&) = default;
+        IDComponent(UUID id)
+            : ID(id) {}
+    };
+
+    struct TagComponent {
+        std::string Tag;
+
+        TagComponent() = default;
+        TagComponent(const TagComponent&) = default;
+        TagComponent(const std::string& tag)
+            : Tag(tag) {}
+    };
+
     struct TransformComponent
     {
         Ref<Transform> transform = CreateRef<Transform>();
@@ -66,6 +86,11 @@ namespace libCore
         Ref<Mesh> mesh = CreateRef<Mesh>();
     };
 
+    struct AABBComponent
+    {
+        Ref<AABB> aabb = CreateRef<AABB>(); 
+    };
+
     struct MaterialComponent
     {
         Ref<Material> material;
@@ -80,9 +105,6 @@ namespace libCore
     {
         Ref<DirectionalLight> directionalLight = CreateRef<DirectionalLight>();
     };
-
-
-
 
     struct ScriptComponent {
 

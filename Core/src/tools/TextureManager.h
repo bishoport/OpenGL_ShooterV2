@@ -1,15 +1,24 @@
 #pragma once
 #include "../LibCoreHeaders.h"
 #include "../Core/Texture.h"
-#include "../tools/AssetsManager.h"  // Asegúrate de incluir el encabezado
 
 namespace libCore
 {
 	class TextureManager
 	{
 	public:
-		static Ref<Texture> LoadTexture(const char* directoryPath, const char* fileName, TEXTURE_TYPES type, GLuint slot);
-		static GLuint LoadImagesForCubemap(std::vector<const char*> faces);
-		static GLuint loadHDR(const char* filepath);
+
+		static TextureManager& getInstance() {
+			static TextureManager instance;
+			return instance;
+		}
+
+		Ref<Texture> LoadTexture(const char* directoryPath, const char* fileName, TEXTURE_TYPES type, GLuint slot);
+		GLuint LoadImagesForCubemap(std::vector<const char*> faces);
+		GLuint loadHDR(const char* filepath);
+
+	private:
+		std::unordered_map<std::string, Ref<Texture>> loadedTextures;
+		TextureManager() {}
 	};
 }

@@ -3,41 +3,30 @@
 
 namespace libCore
 {
-	//AssetsManager& assetsManager = AssetsManager::GetInstance();
-
 	void AssetsManager::LoadDefaultAssets()
 	{
-		std::string defaultAssetsPathTexture = "C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/";
-
-		Ref<Texture> defaultAlbedo = TextureManager::LoadTexture((defaultAssetsPathTexture).c_str(), "default_white.jpg", TEXTURE_TYPES::ALBEDO, 0);
-		SetTexture("default_albedo", defaultAlbedo);
-
-		Ref<Texture> defaultNormal = TextureManager::LoadTexture((defaultAssetsPathTexture ).c_str(), "default_normal.jpg", TEXTURE_TYPES::NORMAL, 1);
-		SetTexture("default_normal", defaultNormal);
-
-		Ref<Texture> defaultMetallic = TextureManager::LoadTexture((defaultAssetsPathTexture).c_str(), "default_black.jpg", TEXTURE_TYPES::METALLIC, 2);
-		SetTexture("default_metallic", defaultMetallic);
-
-		Ref<Texture> defaultRoughness = TextureManager::LoadTexture((defaultAssetsPathTexture).c_str(), "default_black.jpg", TEXTURE_TYPES::ROUGHNESS, 3);
-		SetTexture("default_roughness", defaultRoughness);
-
-		Ref<Texture> defaultAO = TextureManager::LoadTexture((defaultAssetsPathTexture ).c_str(), "default_white.jpg", TEXTURE_TYPES::AO, 4);
-		SetTexture("default_ao", defaultAO);
-
-
-		Ref<Texture> checker = TextureManager::LoadTexture((defaultAssetsPathTexture).c_str(), "checker.jpg", TEXTURE_TYPES::ALBEDO, 0);
-		SetTexture("checker", checker);
-
-		
-
-		//PARA EL TEJADO
-		//Ref<Texture> defaultRoof = TextureManager::LoadTexture((defaultAssetsPathTexture + "roof.jpg").c_str(), TEXTURE_TYPES::ALBEDO, 0);
-		//SetTexture("default_roof", defaultRoof);
-		//
-		//Ref<Texture> wallRoof = TextureManager::LoadTexture((defaultAssetsPathTexture + "carpet.png").c_str(), TEXTURE_TYPES::ALBEDO, 0);
-		//SetTexture("default_wall", wallRoof);
-
+		LoadTextureAsset("default_albedo",    (defaultAssetsPathTexture).c_str(), "default_albedo.jpg",    TEXTURE_TYPES::ALBEDO);
+		LoadTextureAsset("default_normal",    (defaultAssetsPathTexture).c_str(), "default_normal.jpg",    TEXTURE_TYPES::NORMAL);
+		LoadTextureAsset("default_metallic",  (defaultAssetsPathTexture).c_str(), "default_metallic.jpg",  TEXTURE_TYPES::METALLIC);
+		LoadTextureAsset("default_roughness", (defaultAssetsPathTexture).c_str(), "default_roughness.jpg", TEXTURE_TYPES::ROUGHNESS);
+		LoadTextureAsset("default_ao",        (defaultAssetsPathTexture).c_str(), "default_ao.jpg",        TEXTURE_TYPES::AO);
+		LoadTextureAsset("checker",           (defaultAssetsPathTexture).c_str(), "checker.jpg",           TEXTURE_TYPES::ALBEDO);
 	}
+
+	Ref<Texture> AssetsManager::LoadTextureAsset(const std::string &key, const char* directoryPath, const char* fileName, TEXTURE_TYPES type)
+	{
+		int slot = 0;
+		if (type      == TEXTURE_TYPES::ALBEDO)    slot = 0;
+		else if (type == TEXTURE_TYPES::NORMAL)    slot = 1;
+		else if (type == TEXTURE_TYPES::METALLIC)  slot = 2;
+		else if (type == TEXTURE_TYPES::ROUGHNESS) slot = 3;
+		else if (type == TEXTURE_TYPES::AO)        slot = 4;
+
+		SetTexture(key, TextureManager::getInstance().LoadTexture(directoryPath, fileName, type, slot));
+
+		return GetTexture(key);
+	}
+
 
 	// Método para obtener una textura
 	Ref<Texture> AssetsManager::GetTexture(const std::string& name) {
@@ -46,11 +35,17 @@ namespace libCore
 			return it->second;
 		}
 		else {
-			//std::cout << "No existe " << name << std::endl;
+			std::cout << "No existe " << name << std::endl;
 			return nullptr;
 		}
 	}
 
+	const std::unordered_map<std::string, Ref<Texture>>& AssetsManager::GetAllTextures() const {
+		return loadedTextures;
+	}
+	std::size_t AssetsManager::GetNumberOfTextures() const {
+		return loadedTextures.size();
+	}
 	void AssetsManager::SetTexture(const std::string& name, const Ref<Texture>& texture)
 	{
 		loadedTextures[name] = texture;

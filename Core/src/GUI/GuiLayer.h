@@ -46,13 +46,15 @@ namespace libCore
 		void DrawHierarchyPanel();
         void DrawLightsPanel(const std::vector<Ref<libCore::Light>>& lightsInScene);
         void DrawMaterialsPanel();
-        void DrawMaterial(const Ref<Material> materialData);
+        void ShowTexturesPanel();
         void ShowTexture(const char* label, Ref<Texture> texture);
         void RenderCheckerMatrix();
         void DrawComponentEditor(entt::entity entity);
         void DrawToolBarEditor();
 
         void checkGizmo(const Ref<Viewport>& viewport);
+
+        //void DrawMaterial(const Ref<Material> materialData);
 
         enum class GizmoOperation
         {

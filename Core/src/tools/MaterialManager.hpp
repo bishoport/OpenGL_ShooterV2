@@ -69,10 +69,7 @@ namespace libCore
         std::unordered_map<std::string, Ref<Material>> materials;
         static char materialNameBuffer[128];
     private:
-        MaterialManager() // Constructor privado
-        {
-            
-        }  
+        MaterialManager(){}  
     };
 }
 

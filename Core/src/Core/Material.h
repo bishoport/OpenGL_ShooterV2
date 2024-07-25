@@ -16,9 +16,9 @@ namespace libCore
               albedoColor(1.0f, 1.0f, 1.0f), normalStrength(1.0f),
               metallicValue(0.0f), roughnessValue(0.7f), aoValue(1.0f)
         {
-            albedoMap = AssetsManager::GetInstance().GetTexture("default_albedo");
-            normalMap = AssetsManager::GetInstance().GetTexture("default_normal");
-            metallicMap = AssetsManager::GetInstance().GetTexture("default_metallic");
+            albedoMap =    AssetsManager::GetInstance().GetTexture("default_albedo");
+            normalMap =    AssetsManager::GetInstance().GetTexture("default_normal");
+            metallicMap =  AssetsManager::GetInstance().GetTexture("default_metallic");
             roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
         }
 
@@ -27,9 +27,9 @@ namespace libCore
               albedoColor(1.0f, 1.0f, 1.0f), normalStrength(1.0f),
               metallicValue(0.0f), roughnessValue(0.8f), aoValue(1.0f)
         {
-            albedoMap = AssetsManager::GetInstance().GetTexture("default_albedo");
-            normalMap = AssetsManager::GetInstance().GetTexture("default_normal");
-            metallicMap = AssetsManager::GetInstance().GetTexture("default_metallic");
+            albedoMap =    AssetsManager::GetInstance().GetTexture("default_albedo");
+            normalMap =    AssetsManager::GetInstance().GetTexture("default_normal");
+            metallicMap =  AssetsManager::GetInstance().GetTexture("default_metallic");
             roughnessMap = AssetsManager::GetInstance().GetTexture("default_roughness");
         }
 

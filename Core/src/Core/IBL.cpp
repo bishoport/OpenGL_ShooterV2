@@ -24,7 +24,7 @@ namespace libCore
 
 	void IBL::configureStaticIBL()
 	{
-		m_hdrTexture = libCore::TextureManager::loadHDR("assets/HDR/newport_loft.hdr");
+		m_hdrTexture = TextureManager::getInstance().loadHDR("assets/HDR/newport_loft.hdr");
 
 		glGenFramebuffers(1, &IBL_FBO);
 		glGenRenderbuffers(1, &IBL_RBO);

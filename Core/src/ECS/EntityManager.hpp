@@ -16,42 +16,6 @@
 
 namespace libCore 
 {
-
-
-    /*class Entity {
-
-    public:
-
-        Entity() = default;
-
-        Entity(entt::entity handle): m_EntityHandle(handle) {}
-
-        template<typename T, typename... Args>
-        T& AddComponent(Args&&... args);
-
-        template<typename T>
-        T& GetComponent();
-
-        template<typename T>
-        bool HasComponent() const;
-
-        template<typename T>
-        void RemoveComponent();
-
-        operator bool() const { return m_EntityHandle != entt::null; }
-        operator entt::entity() const { return m_EntityHandle; }
-        operator uint32_t() const { return (uint32_t)m_EntityHandle; }
-
-        entt::entity GetHandle() const { return m_EntityHandle; }
-
-    private:
-        entt::entity m_EntityHandle{ entt::null };
-    };*/
-
-
-
-
-
     class EntityManager {
     public:
 
@@ -61,32 +25,32 @@ namespace libCore
             return instance;
         }
 
-        //--ENTITY COLLECTIONS
+        //--ENTITY REGISTRY & COLLECTIONS 
         Ref<entt::registry> m_registry = CreateRef<entt::registry>();
         std::vector<entt::entity> entitiesInRay;
         entt::entity currentSelectedEntityInScene = entt::null;
 
-
-
         //--CREADOR DE ENTITIES
-        entt::entity CreateEmptyGameObject()
+        entt::entity CreateEmptyGameObject(const std::string& name = "")
         {
             entt::entity entity = m_registry->create();
-            // Asignar el componente TransformComponent
-            auto& transformComponent = m_registry->emplace<TransformComponent>(entity);
+
+            m_registry->emplace<IDComponent>(entity,UUID());
+            auto& tag = m_registry->emplace<TagComponent>(entity);
+            tag.Tag = name.empty() ? "Entity" : name;
+
+            m_registry->emplace<TransformComponent>(entity);
             return entity;
         }
-        
         void CreateExternalModelGameObject(ImportModelData importModelData) {
             Ref<Model> model = ModelLoader::LoadModel(importModelData);
             CreateGameObjectFromModel(model, entt::null);
             model.reset();
         }
-
         void CreateCubeGameObject(glm::vec3 position = glm::vec3(0.0f,0.0f,0.0f))
         {
                 // Crear una nueva entidad para el modelo
-                entt::entity gameObject = CreateEmptyGameObject();
+                entt::entity gameObject = CreateEmptyGameObject("Cube");
                 
                 //Transform Component
                 auto& transformComponent = GetComponent<TransformComponent>(gameObject);
@@ -96,16 +60,18 @@ namespace libCore
                 auto& meshComponent = AddComponent<MeshComponent>(gameObject);
                 meshComponent.mesh = PrimitivesHelper::CreateCube();
                 
+                //AABB Component
+                auto& abbComponent = m_registry->emplace<AABBComponent>(gameObject);
+                abbComponent.aabb->CalculateAABB(meshComponent.mesh->vertices);
 
             	//Material Component
                 auto& materialComponent = AddComponent<MaterialComponent>(gameObject);
                 materialComponent.material = MaterialManager::getInstance().getMaterial("default_material");
         }
-
         void CreateSphereGameObject(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), float radius = 1.0f, int sectorCount = 12, int stackCount = 12)
         {
             // Crear una nueva entidad para el modelo
-            entt::entity gameObject = CreateEmptyGameObject();
+            entt::entity gameObject = CreateEmptyGameObject("Sphere");
 
             //Transform Component
             auto& transformComponent = GetComponent<TransformComponent>(gameObject);
@@ -116,6 +82,10 @@ namespace libCore
             meshComponent.mesh = PrimitivesHelper::CreateSphere(radius, sectorCount, stackCount);
             meshComponent.mesh->meshName = "PRIMIVITE_SPHERE";
 
+            //AABB Component
+            auto& abbComponent = m_registry->emplace<AABBComponent>(gameObject);
+            abbComponent.aabb->CalculateAABB(meshComponent.mesh->vertices);
+
             //Material Component
             auto& materialComponent = AddComponent<MaterialComponent>(gameObject);
             materialComponent.material = MaterialManager::getInstance().getMaterial("default_material");
@@ -124,9 +94,7 @@ namespace libCore
         //------------------------------------------------------------------------------------
 
 
-
-
-        //--PINTADOR DE ENTITIES
+        //--DRAW MESH Component
         void DrawGameObjects(const std::string& shader) {
             auto view = m_registry->view<TransformComponent, MeshComponent, MaterialComponent>();
             for (auto entity : view) {
@@ -138,29 +106,33 @@ namespace libCore
                 DrawOneGameObject(transform, mesh, material, shader);
             }
         }
+        //------------------------------------------------------------------------------------
+        
+        //--DRAW AABB Component
         void DrawABBGameObjectMeshComponent(const std::string& shader) {
-            auto view = m_registry->view<TransformComponent, MeshComponent>();
-            for (auto entity : view) {
-                auto& transform = view.get<TransformComponent>(entity);
-                auto& mesh = view.get<MeshComponent>(entity);
+            auto viewAABB = m_registry->view<TransformComponent, AABBComponent>();
+            for (auto entity : viewAABB) {
+                auto& transformComponent = viewAABB.get<TransformComponent>(entity);
+                auto& aabbComponent = viewAABB.get<AABBComponent>(entity);
 
-                if (mesh.mesh->showAABB == true)
+                if (aabbComponent.aabb->showAABB == true)
                 {
                     libCore::ShaderManager::Get(shader)->setVec4("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-                    libCore::ShaderManager::Get(shader)->setMat4("model", transform.transform->getMatrix());
+                    libCore::ShaderManager::Get(shader)->setMat4("model", transformComponent.transform->getMatrix());
 
-                    mesh.mesh->DrawAABB();
-                } 
+                    aabbComponent.aabb->DrawAABB();
+                }
             }
         }
         //------------------------------------------------------------------------------------
         //------------------------------------------------------------------------------------
 
 
+
         //--ACTUALIZADOR DE FUNCIONES UPDATES ANTES DEL RENDER DE LOS COMPONENTES
         void UpdateGameObjects(Timestep deltaTime) 
         {
-            //-SCRIPTS Comp.
+            //-UPDATE SCRIPTS Component.
             if (EngineOpenGL::GetInstance().engineState == EDITOR_PLAY || EngineOpenGL::GetInstance().engineState == PLAY)
             {
                 // Inicializar y actualizar scripts
@@ -172,7 +144,7 @@ namespace libCore
             }
             //-------------------------------------------------------------------------------------------------------------------
 
-            //-TRANSFORM Comp. (Actualizamos matrices para los objetos NON-STATIC)
+            //-UPDATE TRANSFORM Component. (Actualizamos matrices para los objetos NON-STATIC)
             auto transformCompView = m_registry->view<TransformComponent>();
             for (auto entity : transformCompView) {
                 auto& transformComponent = GetComponent<TransformComponent>(entity);// transformCompView.get<TransformComponent>(entity);
@@ -192,39 +164,40 @@ namespace libCore
             //-------------------------------------------------------------------------------------------------------------------
 
 
-            // Actualizar AABBs después de que todas las transformaciones acumuladas estén calculadas
-            auto meshView = m_registry->view<TransformComponent, MeshComponent>();
-            for (auto entity : meshView) {
-                auto& transformComponent = meshView.get<TransformComponent>(entity);
-                auto& meshComponent = meshView.get<MeshComponent>(entity);
+            //-UPDATE AABB Component´s
+            auto viewAABB = m_registry->view<TransformComponent, AABBComponent>();
+            for (auto entity : viewAABB) {
+                auto& transformComponent = viewAABB.get<TransformComponent>(entity);
+                auto& aabbComponent = viewAABB.get<AABBComponent>(entity);
 
-                meshComponent.mesh->UpdateAABB(transformComponent.accumulatedTransform);
+                aabbComponent.aabb->UpdateAABB(transformComponent.accumulatedTransform);
             }
         }
         //------------------------------------------------------------------------------------
         //------------------------------------------------------------------------------------
 
         
-        //--MOUSE CHECKER
+
+        //-- AABB Component MOUSE CHECKER
         void CheckRayModelIntersection(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, const glm::mat4& accumulatedTransform) 
         {
-            auto view = m_registry->view<TransformComponent, MeshComponent>();
-            for (auto entity : view) {
-                auto& transformComponent = view.get<TransformComponent>(entity);
-                auto& meshComponent = view.get<MeshComponent>(entity);
+            auto viewAABB = m_registry->view<TransformComponent, AABBComponent>();
+            for (auto entity : viewAABB) {
+                auto& transformComponent = viewAABB.get<TransformComponent>(entity);
+                auto& aabbComponent = viewAABB.get<AABBComponent>(entity);
 
                 glm::mat4 modelMatrix = accumulatedTransform * transformComponent.transform->getLocalModelMatrix();
 
                 // Transformar AABB
-                glm::vec3 transformedMin = glm::vec3(modelMatrix * glm::vec4(meshComponent.mesh->minBounds, 1.0));
-                glm::vec3 transformedMax = glm::vec3(modelMatrix * glm::vec4(meshComponent.mesh->maxBounds, 1.0));
+                glm::vec3 transformedMin = glm::vec3(modelMatrix * glm::vec4(aabbComponent.aabb->minBounds, 1.0));
+                glm::vec3 transformedMax = glm::vec3(modelMatrix * glm::vec4(aabbComponent.aabb->maxBounds, 1.0));
 
                 // Verificar la intersección del rayo con la AABB transformada
                 if (rayIntersectsBoundingBox(rayOrigin, rayDirection, transformedMin, transformedMax))
                 {
                     entitiesInRay.push_back(entity);
                 }
-            }
+            } 
         }
         //------------------------------------------------------------------------------------
         //------------------------------------------------------------------------------------
@@ -278,7 +251,7 @@ namespace libCore
         void CreateGameObjectFromModel(Ref<Model> model, entt::entity parent) 
         {
             // Crear una nueva entidad para el modelo
-            entt::entity entity = CreateEmptyGameObject();
+            entt::entity entity = CreateEmptyGameObject(model->name);
             auto& transformComponent = GetComponent<TransformComponent>(entity);
             transformComponent.transform = model->transform;
 
@@ -294,6 +267,8 @@ namespace libCore
             if (!model->meshes.empty()) {
                 for (auto& mesh : model->meshes) {
                     m_registry->emplace<MeshComponent>(entity, mesh);
+                    auto& abbComponent = m_registry->emplace<AABBComponent>(entity);
+                    abbComponent.aabb->CalculateAABB(mesh->vertices);
                 }
             }
 
@@ -330,9 +305,6 @@ namespace libCore
             libCore::ShaderManager::Get(shader)->setMat4("model", transformComponent.accumulatedTransform);
             meshComponent.mesh->Draw();
         }
-
-
-
 
 
         bool rayIntersectsBoundingBox(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, glm::vec3 boxMin, glm::vec3 boxMax)

@@ -125,6 +125,7 @@ namespace libCore
             DrawSelectedEntityComponentsPanel();
             DrawLightsPanel(LightsManager::GetLights());
             DrawMaterialsPanel();
+            ShowTexturesPanel();
             //RenderCheckerMatrix(); //Panel para el editor de roofs
 
             Renderer::getInstance().ShowControlsGUI();
@@ -356,13 +357,20 @@ namespace libCore
     void GuiLayer::DrawEntityNode(entt::entity entity) {
         ImGui::PushID(static_cast<int>(entity));
 
+        auto& tagComponent = EntityManager::GetInstance().m_registry->get<TagComponent>(entity);
+        auto& idComponent = EntityManager::GetInstance().m_registry->get<IDComponent>(entity);
+
+        // Obtener el UUID como cadena
+        std::string uuidStr = std::to_string(static_cast<uint64_t>(idComponent.ID));
+
         // Verificar si la entidad es padre o hijo
         bool isParent = EntityManager::GetInstance().m_registry->has<ChildComponent>(entity);
         bool isChild = EntityManager::GetInstance().m_registry->has<ParentComponent>(entity);
 
-        std::string nodeName    = "Entity " + std::to_string(static_cast<int>(entity));
-        if (isParent) nodeName += " (Parent)";
-        if (isChild) nodeName  += " (Child)";
+        // Usar el nombre del TagComponent
+        std::string nodeName = tagComponent.Tag;
+        //if (isParent) nodeName += " (Parent)";
+        //if (isChild) nodeName += " (Child)";
 
         // Comprobar si la entidad está seleccionada
         bool isSelected = EntityManager::GetInstance().currentSelectedEntityInScene == entity;
@@ -371,7 +379,6 @@ namespace libCore
         if (isParent) {
             // La entidad tiene hijos, por lo que es desplegable
             if (ImGui::TreeNode((void*)(intptr_t)entity, "%s", nodeName.c_str())) {
-
                 // Seleccionar la entidad al hacer clic
                 if (ImGui::IsItemClicked()) {
                     EntityManager::GetInstance().currentSelectedEntityInScene = entity;
@@ -408,12 +415,18 @@ namespace libCore
             entt::entity selectedEntity = EntityManager::GetInstance().currentSelectedEntityInScene;
 
             DrawComponentEditor(selectedEntity);
-
+            //--UUID_COMPONENT
+            if (EntityManager::GetInstance().m_registry->has<IDComponent>(selectedEntity)) {
+                auto& idComponent = EntityManager::GetInstance().m_registry->get<IDComponent>(selectedEntity);
+                if (ImGui::CollapsingHeader("ID")) {
+                    std::string uuidStr = std::to_string(static_cast<uint64_t>(idComponent.ID));
+                    ImGui::Text("UUID", uuidStr);
+                }
+            }
             //--TRANSFORM_COMPONENT
             if (EntityManager::GetInstance().m_registry->has<TransformComponent>(selectedEntity)) {
                 auto& transformComponent = EntityManager::GetInstance().m_registry->get<TransformComponent>(selectedEntity);
-
-                if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
+                if (ImGui::CollapsingHeader("Transform")) {
                     auto& transform = transformComponent.transform;
 
                     // Posición
@@ -452,14 +465,24 @@ namespace libCore
                     ImGui::SameLine();
                     ImGui::DragFloat("##ScaleZ", &transform->scale.z, 0.01f, 0.0f, FLT_MAX, "Z: %.2f");
                 }
-            }
+            }           
             //--MESH_COMPONENT
             if (EntityManager::GetInstance().m_registry->has<MeshComponent>(selectedEntity)) {
-                auto& meshComponent = EntityManager::GetInstance().m_registry->get<MeshComponent>(selectedEntity);
-                ImGui::Checkbox("Show ABB", &meshComponent.mesh->showAABB);
+                if (ImGui::CollapsingHeader("Mesh")) {
+                    auto& meshComponent = EntityManager::GetInstance().m_registry->get<MeshComponent>(selectedEntity);
+                    ImGui::Text("Mesh Name:", &meshComponent.mesh->meshName);
+                }
+            }
+            //--AABB_COMPONENT
+            if (EntityManager::GetInstance().m_registry->has<AABBComponent>(selectedEntity)) {
+                if (ImGui::CollapsingHeader("AABB")) {
+                    auto& aabbComponent = EntityManager::GetInstance().m_registry->get<AABBComponent>(selectedEntity);
+                    ImGui::Checkbox("Show ABB", &aabbComponent.aabb->showAABB);
+                }
             }
             //--MATERIAL_COMPONENT
             if (EntityManager::GetInstance().m_registry->has<MaterialComponent>(selectedEntity)) {
+                
                 auto& materialComponent = EntityManager::GetInstance().m_registry->get<MaterialComponent>(selectedEntity);
                 auto& material = *materialComponent.material;
 
@@ -491,6 +514,7 @@ namespace libCore
                         ImGui::Image((void*)(intptr_t)materialComponent.material->roughnessMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
                     }
                 }
+                
             }
             //--SCRIPT_COMPONENT
             if (EntityManager::GetInstance().m_registry->has<ScriptComponent>(selectedEntity)) {
@@ -789,6 +813,70 @@ namespace libCore
         }
     }
     //-----------------------------------------------------------------------------------------------------
+
+    //--GLOBAL TEXTURES PANEL
+    void GuiLayer::ShowTexturesPanel()
+    {
+        auto& assetsManager = libCore::AssetsManager::GetInstance();
+        const auto& textures = assetsManager.GetAllTextures();
+        std::size_t numberOfTextures = assetsManager.GetNumberOfTextures();
+
+        static float imageSize = 128.0f; // Tamaño inicial de la imagen
+        static float cellPadding = 0.0f; // Padding inicial entre celdas
+
+        // Comenzar la ventana de ImGui
+        ImGui::Begin("Textures Panel");
+
+        // Mostrar el número de texturas cargadas
+        ImGui::Spacing();
+        ImGui::Text("Texture Count: %zu", numberOfTextures);
+        ImGui::Spacing();
+
+        // Slider para ajustar el tamaño de la imagen
+        ImGui::SliderFloat("Image Size", &imageSize, 32.0f, 256.0f);
+        ImGui::SliderFloat("Cell Padding", &cellPadding, 0.0f, 20.0f);
+        ImGui::Spacing();
+
+        // Obtener el ancho disponible del panel
+        float panelWidth = ImGui::GetContentRegionAvail().x;
+
+        // Calcular el número de columnas basado en el tamaño de la imagen y el padding
+        int columns = static_cast<int>(panelWidth / (imageSize + cellPadding));
+        if (columns < 1) columns = 1;
+
+        // Configurar las columnas
+        ImGui::Columns(columns, nullptr, false);
+
+        int textureIndex = 0;
+        for (const auto& texturePair : textures) {
+            const auto& textureName = texturePair.first;
+            const auto& texture = texturePair.second;
+
+            if (texture->IsValid()) {
+                // Mostrar la imagen de la textura
+                ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(texture->GetTextureID())), ImVec2(imageSize, imageSize));
+
+                // Mostrar información adicional debajo de la imagen
+                ImGui::TextWrapped("Name: %s", textureName.c_str());
+                ImGui::TextWrapped("Path: %s", texture->texturePath.c_str());
+                ImGui::TextWrapped("File: %s", texture->m_textureName.c_str());
+                ImGui::TextWrapped("Slot: %u", texture->m_unit);
+
+                // Añadir espacio extra entre celdas
+                ImGui::Dummy(ImVec2(0.0f, cellPadding));
+            }
+            else {
+                ImGui::Text("Invalid texture: %s", textureName.c_str());
+            }
+
+            ImGui::NextColumn();
+        }
+
+        ImGui::Columns(1);
+        ImGui::End();
+    }
+    //-----------------------------------------------------------------------------------------------------
+
 
     //--SCRIPTS-EDITOR PANEL
     void GuiLayer::DrawComponentEditor(entt::entity entity) {

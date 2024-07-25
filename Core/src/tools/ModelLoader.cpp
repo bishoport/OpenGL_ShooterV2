@@ -57,9 +57,6 @@ namespace libCore
         return modelParent;
     }
 
-    
-
-
 
     //------------------------------------STANDARD MODELS---------------------------
     void ModelLoader::processNode(aiNode* node, const aiScene* scene, Ref<Model> modelParent, aiMatrix4x4 _nodeTransform, ImportModelData importOptions)
@@ -271,7 +268,10 @@ namespace libCore
                 std::string directoryPath = fs::path(importOptions.filePath).parent_path().string();
                 std::string fileName = fs::path(completePathTexture).filename().string();
 
-                Ref<Texture> texture = libCore::TextureManager::LoadTexture(directoryPath.c_str(), fileName.c_str(), TEXTURE_TYPES::ALBEDO, 0);
+                std::string key = materialName + "_ALBEDO";
+
+                Ref<Texture> texture = AssetsManager::GetInstance().LoadTextureAsset(key, directoryPath.c_str(), fileName.c_str(), TEXTURE_TYPES::ALBEDO);
+                //Ref<Texture> texture = libCore::TextureManager::LoadTexture(directoryPath.c_str(), fileName.c_str(), TEXTURE_TYPES::ALBEDO, 0);
 
                 if (texture != nullptr) {
                     material->albedoMap = texture;
@@ -292,12 +292,16 @@ namespace libCore
                 std::string directoryPath = fs::path(importOptions.filePath).parent_path().string();
                 std::string fileName = fs::path(completePathTexture).filename().string();
 
-                Ref<Texture> texture = libCore::TextureManager::LoadTexture(directoryPath.c_str(), fileName.c_str(), TEXTURE_TYPES::NORMAL, 1);
+                std::string key = materialName + "_NORMAL";
+                Ref<Texture> texture = AssetsManager::GetInstance().LoadTextureAsset(key, directoryPath.c_str(), fileName.c_str(), TEXTURE_TYPES::NORMAL);
+                //Ref<Texture> texture = libCore::TextureManager::LoadTexture(directoryPath.c_str(), fileName.c_str(), TEXTURE_TYPES::NORMAL, 1);
 
-                if (texture != nullptr) {
+                if (texture != nullptr) 
+                {
                     material->normalMap = texture;
                 }
-                else {
+                else 
+                {
                     material->normalMap = AssetsManager::GetInstance().GetTexture("default_normal");
                 }
             }
@@ -313,7 +317,10 @@ namespace libCore
                 std::string directoryPath = fs::path(importOptions.filePath).parent_path().string();
                 std::string fileName = fs::path(completePathTexture).filename().string();
 
-                Ref<Texture> texture = libCore::TextureManager::LoadTexture(directoryPath.c_str(), fileName.c_str(), TEXTURE_TYPES::METALLIC, 2);
+                std::string key = materialName + "_METALLIC";
+                Ref<Texture> texture = AssetsManager::GetInstance().LoadTextureAsset(key, directoryPath.c_str(), fileName.c_str(), TEXTURE_TYPES::METALLIC);
+
+                //Ref<Texture> texture = libCore::TextureManager::LoadTexture(directoryPath.c_str(), fileName.c_str(), TEXTURE_TYPES::METALLIC, 2);
 
                 if (texture != nullptr) {
                     material->metallicMap = texture;
@@ -334,7 +341,10 @@ namespace libCore
                 std::string directoryPath = fs::path(importOptions.filePath).parent_path().string();
                 std::string fileName = fs::path(completePathTexture).filename().string();
 
-                Ref<Texture> texture = libCore::TextureManager::LoadTexture(directoryPath.c_str(), fileName.c_str(), TEXTURE_TYPES::ROUGHNESS, 3);
+                std::string key = materialName + "_ROUGHNESS";
+                Ref<Texture> texture = AssetsManager::GetInstance().LoadTextureAsset(key, directoryPath.c_str(), fileName.c_str(), TEXTURE_TYPES::ROUGHNESS);
+
+                //Ref<Texture> texture = libCore::TextureManager::LoadTexture(directoryPath.c_str(), fileName.c_str(), TEXTURE_TYPES::ROUGHNESS, 3);
 
                 if (texture != nullptr) {
                     material->roughnessMap = texture;
@@ -356,7 +366,6 @@ namespace libCore
         modelBuild->materials.push_back(material);
     }
     //------------------------------------------------------------------------------
-
 
 
     //-------------------------------------TOOLS---------------------------
@@ -385,7 +394,6 @@ namespace libCore
         return to;
     }
     //-----------------------------------------------------------------------
-
 
 
     //------------------------------------SKELETAL MODELS---------------------------

@@ -9,8 +9,10 @@ namespace libCore
     class Texture
     {
     public:
+
         GLuint ID = 0;
         TEXTURE_TYPES m_type = TEXTURE_TYPES::ALBEDO;
+
         GLuint m_unit = 0;
         std::string m_textureName = "";
         std::string texturePath = "";

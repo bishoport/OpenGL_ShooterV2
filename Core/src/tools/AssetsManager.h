@@ -15,13 +15,17 @@ namespace libCore
 			return instance;
 		}
 		
+		std::string defaultAssetsPathTexture = "C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/";
+
 		void UnloadTexture(const std::string& name);
 		void LoadDefaultAssets();
+		Ref<Texture> LoadTextureAsset(const std::string& key, const char* directoryPath, const char* fileName, TEXTURE_TYPES type);
 		Ref<Texture> GetTexture(const std::string& name);
 		void SetTexture(const std::string& name, const Ref<Texture>& texture);
-
+		const std::unordered_map<std::string, Ref<Texture>>& GetAllTextures() const;
+		std::size_t GetNumberOfTextures() const;
+	
 	private:
-
 		// Constructor privado
 		AssetsManager() {}
 
@@ -31,7 +35,4 @@ namespace libCore
 		AssetsManager(const AssetsManager&) = delete;
 		AssetsManager& operator=(const AssetsManager&) = delete;
 	};
-
-	// Declaración externa de una referencia a AssetsManager
-	//extern AssetsManager& assetsManager;
 }
