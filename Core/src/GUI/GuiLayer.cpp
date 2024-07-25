@@ -302,7 +302,8 @@ namespace libCore
 
             auto& transformComponent = EntityManager::GetInstance().GetComponent<TransformComponent>(EntityManager::GetInstance().currentSelectedEntityInScene);
 
-            glm::mat4 entity_transform = transformComponent.transform->getMatrix();
+            // Usar la transformación global
+            glm::mat4 entity_transform = transformComponent.getGlobalTransform(EntityManager::GetInstance().currentSelectedEntityInScene, *EntityManager::GetInstance().m_registry);
 
             ImGuizmo::MODE transformMode = useLocalTransform ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
 
@@ -333,7 +334,8 @@ namespace libCore
 
             if (ImGuizmo::IsUsing())
             {
-                transformComponent.transform->setMatrix(entity_transform);
+                // Actualizar la transformación local basada en la transformación global manipulada
+                transformComponent.setTransformFromGlobal(entity_transform, EntityManager::GetInstance().currentSelectedEntityInScene, *EntityManager::GetInstance().m_registry);
             }
         }
     }

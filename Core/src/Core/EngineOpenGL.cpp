@@ -388,7 +388,7 @@ namespace libCore
 					glm::vec3 rayOrigin = ViewportManager::GetInstance().viewports[currentViewport]->camera->Position;
 					glm::vec3 rayDirection = glm::normalize(worldCoordinates - rayOrigin);
 
-					EntityManager::GetInstance().CheckRayModelIntersection(rayOrigin, rayDirection, glm::mat4(1.0f));
+					EntityManager::GetInstance().CheckRayModelIntersection(rayOrigin, rayDirection);
 
 					if (EntityManager::GetInstance().entitiesInRay.size() == 1) 
 					{

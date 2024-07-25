@@ -170,6 +170,7 @@ namespace libCore
             childTransformComponent.setTransformFromGlobal(childGlobalTransform, child, *m_registry);
         }
 
+        //--DUPLICATE
         entt::entity DuplicateEntityRecursively(entt::entity entity, entt::entity parentEntity)
         {
             if (!m_registry->valid(entity)) {
@@ -224,8 +225,6 @@ namespace libCore
 
             return newEntity;
         }
-
-        // Duplicar una entidad
         void DuplicateEntity()
         {
             if (EntityManager::GetInstance().currentSelectedEntityInScene != entt::null)
@@ -234,6 +233,8 @@ namespace libCore
             }
 
         }
+        //------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------
 
         //--DESTROY
         void MarkToDeleteRecursively(entt::entity entity)
@@ -255,14 +256,12 @@ namespace libCore
                 }
             }
         }
-
         void DestroyEntity(entt::entity entity)
         {
             if (m_registry->valid(entity)) {
                 m_registry->destroy(entity);
             }
         }
-
         void DestroyEntityRecursively(entt::entity entity)
         {
             if (!m_registry->valid(entity)) {
@@ -340,15 +339,18 @@ namespace libCore
                 auto& transformComponent = viewAABB.get<TransformComponent>(entity);
                 auto& aabbComponent = viewAABB.get<AABBComponent>(entity);
 
-                if (aabbComponent.aabb->showAABB == true)
-                {
+                if (aabbComponent.aabb->showAABB) {
+                    // Obtener la transformación global correcta
+                    glm::mat4 globalTransform = transformComponent.getGlobalTransform(entity, *m_registry);
+
                     libCore::ShaderManager::Get(shader)->setVec4("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-                    libCore::ShaderManager::Get(shader)->setMat4("model", transformComponent.transform->getMatrix());
+                    libCore::ShaderManager::Get(shader)->setMat4("model", globalTransform);
 
                     aabbComponent.aabb->DrawAABB();
                 }
             }
         }
+
         //------------------------------------------------------------------------------------
         //------------------------------------------------------------------------------------
 
@@ -406,8 +408,14 @@ namespace libCore
                 auto& transformComponent = viewAABB.get<TransformComponent>(entity);
                 auto& aabbComponent = viewAABB.get<AABBComponent>(entity);
 
-                aabbComponent.aabb->UpdateAABB(transformComponent.accumulatedTransform);
+                // Obtener la transformación global correcta
+                glm::mat4 globalTransform = transformComponent.getGlobalTransform(entity, *m_registry);
+
+                // Actualizar el AABB con la transformación global
+                aabbComponent.aabb->UpdateAABB(globalTransform);
             }
+
+
         }
         //------------------------------------------------------------------------------------
         //------------------------------------------------------------------------------------
@@ -415,26 +423,28 @@ namespace libCore
         
 
         //--AABB Component MOUSE CHECKER
-        void CheckRayModelIntersection(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, const glm::mat4& accumulatedTransform) 
+        void CheckRayModelIntersection(const glm::vec3& rayOrigin, const glm::vec3& rayDirection)
         {
             auto viewAABB = m_registry->view<TransformComponent, AABBComponent>();
             for (auto entity : viewAABB) {
                 auto& transformComponent = viewAABB.get<TransformComponent>(entity);
                 auto& aabbComponent = viewAABB.get<AABBComponent>(entity);
 
-                glm::mat4 modelMatrix = accumulatedTransform * transformComponent.transform->getLocalModelMatrix();
+                // Obtener la transformación global correcta
+                glm::mat4 globalTransform = transformComponent.getGlobalTransform(entity, *m_registry);
 
                 // Transformar AABB
-                glm::vec3 transformedMin = glm::vec3(modelMatrix * glm::vec4(aabbComponent.aabb->minBounds, 1.0));
-                glm::vec3 transformedMax = glm::vec3(modelMatrix * glm::vec4(aabbComponent.aabb->maxBounds, 1.0));
+                glm::vec3 transformedMin = glm::vec3(globalTransform * glm::vec4(aabbComponent.aabb->minBounds, 1.0));
+                glm::vec3 transformedMax = glm::vec3(globalTransform * glm::vec4(aabbComponent.aabb->maxBounds, 1.0));
 
                 // Verificar la intersección del rayo con la AABB transformada
                 if (rayIntersectsBoundingBox(rayOrigin, rayDirection, transformedMin, transformedMax))
                 {
                     entitiesInRay.push_back(entity);
                 }
-            } 
+            }
         }
+
         bool rayIntersectsBoundingBox(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, glm::vec3 boxMin, glm::vec3 boxMax)
         {
             float tMin = (boxMin.x - rayOrigin.x) / rayDirection.x;
