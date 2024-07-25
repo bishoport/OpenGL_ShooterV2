@@ -961,7 +961,7 @@ namespace libCore
                 // Añadir botón "Instantiate"
                 if (ImGui::Button(("Instantiate " + model->name).c_str())) {
                     // Lógica de instanciación del modelo
-                    //InstantiateModel(model);
+                    EntityManager::GetInstance().CreateGameObjectFromModel(model, entt::null);
                 }
             }
             else {

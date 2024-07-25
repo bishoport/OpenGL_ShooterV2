@@ -84,6 +84,10 @@ namespace libCore
     struct MeshComponent
     {
         Ref<Mesh> mesh = CreateRef<Mesh>();
+        std::vector<glm::mat4> instanceMatrices;
+
+        MeshComponent() = default;
+        MeshComponent(const Ref<Mesh>& mesh) : mesh(mesh) {}
     };
 
     struct AABBComponent

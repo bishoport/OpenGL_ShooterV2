@@ -36,5 +36,10 @@ namespace libCore
 
         auto& GetBoneInfoMap() { return m_BoneInfoMap; }
         int& GetBoneCount() { return m_BoneCounter; }
+
+        // Instancing data
+        std::vector<glm::mat4> instanceMatrices;
+
+
     };
 }

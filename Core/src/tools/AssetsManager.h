@@ -30,16 +30,19 @@ namespace libCore
 		std::size_t GetNumberOfTextures() const;
 		//---------------------------------------------------------------------------------------------------------------------------
 
+
 		//--MODELS
 		void LoadModelAsset(ImportModelData importModelData);
 		Ref<Model> GetModel(const std::string& name);
 		const std::unordered_map<std::string, Ref<Model>>& GetAllModels() const;
 		//---------------------------------------------------------------------------------------------------------------------------
 
+
 	private:
 		// Constructor privado
 		AssetsManager() {}
 
+		//-CARGADOS EN MEMORIA
 		std::unordered_map<std::string, Ref<Texture>> loadedTextures;
 		std::unordered_map<std::string, Ref<Model>>   loadedModels;
 
