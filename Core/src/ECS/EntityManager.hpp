@@ -127,68 +127,148 @@ namespace libCore
             auto& materialComponent = AddComponent<MaterialComponent>(gameObject);
             materialComponent.material = AssetsManager::GetInstance().getMaterial("default_material");
         }
+        
+        void AddChild(entt::entity parent, entt::entity child)
+        {
+            if (!m_registry->valid(parent) || !m_registry->valid(child)) {
+                return;
+            }
+
+            // Añadir ParentComponent al hijo
+            if (!HasComponent<ParentComponent>(child)) {
+                AddComponent<ParentComponent>(child).parent = parent;
+            }
+            else {
+                GetComponent<ParentComponent>(child).parent = parent;
+            }
+
+            // Añadir ChildComponent al padre
+            if (!HasComponent<ChildComponent>(parent)) {
+                AddComponent<ChildComponent>(parent).children.push_back(child);
+            }
+            else {
+                GetComponent<ChildComponent>(parent).children.push_back(child);
+            }
+        }
+
+        entt::entity DuplicateEntityRecursively(entt::entity entity, entt::entity parentEntity)
+        {
+            if (!m_registry->valid(entity)) {
+                return entt::null;
+            }
+
+            // Obtener el nombre original y concatenar con "_clone"
+            std::string originalTag = GetComponent<TagComponent>(entity).Tag;
+            std::string newTag = originalTag + "_clone";
+
+            // Crear una nueva entidad con el nombre modificado
+            entt::entity newEntity = CreateEmptyGameObject(newTag);
+
+            // Copiar componentes
+            if (HasComponent<TransformComponent>(entity)) {
+                auto& srcTransform = GetComponent<TransformComponent>(entity);
+                auto& dstTransform = GetComponent<TransformComponent>(newEntity);
+
+                dstTransform.transform->setMatrix(srcTransform.transform->getMatrix());
+            }
+
+            if (HasComponent<MeshComponent>(entity)) {
+                auto& srcMesh = GetComponent<MeshComponent>(entity);
+                auto& dstMesh = AddComponent<MeshComponent>(newEntity, srcMesh.mesh);
+                dstMesh.instanceMatrices = srcMesh.instanceMatrices;
+            }
+
+            if (HasComponent<MaterialComponent>(entity)) {
+                auto& srcMaterial = GetComponent<MaterialComponent>(entity);
+                AddComponent<MaterialComponent>(newEntity, srcMaterial.material);
+            }
+
+            if (HasComponent<AABBComponent>(entity)) {
+                auto& srcAABB = GetComponent<AABBComponent>(entity);
+                auto& dstAABB = AddComponent<AABBComponent>(newEntity);
+                auto& srcMesh = GetComponent<MeshComponent>(entity);
+                dstAABB.aabb->CalculateAABB(srcMesh.mesh->vertices);
+            }
+
+            // Añadir el hijo al padre usando AddChild
+            if (parentEntity != entt::null) {
+                AddChild(parentEntity, newEntity);
+            }
+
+            // Manejar los hijos
+            if (HasComponent<ChildComponent>(entity)) {
+                auto& srcChild = GetComponent<ChildComponent>(entity);
+                for (auto& child : srcChild.children) {
+                    DuplicateEntityRecursively(child, newEntity);
+                }
+            }
+
+            return newEntity;
+        }
+
+        // Duplicar una entidad
         void DuplicateEntity()
         {
             if (EntityManager::GetInstance().currentSelectedEntityInScene != entt::null)
             {
-                // Crear una nueva entidad
-                entt::entity entity = EntityManager::GetInstance().currentSelectedEntityInScene;
+                DuplicateEntityRecursively(EntityManager::GetInstance().currentSelectedEntityInScene, entt::null);
+            }
 
-                // Obtener el nombre original y concatenar con "_clone"
-                std::string originalTag = GetComponent<TagComponent>(entity).Tag;
-                std::string newTag = originalTag + "_clone";
+        }
 
-                // Crear una nueva entidad con el nombre modificado
-                entt::entity newEntity = CreateEmptyGameObject(newTag);
+        //--DESTROY
+        void MarkToDeleteRecursively(entt::entity entity)
+        {
+            if (!m_registry->valid(entity)) {
+                return;
+            }
 
-                // Copiar componentes
-                if (HasComponent<TransformComponent>(entity))
-                {
-                    auto& srcTransform = GetComponent<TransformComponent>(entity);
-                    auto& dstTransform = GetComponent<TransformComponent>(newEntity);
+            // Marcar la entidad actual
+            if (HasComponent<IDComponent>(entity)) {
+                GetComponent<IDComponent>(entity).markToDelete = true;
+            }
 
-                    dstTransform.transform->SetPosition(srcTransform.transform->GetPosition());
-                    dstTransform.transform->SetRotation(srcTransform.transform->GetRotation());
-                    dstTransform.transform->SetScale(srcTransform.transform->GetScale());
+            // Marcar recursivamente los hijos
+            if (HasComponent<ChildComponent>(entity)) {
+                auto& childComponent = GetComponent<ChildComponent>(entity);
+                for (auto& child : childComponent.children) {
+                    MarkToDeleteRecursively(child);
                 }
+            }
+        }
 
-                if (HasComponent<MeshComponent>(entity))
-                {
-                    auto& srcMesh = GetComponent<MeshComponent>(entity);
-                    auto& dstMesh = AddComponent<MeshComponent>(newEntity, srcMesh.mesh);
-                    dstMesh.instanceMatrices = srcMesh.instanceMatrices;
-                }
+        void DestroyEntity(entt::entity entity)
+        {
+            if (m_registry->valid(entity)) {
+                m_registry->destroy(entity);
+            }
+        }
 
-                if (HasComponent<MaterialComponent>(entity))
-                {
-                    auto& srcMaterial = GetComponent<MaterialComponent>(entity);
-                    AddComponent<MaterialComponent>(newEntity, srcMaterial.material);
-                }
+        void DestroyEntityRecursively(entt::entity entity)
+        {
+            if (!m_registry->valid(entity)) {
+                return;
+            }
 
-                if (HasComponent<AABBComponent>(entity))
-                {
-                    auto& srcAABB = GetComponent<AABBComponent>(entity);
-                    auto& dstAABB = AddComponent<AABBComponent>(newEntity);
-                    auto& srcMesh = GetComponent<MeshComponent>(entity);
-                    dstAABB.aabb->CalculateAABB(srcMesh.mesh->vertices);
-                }
-
-                if (HasComponent<ParentComponent>(entity))
-                {
-                    auto& srcParent = GetComponent<ParentComponent>(entity);
-                    auto& dstParent = AddComponent<ParentComponent>(newEntity);
-                    dstParent.parent = srcParent.parent;
-                }
-
-                if (HasComponent<ChildComponent>(entity))
-                {
-                    auto& srcChild = GetComponent<ChildComponent>(entity);
-                    auto& dstChild = AddComponent<ChildComponent>(newEntity);
-                    dstChild.children = srcChild.children;
+            // Primero, eliminar todos los hijos recursivamente
+            if (HasComponent<ChildComponent>(entity)) {
+                auto& childComponent = GetComponent<ChildComponent>(entity);
+                for (auto childEntity : childComponent.children) {
+                    DestroyEntityRecursively(childEntity);
                 }
             }
 
-            
+            // Eliminar referencia del padre si existe
+            if (HasComponent<ParentComponent>(entity)) {
+                auto& parentComponent = GetComponent<ParentComponent>(entity);
+                if (m_registry->valid(parentComponent.parent)) {
+                    auto& parentChildren = GetComponent<ChildComponent>(parentComponent.parent).children;
+                    parentChildren.erase(std::remove(parentChildren.begin(), parentChildren.end(), entity), parentChildren.end());
+                }
+            }
+
+            // Luego, eliminar la entidad actual
+            DestroyEntity(entity);
         }
         //------------------------------------------------------------------------------------
         //------------------------------------------------------------------------------------
@@ -257,6 +337,18 @@ namespace libCore
         //--ACTUALIZADOR DE FUNCIONES UPDATES ANTES DEL RENDER DE LOS COMPONENTES
         void UpdateGameObjects(Timestep deltaTime) 
         {
+            auto IDCompView = m_registry->view<IDComponent>();
+            for (auto entity : IDCompView) {
+                auto& idComponent = GetComponent<IDComponent>(entity);
+
+                if (idComponent.markToDelete == true)
+                {
+                    EntityManager::GetInstance().DestroyEntityRecursively(entity);
+               }
+            }
+
+            
+
             //-UPDATE SCRIPTS Component.
             if (EngineOpenGL::GetInstance().engineState == EDITOR_PLAY || EngineOpenGL::GetInstance().engineState == PLAY)
             {

@@ -51,6 +51,7 @@ namespace libCore
 
     struct IDComponent {
         UUID ID;
+        bool markToDelete = false;
 
         IDComponent() = default;
         IDComponent(const IDComponent&) = default;

@@ -409,10 +409,10 @@ namespace libCore
     {
         ImGui::Begin("Inspector");
 
-        if (EntityManager::GetInstance().currentSelectedEntityInScene != entt::null) {
+        entt::entity selectedEntity = EntityManager::GetInstance().currentSelectedEntityInScene;
 
-            entt::entity selectedEntity = EntityManager::GetInstance().currentSelectedEntityInScene;
-
+        if (selectedEntity != entt::null && EntityManager::GetInstance().m_registry->valid(selectedEntity))
+        {
             DrawComponentEditor(selectedEntity);
 
             //--UUID_COMPONENT
@@ -421,6 +421,12 @@ namespace libCore
                 if (ImGui::CollapsingHeader("ID")) {
                     std::string uuidStr = std::to_string(static_cast<uint64_t>(idComponent.ID));
                     ImGui::Text("UUID: %s", uuidStr.c_str());
+
+                    // Botón para eliminar la entidad
+                    if (ImGui::Button("Delete Entity")) {
+                        EntityManager::GetInstance().MarkToDeleteRecursively(EntityManager::GetInstance().currentSelectedEntityInScene);
+                        EntityManager::GetInstance().currentSelectedEntityInScene = entt::null;
+                    }
                 }
             }
             //--TAG_COMPONENT
@@ -450,6 +456,30 @@ namespace libCore
 
                         // Limpiar el buffer después de actualizar
                         buffer[0] = '\0';
+                    }
+                }
+            }
+            //--PARENT_COMPONENT
+            if (EntityManager::GetInstance().HasComponent<ParentComponent>(selectedEntity)) {
+                auto& parentComponent = EntityManager::GetInstance().GetComponent<ParentComponent>(selectedEntity);
+                if (ImGui::CollapsingHeader("Parent")) {
+                    std::string parentTag = "None";
+                    if (EntityManager::GetInstance().HasComponent<TagComponent>(parentComponent.parent)) {
+                        parentTag = EntityManager::GetInstance().GetComponent<TagComponent>(parentComponent.parent).Tag;
+                    }
+                    ImGui::Text("Parent Entity: %s", parentTag.c_str());
+                }
+            }
+
+            //--CHILD_COMPONENT
+            if (EntityManager::GetInstance().HasComponent<ChildComponent>(selectedEntity)) {
+                auto& childComponent = EntityManager::GetInstance().GetComponent<ChildComponent>(selectedEntity);
+                if (ImGui::CollapsingHeader("Children")) {
+                    for (auto child : childComponent.children) {
+                        if (EntityManager::GetInstance().HasComponent<TagComponent>(child)) {
+                            std::string childTag = EntityManager::GetInstance().GetComponent<TagComponent>(child).Tag;
+                            ImGui::Text("Child Entity: %s", childTag.c_str());
+                        }
                     }
                 }
             }
