@@ -10,6 +10,7 @@
 #include "../Core/ViewportManager.hpp"
 #include "../Core/Renderer.hpp"
 
+
 namespace libCore
 {
     //--CONSTRUCTOR
@@ -126,6 +127,7 @@ namespace libCore
             DrawLightsPanel(LightsManager::GetLights());
             DrawMaterialsPanel();
             ShowTexturesPanel();
+            ShowModelsPanel();
             //RenderCheckerMatrix(); //Panel para el editor de roofs
 
             Renderer::getInstance().ShowControlsGUI();
@@ -877,6 +879,100 @@ namespace libCore
     }
     //-----------------------------------------------------------------------------------------------------
 
+    //--GLOBAL MODELS PANEL
+    void GuiLayer::ShowModelInfo(const Ref<libCore::Model>& model, int depth)
+    {
+        if (!model) return;
+
+        ImGui::Separator();
+        ImGui::Text("%*sModel: %s", depth * 2, "", model->name.c_str());
+
+        if (model->modelParent) {
+            ImGui::Text("%*sParent Model: %s", depth * 2, "", model->modelParent->name.c_str());
+            ImGui::Text("%*sParent Position: (%f, %f, %f)", depth * 2, "", model->modelParent->transform->position.x, model->modelParent->transform->position.y, model->modelParent->transform->position.z);
+        }
+        else {
+            ImGui::Text("%*sParent Model: None", depth * 2, "");
+        }
+
+        ImGui::Text("%*sChildren Count: %zu", depth * 2, "", model->children.size());
+        ImGui::Text("%*sMeshes Count: %zu", depth * 2, "", model->meshes.size());
+        ImGui::Text("%*sMaterials Count: %zu", depth * 2, "", model->materials.size());
+
+        for (const auto& child : model->children) {
+            ShowModelInfo(child, depth + 1);
+        }
+    }
+
+    void CountMeshesAndMaterials(const Ref<libCore::Model>& model, int& meshCount, int& materialCount)
+    {
+        if (!model) return;
+
+        // Contar los meshes y materials del modelo actual
+        meshCount += model->meshes.size();
+        materialCount += model->materials.size();
+
+        // Recorrer recursivamente los hijos
+        for (const auto& child : model->children) {
+            CountMeshesAndMaterials(child, meshCount, materialCount);
+        }
+    }
+
+    void GuiLayer::ShowModelsPanel()
+    {
+        auto& assetsManager = libCore::AssetsManager::GetInstance();
+        const auto& models = assetsManager.GetAllModels();
+        std::size_t numberOfModels = models.size();
+
+        // Comenzar la ventana de ImGui
+        ImGui::Begin("Models Panel");
+
+        // Mostrar el número de modelos cargados
+        ImGui::Spacing();
+        ImGui::Text("Model Count: %zu", numberOfModels);
+        ImGui::Spacing();
+
+        for (const auto& modelPair : models) {
+            const auto& modelName = modelPair.first;
+            const auto& model = modelPair.second;
+
+            if (model) {
+                int totalMeshes = 0;
+                int totalMaterials = 0;
+
+                // Contar todos los meshes y materials del modelo y sus hijos
+                CountMeshesAndMaterials(model, totalMeshes, totalMaterials);
+
+                ImGui::Separator();
+                ImGui::Text("Model: %s", model->name.c_str());
+
+                if (model->modelParent) {
+                    ImGui::Text("Parent Model: %s", model->modelParent->name.c_str());
+                    ImGui::Text("Parent Position: (%f, %f, %f)", model->modelParent->transform->position.x, model->modelParent->transform->position.y, model->modelParent->transform->position.z);
+                }
+                else {
+                    ImGui::Text("Parent Model: None");
+                }
+
+                ImGui::Text("Children Count: %zu", model->children.size());
+                ImGui::Text("Meshes Count: %d", totalMeshes);
+                ImGui::Text("Materials Count: %d", totalMaterials);
+
+                // Añadir botón "Instantiate"
+                if (ImGui::Button(("Instantiate " + model->name).c_str())) {
+                    // Lógica de instanciación del modelo
+                    //InstantiateModel(model);
+                }
+            }
+            else {
+                ImGui::Text("Invalid model: %s", modelName.c_str());
+            }
+        }
+
+        ImGui::End();
+    }
+    //-----------------------------------------------------------------------------------------------------
+
 
     //--SCRIPTS-EDITOR PANEL
     void GuiLayer::DrawComponentEditor(entt::entity entity) {
@@ -915,12 +1011,12 @@ namespace libCore
             else if (selectedComponent == "MaterialComponent") {
                 entityManager.AddComponent<MaterialComponent>(entity);
             }
-            else if (selectedComponent == "LightComponent") {
+            /*else if (selectedComponent == "LightComponent") {
                 entityManager.AddComponent<LightComponent>(entity);
             }
             else if (selectedComponent == "DirectionalLightComponent") {
                 entityManager.AddComponent<DirectionalLightComponent>(entity);
-            }
+            }*/
             else if (selectedComponent == "ScriptComponent") {
                 entityManager.AddComponent<ScriptComponent>(entity);
             }

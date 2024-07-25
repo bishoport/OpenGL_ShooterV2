@@ -6,10 +6,9 @@
 #include "../tools/RoofGenerator.hpp"
 #include "../tools/LightsManager.hpp"
 #include "../tools/SkyBox.hpp"
-#include "../tools/MousePicker.hpp"
 #include "../ECS/EntityManager.hpp"
-
-#include "../ECS/Scene.h"
+#include "../tools/AssetsManager.h"
+#include "../tools/FreeTypeManager.h"
 
 
 

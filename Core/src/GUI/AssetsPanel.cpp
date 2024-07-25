@@ -161,8 +161,8 @@ namespace libCore {
 				importOptions.filePath = filePath;
 				importOptions.fileName = fileName;
 
-				// Llama a UsarDelegado con las opciones
-				UsarDelegado(importOptions);
+				AssetsManager::GetInstance().LoadModelAsset(importOptions);
+
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel")) {

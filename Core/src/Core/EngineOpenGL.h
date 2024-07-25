@@ -2,13 +2,8 @@
 
 #include "../LibCoreHeaders.h"
 #include "../Timestep.h"
-#include "../tools/AssetsManager.h"
-#include "../tools/ModelLoader.h"
-#include "../tools/PrimitivesHelper.h"
-#include "Light.hpp"
-#include "../StraightSkeleton/Vector2d.h"
-#include "../tools/FreeTypeManager.h"
 #include "../ECS/Scene.h"
+
 
 
 namespace libCore

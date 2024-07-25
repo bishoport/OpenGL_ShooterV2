@@ -96,15 +96,15 @@ namespace libCore
         Ref<Material> material;
     };
 
-    struct LightComponent
+    /*struct LightComponent
     {
         Ref<Light> light;
-    };
+    };*/
 
-    struct DirectionalLightComponent
+    /*struct DirectionalLightComponent
     {
         Ref<DirectionalLight> directionalLight = CreateRef<DirectionalLight>();
-    };
+    };*/
 
     struct ScriptComponent {
 

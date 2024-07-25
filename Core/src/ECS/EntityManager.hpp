@@ -43,9 +43,9 @@ namespace libCore
             return entity;
         }
         void CreateExternalModelGameObject(ImportModelData importModelData) {
-            Ref<Model> model = ModelLoader::LoadModel(importModelData);
-            CreateGameObjectFromModel(model, entt::null);
-            model.reset();
+            //Ref<Model> model = ModelLoader::LoadModel(importModelData);
+            //CreateGameObjectFromModel(model, entt::null);
+            //model.reset();
         }
         void CreateCubeGameObject(glm::vec3 position = glm::vec3(0.0f,0.0f,0.0f))
         {

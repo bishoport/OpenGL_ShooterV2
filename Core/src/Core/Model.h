@@ -6,7 +6,7 @@
 #include "Material.h"
 #include "Transform.h"
 #include "skeletal/AnimData.h"
-#include "../ECS/ECS.h"
+
 
 namespace libCore
 {
@@ -38,5 +38,3 @@ namespace libCore
         int& GetBoneCount() { return m_BoneCounter; }
     };
 }
-
-// childs;

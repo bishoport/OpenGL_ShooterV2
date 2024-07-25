@@ -21,9 +21,13 @@ namespace libCore
         //--DRAW MESH
         void SetupMesh();
         void Draw();
-
+        void DrawInstanced(GLsizei instanceCount);
     private:
         //--MAIN MESH
         VAO VAO;
+
+        // Instancing data
+        GLuint instanceVBO = 0;
+        std::vector<glm::mat4> instanceMatrices;
     };
 }

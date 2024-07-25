@@ -13,21 +13,6 @@
 
 namespace libCore
 {
-	// Struct para las opciones de importación
-	struct ImportModelData {
-		std::string filePath = "";
-		std::string fileName = "";
-		int modelID = 0;
-		bool invertUV = false;
-		bool rotate90 = false;
-		bool skeletal = false;
-		bool useCustomTransform = true;
-		bool processLights = false;
-		float globalScaleFactor = 1.0f; // Ajusta según tus necesidades
-	};
-
-
-
 	class ModelLoader 
 	{
 	public:

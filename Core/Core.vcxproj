@@ -126,6 +126,7 @@
     <ClCompile Include="src\Core\EBO.cpp" />
     <ClCompile Include="src\Core\EngineOpenGL.cpp" />
     <ClCompile Include="src\Core\IBL.cpp" />
+    <ClCompile Include="src\Core\Material.cpp" />
     <ClCompile Include="src\Core\Mesh.cpp" />
     <ClCompile Include="src\Core\Texture.cpp" />
     <ClCompile Include="src\Core\UUID.cpp" />

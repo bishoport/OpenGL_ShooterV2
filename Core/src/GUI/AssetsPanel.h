@@ -8,23 +8,11 @@
 
 
 namespace libCore {
-
-
 	class AssetsPanel
 	{
 	public:
-
 		AssetsPanel();
-
-
 		void OnImGuiRender();
-
-		// Función para establecer el delegado
-		void SetDelegate(std::function<void(ImportModelData importOptions)> delegado) {
-			//getModelPathFromAssetsDelegate = delegado;
-		}
-
-
 
 	private:
 		std::filesystem::path m_BaseDirectory;
@@ -40,20 +28,5 @@ namespace libCore {
 		bool isDialogOpen = false;
 
 		std::filesystem::path s_AssetPath = "assets";
-
-
-		//callbacks:
-		std::function<void(ImportModelData importOptions)> getModelPathFromAssetsDelegate;
-
-		// Función que utiliza el delegado
-		void UsarDelegado(const ImportModelData importOptions) 
-		{
-			EntityManager::GetInstance().CreateExternalModelGameObject(importOptions);
-
-
-			//if (getModelPathFromAssetsDelegate) {  // Verifica que el delegado haya sido establecido
-			//	getModelPathFromAssetsDelegate(importOptions);
-			//}
-		}
 	};
 }

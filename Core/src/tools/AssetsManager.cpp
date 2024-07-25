@@ -1,5 +1,6 @@
 #include "AssetsManager.h"
 #include "TextureManager.h"
+#include "ModelLoader.h"
 
 namespace libCore
 {
@@ -13,6 +14,8 @@ namespace libCore
 		LoadTextureAsset("checker",           (defaultAssetsPathTexture).c_str(), "checker.jpg",           TEXTURE_TYPES::ALBEDO);
 	}
 
+
+	//--TEXTURES
 	Ref<Texture> AssetsManager::LoadTextureAsset(const std::string &key, const char* directoryPath, const char* fileName, TEXTURE_TYPES type)
 	{
 		int slot = 0;
@@ -26,10 +29,7 @@ namespace libCore
 
 		return GetTexture(key);
 	}
-
-
-	// Método para obtener una textura
-	Ref<Texture> AssetsManager::GetTexture(const std::string& name) {
+	Ref<Texture> AssetsManager::GetTexture(const std::string& name) { // Método para obtener una textura
 		auto it = loadedTextures.find(name);
 		if (it != loadedTextures.end()) {
 			return it->second;
@@ -39,7 +39,6 @@ namespace libCore
 			return nullptr;
 		}
 	}
-
 	const std::unordered_map<std::string, Ref<Texture>>& AssetsManager::GetAllTextures() const {
 		return loadedTextures;
 	}
@@ -50,9 +49,40 @@ namespace libCore
 	{
 		loadedTextures[name] = texture;
 	}
-
-	// Método para eliminar una textura
 	void AssetsManager::UnloadTexture(const std::string& name) {
 		loadedTextures.erase(name);
 	}
+	//---------------------------------------------------------------------------------------------------------------------------
+
+	//--MODELS
+	void AssetsManager::LoadModelAsset(ImportModelData importModelData)
+	{
+		Ref<Model> model = ModelLoader::LoadModel(importModelData);
+	
+		if (model != nullptr)
+		{
+			std::string key = importModelData.filePath + importModelData.fileName;
+			loadedModels[key] = model;
+		}
+		else 
+		{
+			std::cout << "Error Loading MODEL" << std::endl;
+		}
+		
+	}
+	Ref<Model> AssetsManager::GetModel(const std::string& name) {
+		auto it = loadedModels.find(name);
+		if (it != loadedModels.end()) {
+			return it->second;
+		}
+		else {
+			return nullptr;
+		}
+	}
+	
+	const std::unordered_map<std::string, Ref<Model>>& AssetsManager::GetAllModels() const {
+		return loadedModels;
+	}
+
+	//---------------------------------------------------------------------------------------------------------------------------
 }
