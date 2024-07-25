@@ -258,7 +258,6 @@ namespace libCore
     //-------------------------------------------------------------------------------
 
 
-
     //--UPDATES
     void GuiLayer::checkGizmo(const Ref<Viewport>& viewport)
     {
@@ -343,7 +342,6 @@ namespace libCore
 
     //--HIREARCHY PANEL
     void GuiLayer::DrawHierarchyPanel() {
-
         ImGui::Begin("Hierarchy");
 
         // Iterar sobre las entidades raíz (aquellas que no tienen un ParentComponent)
@@ -355,6 +353,7 @@ namespace libCore
 
         ImGui::End();
     }
+
     void GuiLayer::DrawEntityNode(entt::entity entity) {
         ImGui::PushID(static_cast<int>(entity));
 
@@ -374,29 +373,39 @@ namespace libCore
         // Comprobar si la entidad está seleccionada
         bool isSelected = EntityManager::GetInstance().currentSelectedEntityInScene == entity;
 
-        // Mostrar el ID de la entidad
-        if (isParent) {
-            // La entidad tiene hijos, por lo que es desplegable
-            if (ImGui::TreeNode((void*)(intptr_t)entity, "%s", nodeName.c_str())) {
-                // Seleccionar la entidad al hacer clic
-                if (ImGui::IsItemClicked()) {
-                    EntityManager::GetInstance().currentSelectedEntityInScene = entity;
-                }
-
-                // Recorrer y mostrar hijos
-                auto& children = EntityManager::GetInstance().m_registry->get<ChildComponent>(entity).children;
-                for (auto child : children) {
-                    DrawEntityNode(child);
-                }
-
-                ImGui::TreePop();
-            }
+        ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | (isSelected ? ImGuiTreeNodeFlags_Selected : 0);
+        if (!isParent) {
+            nodeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
         }
-        else {
-            // La entidad no tiene hijos, usar ImGui::Selectable
-            if (ImGui::Selectable(nodeName.c_str(), isSelected)) {
-                EntityManager::GetInstance().currentSelectedEntityInScene = entity;
+
+        bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)entity, nodeFlags, "%s", nodeName.c_str());
+        if (ImGui::IsItemClicked()) {
+            EntityManager::GetInstance().currentSelectedEntityInScene = entity;
+        }
+
+        // Handle drag source
+        if (ImGui::BeginDragDropSource()) {
+            ImGui::SetDragDropPayload("ENTITY_PAYLOAD", &entity, sizeof(entt::entity));
+            ImGui::Text("Moving %s", nodeName.c_str());
+            ImGui::EndDragDropSource();
+        }
+
+        // Handle drag target
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_PAYLOAD")) {
+                IM_ASSERT(payload->DataSize == sizeof(entt::entity));
+                entt::entity droppedEntity = *(const entt::entity*)payload->Data;
+                EntityManager::GetInstance().AddChild(entity, droppedEntity);
             }
+            ImGui::EndDragDropTarget();
+        }
+
+        if (nodeOpen && isParent) {
+            auto& children = EntityManager::GetInstance().m_registry->get<ChildComponent>(entity).children;
+            for (auto child : children) {
+                DrawEntityNode(child);
+            }
+            ImGui::TreePop();
         }
 
         ImGui::PopID();

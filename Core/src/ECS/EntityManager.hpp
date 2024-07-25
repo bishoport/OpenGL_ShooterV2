@@ -134,6 +134,19 @@ namespace libCore
                 return;
             }
 
+            // Obtener la transformación global actual del hijo
+            auto& childTransformComponent = GetComponent<TransformComponent>(child);
+            glm::mat4 childGlobalTransform = childTransformComponent.getGlobalTransform(child, *m_registry);
+
+            // Eliminar el hijo de la lista de hijos del antiguo padre, si lo tiene
+            if (HasComponent<ParentComponent>(child)) {
+                entt::entity oldParent = GetComponent<ParentComponent>(child).parent;
+                if (m_registry->valid(oldParent) && HasComponent<ChildComponent>(oldParent)) {
+                    auto& oldParentChildren = GetComponent<ChildComponent>(oldParent).children;
+                    oldParentChildren.erase(std::remove(oldParentChildren.begin(), oldParentChildren.end(), child), oldParentChildren.end());
+                }
+            }
+
             // Añadir ParentComponent al hijo
             if (!HasComponent<ParentComponent>(child)) {
                 AddComponent<ParentComponent>(child).parent = parent;
@@ -147,8 +160,14 @@ namespace libCore
                 AddComponent<ChildComponent>(parent).children.push_back(child);
             }
             else {
-                GetComponent<ChildComponent>(parent).children.push_back(child);
+                auto& parentChildren = GetComponent<ChildComponent>(parent).children;
+                if (std::find(parentChildren.begin(), parentChildren.end(), child) == parentChildren.end()) {
+                    parentChildren.push_back(child);
+                }
             }
+
+            // Actualizar la transformación local del hijo para mantener la transformación global
+            childTransformComponent.setTransformFromGlobal(childGlobalTransform, child, *m_registry);
         }
 
         entt::entity DuplicateEntityRecursively(entt::entity entity, entt::entity parentEntity)

@@ -68,11 +68,9 @@ namespace libCore
             : Tag(tag) {}
     };
 
-    struct TransformComponent
-    {
-        Ref<Transform> transform = CreateRef<Transform>();
-        glm::mat4 accumulatedTransform = glm::mat4(1.0f); // Transformación acumulada
-    };
+    
+
+
 
     struct ParentComponent {
         entt::entity parent = entt::null;
@@ -99,6 +97,34 @@ namespace libCore
     struct MaterialComponent
     {
         Ref<Material> material;
+    };
+
+    struct TransformComponent {
+        Ref<Transform> transform = CreateRef<Transform>();
+        glm::mat4 accumulatedTransform = glm::mat4(1.0f); // Transformación acumulada
+
+        glm::mat4 getGlobalTransform(entt::entity entity, entt::registry& registry) const {
+            glm::mat4 globalTransform = transform->getLocalModelMatrix();
+            if (registry.has<ParentComponent>(entity)) {
+                entt::entity parentEntity = registry.get<ParentComponent>(entity).parent;
+                if (registry.valid(parentEntity)) {
+                    globalTransform = registry.get<TransformComponent>(parentEntity).getGlobalTransform(parentEntity, registry) * globalTransform;
+                }
+            }
+            return globalTransform;
+        }
+
+        void setTransformFromGlobal(const glm::mat4& globalTransform, entt::entity entity, entt::registry& registry) {
+            glm::mat4 parentGlobalTransform = glm::mat4(1.0f);
+            if (registry.has<ParentComponent>(entity)) {
+                entt::entity parentEntity = registry.get<ParentComponent>(entity).parent;
+                if (registry.valid(parentEntity)) {
+                    parentGlobalTransform = registry.get<TransformComponent>(parentEntity).getGlobalTransform(parentEntity, registry);
+                }
+            }
+            glm::mat4 newLocalTransform = glm::inverse(parentGlobalTransform) * globalTransform;
+            transform->setMatrix(newLocalTransform);
+        }
     };
 
     /*struct LightComponent
