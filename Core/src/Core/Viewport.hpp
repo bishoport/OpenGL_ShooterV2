@@ -23,7 +23,7 @@ namespace libCore
         bool mouseInviewport = false;
 
         //--Camera
-        Ref<libCore::Camera> camera;
+        Ref<libCore::Camera> camera = nullptr;
         
         //--FBO´s
         Ref<libCore::FBO> framebuffer_shadowmap = nullptr;
@@ -57,42 +57,50 @@ namespace libCore
             //--RESIZE EVENT´s
             EventManager::OnPanelResizedEvent().subscribe([this](const std::string name, const glm::vec2& size, const glm::vec2& position)
                 {
-                    viewportSize.x = size.x;
-                    viewportSize.y = size.y;
+                    if (camera != nullptr)
+                    {
+                        viewportSize.x = size.x;
+                        viewportSize.y = size.y;
 
-                    viewportPos.x = position.x;
-                    viewportPos.y = viewportSize.y - position.y;
+                        viewportPos.x = position.x;
+                        viewportPos.y = viewportSize.y - position.y;
 
-                    gBuffer->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                        gBuffer->resize(static_cast<int>(size.x), static_cast<int>(size.y));
 
-                    framebuffer_deferred->resize(static_cast<int>(size.x), static_cast<int>(size.y));
-                    framebuffer_shadowmap->resize(static_cast<int>(size.x), static_cast<int>(size.y));
-                    framebuffer_forward->resize(static_cast<int>(size.x), static_cast<int>(size.y));
-                    framebuffer_final->resize(static_cast<int>(size.x), static_cast<int>(size.y));
-                    framebuffer_HDR->resize(static_cast<int>(size.x), static_cast<int>(size.y));
-                    framebuffer_SSAO->resize(static_cast<int>(size.x), static_cast<int>(size.y));
-                    framebuffer_SSAOBlur->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                        framebuffer_deferred->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                        framebuffer_shadowmap->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                        framebuffer_forward->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                        framebuffer_final->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                        framebuffer_HDR->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                        framebuffer_SSAO->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                        framebuffer_SSAOBlur->resize(static_cast<int>(size.x), static_cast<int>(size.y));
 
-                    camera->width = static_cast<int>(size.x);
-                    camera->height = static_cast<int>(size.y);
+                        camera->width = static_cast<int>(size.x);
+                        camera->height = static_cast<int>(size.y);
+                    }
+                    
                 });
             EventManager::OnWindowResizeEvent().subscribe([this](const int width, const int height)
                 {
-                    viewportSize.x = static_cast<float>(width);
-                    viewportSize.y = static_cast<float>(height);
+                    if (camera != nullptr)
+                    {
+                        viewportSize.x = static_cast<float>(width);
+                        viewportSize.y = static_cast<float>(height);
 
-                    gBuffer->resize(width, height);
+                        gBuffer->resize(width, height);
 
-                    framebuffer_deferred->resize(width, height);
-                    framebuffer_shadowmap->resize(width, height);
-                    framebuffer_forward->resize(width, height);
-                    framebuffer_final->resize(width, height);
-                    framebuffer_HDR->resize(width, height);
-                    framebuffer_SSAO->resize(width, height);
-                    framebuffer_SSAOBlur->resize(width, height);
+                        framebuffer_deferred->resize(width, height);
+                        framebuffer_shadowmap->resize(width, height);
+                        framebuffer_forward->resize(width, height);
+                        framebuffer_final->resize(width, height);
+                        framebuffer_HDR->resize(width, height);
+                        framebuffer_SSAO->resize(width, height);
+                        framebuffer_SSAOBlur->resize(width, height);
 
-                    camera->width = static_cast<int>(width);
-                    camera->height = static_cast<int>(height);
+                        camera->width = static_cast<int>(width);
+                        camera->height = static_cast<int>(height);
+                    }
+
                 });
             //---------------------------------------------------
         }

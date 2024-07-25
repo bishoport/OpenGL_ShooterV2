@@ -258,9 +258,6 @@
     <ClInclude Include="src\tools\FPSCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\tools\MaterialManager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\tools\DepthBufferPicking.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

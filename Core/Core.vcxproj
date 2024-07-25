@@ -94,7 +94,6 @@
     <ClInclude Include="src\tools\FreeTypeManager.h" />
     <ClInclude Include="src\tools\LightsManager.hpp" />
     <ClInclude Include="src\tools\LUTGenerator.hpp" />
-    <ClInclude Include="src\tools\MaterialManager.hpp" />
     <ClInclude Include="src\tools\ModelLoader.h" />
     <ClInclude Include="src\tools\MousePicker.hpp" />
     <ClInclude Include="src\tools\PrimitivesHelper.h" />

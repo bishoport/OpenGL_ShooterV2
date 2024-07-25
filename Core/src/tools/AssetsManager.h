@@ -37,14 +37,23 @@ namespace libCore
 		const std::unordered_map<std::string, Ref<Model>>& GetAllModels() const;
 		//---------------------------------------------------------------------------------------------------------------------------
 
+		//--MATERIALS
+		void CreateDefaultMaterial();
+		void CreateEmptyMaterial(const std::string& matName);
+		Ref<Material> addMaterial(Ref<Material> materialData);
+		Ref<Material> getMaterial(const std::string& key);
+		bool removeMaterial(const std::string& key);
+		const std::unordered_map<std::string, Ref<Material>>& GetAllMaterials() const;
+		//---------------------------------------------------------------------------------------------------------------------------
 
 	private:
 		// Constructor privado
 		AssetsManager() {}
 
 		//-CARGADOS EN MEMORIA
-		std::unordered_map<std::string, Ref<Texture>> loadedTextures;
-		std::unordered_map<std::string, Ref<Model>>   loadedModels;
+		std::unordered_map<std::string, Ref<Material>> loadedMaterials;
+		std::unordered_map<std::string, Ref<Texture>>  loadedTextures;
+		std::unordered_map<std::string, Ref<Model>>    loadedModels;
 
 
 		// Eliminar la posibilidad de copiar o asignar instancias

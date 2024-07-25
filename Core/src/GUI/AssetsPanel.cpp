@@ -18,7 +18,7 @@ namespace libCore {
 	{
 		m_CurrentDirectory = s_AssetPath;
 
-		std::cout << "m_CurrentDirectory-> " << m_CurrentDirectory << std::endl;
+		//std::cout << "m_CurrentDirectory-> " << m_CurrentDirectory << std::endl;
 
 		//iconFolder = GLCore::Utils::ImageLoader::loadIcon("assets/default/icons/folder_icon.png");
 		//iconModel = GLCore::Utils::ImageLoader::loadIcon("assets/default/icons/model_icon.png");

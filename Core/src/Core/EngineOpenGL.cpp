@@ -170,7 +170,7 @@ namespace libCore
 
 		// -- ASSETS MANAGER (load Default Assets)
 		AssetsManager::GetInstance().LoadDefaultAssets();
-		MaterialManager::getInstance().CreateDefaultMaterial();
+		AssetsManager::GetInstance().CreateDefaultMaterial();
 		//---------------------------------------------------------------------------
 
 
@@ -338,6 +338,10 @@ namespace libCore
 				engineState = EDITOR;
 			}
 		}
+		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_C)) //CLONE
+		{
+			EntityManager::GetInstance().DuplicateEntity();
+		}
 		//-------------------------------------------------------------------
 
 
@@ -386,7 +390,8 @@ namespace libCore
 
 					EntityManager::GetInstance().CheckRayModelIntersection(rayOrigin, rayDirection, glm::mat4(1.0f));
 
-					if (EntityManager::GetInstance().entitiesInRay.size() == 1) {
+					if (EntityManager::GetInstance().entitiesInRay.size() == 1) 
+					{
 						EntityManager::GetInstance().currentSelectedEntityInScene = EntityManager::GetInstance().entitiesInRay[0];
 						guiLayer->isSelectingObject = false; // No need to select, auto-selected
 						guiLayer->showModelSelectionCombo = false;
@@ -394,10 +399,12 @@ namespace libCore
 					else if (EntityManager::GetInstance().entitiesInRay.size() > 1) {
 						guiLayer->isSelectingObject = true; // Multiple options, need to select
 						guiLayer->showModelSelectionCombo = true;
+						EntityManager::GetInstance().currentSelectedEntityInScene = entt::null;
 					}
 					else {
 						guiLayer->isSelectingObject = false; // No selection
 						guiLayer->showModelSelectionCombo = false;
+						EntityManager::GetInstance().currentSelectedEntityInScene = entt::null;
 					}
 				}
 			}

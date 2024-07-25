@@ -12,7 +12,7 @@
 #include "../Core/EngineOpenGL.h"
 #include "Scripts/MyScript.h"
 #include "../Timestep.h"
-#include "../tools/MaterialManager.hpp"
+#include "../tools/AssetsManager.h"
 
 namespace libCore 
 {
@@ -103,7 +103,7 @@ namespace libCore
 
             	//Material Component
                 auto& materialComponent = AddComponent<MaterialComponent>(gameObject);
-                materialComponent.material = MaterialManager::getInstance().getMaterial("default_material");
+                materialComponent.material = AssetsManager::GetInstance().getMaterial("default_material");
         }
         void CreateSphereGameObject(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), float radius = 1.0f, int sectorCount = 12, int stackCount = 12)
         {
@@ -125,7 +125,70 @@ namespace libCore
 
             //Material Component
             auto& materialComponent = AddComponent<MaterialComponent>(gameObject);
-            materialComponent.material = MaterialManager::getInstance().getMaterial("default_material");
+            materialComponent.material = AssetsManager::GetInstance().getMaterial("default_material");
+        }
+        void DuplicateEntity()
+        {
+            if (EntityManager::GetInstance().currentSelectedEntityInScene != entt::null)
+            {
+                // Crear una nueva entidad
+                entt::entity entity = EntityManager::GetInstance().currentSelectedEntityInScene;
+
+                // Obtener el nombre original y concatenar con "_clone"
+                std::string originalTag = GetComponent<TagComponent>(entity).Tag;
+                std::string newTag = originalTag + "_clone";
+
+                // Crear una nueva entidad con el nombre modificado
+                entt::entity newEntity = CreateEmptyGameObject(newTag);
+
+                // Copiar componentes
+                if (HasComponent<TransformComponent>(entity))
+                {
+                    auto& srcTransform = GetComponent<TransformComponent>(entity);
+                    auto& dstTransform = GetComponent<TransformComponent>(newEntity);
+
+                    dstTransform.transform->SetPosition(srcTransform.transform->GetPosition());
+                    dstTransform.transform->SetRotation(srcTransform.transform->GetRotation());
+                    dstTransform.transform->SetScale(srcTransform.transform->GetScale());
+                }
+
+                if (HasComponent<MeshComponent>(entity))
+                {
+                    auto& srcMesh = GetComponent<MeshComponent>(entity);
+                    auto& dstMesh = AddComponent<MeshComponent>(newEntity, srcMesh.mesh);
+                    dstMesh.instanceMatrices = srcMesh.instanceMatrices;
+                }
+
+                if (HasComponent<MaterialComponent>(entity))
+                {
+                    auto& srcMaterial = GetComponent<MaterialComponent>(entity);
+                    AddComponent<MaterialComponent>(newEntity, srcMaterial.material);
+                }
+
+                if (HasComponent<AABBComponent>(entity))
+                {
+                    auto& srcAABB = GetComponent<AABBComponent>(entity);
+                    auto& dstAABB = AddComponent<AABBComponent>(newEntity);
+                    auto& srcMesh = GetComponent<MeshComponent>(entity);
+                    dstAABB.aabb->CalculateAABB(srcMesh.mesh->vertices);
+                }
+
+                if (HasComponent<ParentComponent>(entity))
+                {
+                    auto& srcParent = GetComponent<ParentComponent>(entity);
+                    auto& dstParent = AddComponent<ParentComponent>(newEntity);
+                    dstParent.parent = srcParent.parent;
+                }
+
+                if (HasComponent<ChildComponent>(entity))
+                {
+                    auto& srcChild = GetComponent<ChildComponent>(entity);
+                    auto& dstChild = AddComponent<ChildComponent>(newEntity);
+                    dstChild.children = srcChild.children;
+                }
+            }
+
+            
         }
         //------------------------------------------------------------------------------------
         //------------------------------------------------------------------------------------

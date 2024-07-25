@@ -3,7 +3,7 @@
 #include "AssimpGlmHelpers.h"
 #include "../Core/Light.hpp"
 #include "LightsManager.hpp"
-#include "MaterialManager.hpp"
+#include "AssetsManager.h"
 #include <filesystem>
 
 namespace libCore
@@ -240,7 +240,7 @@ namespace libCore
         std::string materialName = mat->GetName().C_Str();
 
         // Verificar si el material ya existe en el MaterialManager
-        auto existingMaterial = MaterialManager::getInstance().getMaterial(materialName);
+        auto existingMaterial = AssetsManager::GetInstance().getMaterial(materialName);
         
         Ref<Material> material;
 
@@ -358,8 +358,8 @@ namespace libCore
             }
 
             // Añadir el material al MaterialManager
-            MaterialManager::getInstance().addMaterial(material);
-            std::cout << "Added new material: " << material->materialName << std::endl;
+            AssetsManager::GetInstance().addMaterial(material);
+            
         }
 
         // Añadir el material al modelo

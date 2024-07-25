@@ -83,6 +83,49 @@ namespace libCore
 	const std::unordered_map<std::string, Ref<Model>>& AssetsManager::GetAllModels() const {
 		return loadedModels;
 	}
+	//---------------------------------------------------------------------------------------------------------------------------
 
+
+	//--MATERIALS
+	void AssetsManager::CreateDefaultMaterial()
+	{
+		auto material = CreateRef<Material>("default_material");
+		addMaterial(material);
+	}
+	void AssetsManager::CreateEmptyMaterial(const std::string& matName)
+	{
+		Ref <Material> material = CreateRef<Material>(matName);
+		addMaterial(material);
+	}
+	Ref<Material> AssetsManager::addMaterial(Ref<Material> materialData)
+	{
+		auto result = loadedMaterials.emplace(materialData->materialName, materialData);
+
+		if (result.second) {
+			std::cout << "Added new material: " << materialData->materialName << std::endl;
+			return materialData;
+		}
+		else {
+			// El material ya existía, devuelve el material existente.
+			return result.first->second;
+		}
+	}
+	Ref<Material> AssetsManager::getMaterial(const std::string& key)
+	{
+		auto it = loadedMaterials.find(key);
+		if (it != loadedMaterials.end()) {
+			return it->second;
+		}
+		std::cout << key << " material does exist" << std::endl;
+		return nullptr; // O manejar el error como prefieras
+	}
+	bool AssetsManager::removeMaterial(const std::string& key)
+	{
+		return loadedMaterials.erase(key) > 0;
+	}
+	const std::unordered_map<std::string, Ref<Material>>& AssetsManager::GetAllMaterials() const
+	{
+		return loadedMaterials;
+	}
 	//---------------------------------------------------------------------------------------------------------------------------
 }

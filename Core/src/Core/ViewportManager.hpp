@@ -30,11 +30,11 @@ namespace libCore
             // Camera
             if (controller == CAMERA_CONTROLLERS::FPS)
             {
-                viewport->camera = CreateScope<libCore::FPSCamera>(viewport->viewportSize.x, viewport->viewportSize.y, cameraPosition);
+                viewport->camera = CreateRef<libCore::FPSCamera>(viewport->viewportSize.x, viewport->viewportSize.y, cameraPosition);
             }
             else if (controller == CAMERA_CONTROLLERS::EDITOR)
             {
-                viewport->camera = CreateScope<libCore::EditorCamera>(viewport->viewportSize.x, viewport->viewportSize.y, cameraPosition);
+                viewport->camera = CreateRef<libCore::EditorCamera>(viewport->viewportSize.x, viewport->viewportSize.y, cameraPosition);
             }
             //----------------------------------------------------------
 

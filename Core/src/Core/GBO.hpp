@@ -76,18 +76,18 @@ namespace libCore {
                 glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
                 glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT, &internalFormat);
 
-                std::cout << "Texture: " << attachment.first << " - Width: " << width << ", Height: " << height << ", Internal Format: " << internalFormat << std::endl;
+                //std::cout << "Texture: " << attachment.first << " - Width: " << width << ", Height: " << height << ", Internal Format: " << internalFormat << std::endl;
 
                 // Optional: Check texture content for debugging
                 std::vector<GLubyte> data(width * height * 4); // Adjust size based on expected channels
                 glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
 
                 // Print first pixel value for debugging
-                std::cout << "First pixel RGBA of " << attachment.first << ": "
+                /*std::cout << "First pixel RGBA of " << attachment.first << ": "
                     << static_cast<int>(data[0]) << ", "
                     << static_cast<int>(data[1]) << ", "
                     << static_cast<int>(data[2]) << ", "
-                    << static_cast<int>(data[3]) << std::endl;
+                    << static_cast<int>(data[3]) << std::endl;*/
 
                 glBindTexture(GL_TEXTURE_2D, 0);
             }

@@ -23,9 +23,6 @@ namespace libCore
             return;
         }
 
-        //std::cout << "Image loaded successfully: " << image << std::endl;
-        //std::cout << "Width: " << widthImg << ", Height: " << heightImg << ", Channels: " << numColCh << std::endl;
-
         // Generates an OpenGL texture object
         glGenTextures(1, &ID);
         if (glGetError() != GL_NO_ERROR) {

@@ -5,7 +5,6 @@
 #include <imgui_internal.h>
 
 #include "../tools/LightsManager.hpp"
-#include "../tools/MaterialManager.hpp"
 #include "../ECS/EntityManager.hpp"
 #include "../Core/ViewportManager.hpp"
 #include "../Core/Renderer.hpp"
@@ -371,8 +370,6 @@ namespace libCore
 
         // Usar el nombre del TagComponent
         std::string nodeName = tagComponent.Tag;
-        //if (isParent) nodeName += " (Parent)";
-        //if (isChild) nodeName += " (Child)";
 
         // Comprobar si la entidad está seleccionada
         bool isSelected = EntityManager::GetInstance().currentSelectedEntityInScene == entity;
@@ -417,17 +414,48 @@ namespace libCore
             entt::entity selectedEntity = EntityManager::GetInstance().currentSelectedEntityInScene;
 
             DrawComponentEditor(selectedEntity);
+
             //--UUID_COMPONENT
-            if (EntityManager::GetInstance().m_registry->has<IDComponent>(selectedEntity)) {
-                auto& idComponent = EntityManager::GetInstance().m_registry->get<IDComponent>(selectedEntity);
+            if (EntityManager::GetInstance().HasComponent<IDComponent>(selectedEntity)) {
+                auto& idComponent = EntityManager::GetInstance().GetComponent<IDComponent>(selectedEntity);
                 if (ImGui::CollapsingHeader("ID")) {
                     std::string uuidStr = std::to_string(static_cast<uint64_t>(idComponent.ID));
-                    ImGui::Text("UUID", uuidStr);
+                    ImGui::Text("UUID: %s", uuidStr.c_str());
+                }
+            }
+            //--TAG_COMPONENT
+            if (EntityManager::GetInstance().HasComponent<TagComponent>(selectedEntity)) {
+                auto& tagComponent = EntityManager::GetInstance().GetComponent<TagComponent>(selectedEntity);
+                if (ImGui::CollapsingHeader("Tag")) {
+                    // Mostrar el tag actual
+                    ImGui::Text("Current Tag: %s", tagComponent.Tag.c_str());
+
+                    // Definir un buffer estático para el nuevo nombre del tag
+                    static char buffer[256];
+
+                    // Inicializar el buffer con el valor actual del tagComponent solo si el buffer está vacío
+                    if (strlen(buffer) == 0) {
+                        strncpy_s(buffer, tagComponent.Tag.c_str(), sizeof(buffer));
+                        buffer[sizeof(buffer) - 1] = '\0'; // Asegurarse de que el buffer está null-terminated
+                    }
+
+                    // Mostrar el campo de texto editable y el botón para actualizar el tag
+                    if (ImGui::InputText("New Tag", buffer, sizeof(buffer))) {
+                        // El buffer se actualiza automáticamente al escribir
+                    }
+
+                    if (ImGui::Button("Update Tag")) {
+                        // Actualizar el tagComponent con el nuevo valor del buffer
+                        tagComponent.Tag = std::string(buffer);
+
+                        // Limpiar el buffer después de actualizar
+                        buffer[0] = '\0';
+                    }
                 }
             }
             //--TRANSFORM_COMPONENT
-            if (EntityManager::GetInstance().m_registry->has<TransformComponent>(selectedEntity)) {
-                auto& transformComponent = EntityManager::GetInstance().m_registry->get<TransformComponent>(selectedEntity);
+            if (EntityManager::GetInstance().HasComponent<TransformComponent>(selectedEntity)) {
+                auto& transformComponent = EntityManager::GetInstance().GetComponent<TransformComponent>(selectedEntity);
                 if (ImGui::CollapsingHeader("Transform")) {
                     auto& transform = transformComponent.transform;
 
@@ -469,23 +497,23 @@ namespace libCore
                 }
             }           
             //--MESH_COMPONENT
-            if (EntityManager::GetInstance().m_registry->has<MeshComponent>(selectedEntity)) {
+            if (EntityManager::GetInstance().HasComponent<MeshComponent>(selectedEntity)) {
                 if (ImGui::CollapsingHeader("Mesh")) {
-                    auto& meshComponent = EntityManager::GetInstance().m_registry->get<MeshComponent>(selectedEntity);
+                    auto& meshComponent = EntityManager::GetInstance().GetComponent<MeshComponent>(selectedEntity);
                     ImGui::Text("Mesh Name:", &meshComponent.mesh->meshName);
                 }
             }
             //--AABB_COMPONENT
-            if (EntityManager::GetInstance().m_registry->has<AABBComponent>(selectedEntity)) {
+            if (EntityManager::GetInstance().HasComponent<AABBComponent>(selectedEntity)) {
                 if (ImGui::CollapsingHeader("AABB")) {
-                    auto& aabbComponent = EntityManager::GetInstance().m_registry->get<AABBComponent>(selectedEntity);
+                    auto& aabbComponent = EntityManager::GetInstance().GetComponent<AABBComponent>(selectedEntity);
                     ImGui::Checkbox("Show ABB", &aabbComponent.aabb->showAABB);
                 }
             }
             //--MATERIAL_COMPONENT
-            if (EntityManager::GetInstance().m_registry->has<MaterialComponent>(selectedEntity)) {
+            if (EntityManager::GetInstance().HasComponent<MaterialComponent>(selectedEntity)) {
                 
-                auto& materialComponent = EntityManager::GetInstance().m_registry->get<MaterialComponent>(selectedEntity);
+                auto& materialComponent = EntityManager::GetInstance().GetComponent<MaterialComponent>(selectedEntity);
                 auto& material = *materialComponent.material;
 
                 if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -519,8 +547,8 @@ namespace libCore
                 
             }
             //--SCRIPT_COMPONENT
-            if (EntityManager::GetInstance().m_registry->has<ScriptComponent>(selectedEntity)) {
-                auto& scriptComponent = EntityManager::GetInstance().m_registry->get<ScriptComponent>(selectedEntity);
+            if (EntityManager::GetInstance().HasComponent<ScriptComponent>(selectedEntity)) {
+                auto& scriptComponent = EntityManager::GetInstance().GetComponent<ScriptComponent>(selectedEntity);
                 if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen)) {
                     ImGui::Text("Script Instance: %s", scriptComponent.instance ? typeid(*scriptComponent.instance).name() : "None");
                     // Aquí puedes agregar más controles para interactuar con el script, si es necesario
@@ -757,7 +785,7 @@ namespace libCore
         ImGui::Begin("Materials In Scene"); // Comienza el panel de materiales
 
         // Muestra todos los materiales desplegados
-        for (auto& pair : MaterialManager::getInstance().materials) {
+        for (auto& pair : AssetsManager::GetInstance().GetAllMaterials()) {
             std::string key = pair.first;
             Ref<Material> material = pair.second;
 
@@ -884,26 +912,35 @@ namespace libCore
     {
         if (!model) return;
 
-        ImGui::Separator();
-        ImGui::Text("%*sModel: %s", depth * 2, "", model->name.c_str());
+        // Crear un nodo del árbol
+        if (ImGui::TreeNode((void*)(intptr_t)model.get(), "%*sModel: %s", depth * 2, "", model->name.c_str()))
+        {
+            if (model->modelParent) {
+                ImGui::Text("%*sParent Model: %s", depth * 2, "", model->modelParent->name.c_str());
+                ImGui::Text("%*sParent Position: (%f, %f, %f)", depth * 2, "", model->modelParent->transform->position.x, model->modelParent->transform->position.y, model->modelParent->transform->position.z);
+            }
+            else {
+                ImGui::Text("%*sParent Model: None", depth * 2, "");
+            }
 
-        if (model->modelParent) {
-            ImGui::Text("%*sParent Model: %s", depth * 2, "", model->modelParent->name.c_str());
-            ImGui::Text("%*sParent Position: (%f, %f, %f)", depth * 2, "", model->modelParent->transform->position.x, model->modelParent->transform->position.y, model->modelParent->transform->position.z);
-        }
-        else {
-            ImGui::Text("%*sParent Model: None", depth * 2, "");
-        }
+            ImGui::Text("%*sChildren Count: %zu", depth * 2, "", model->children.size());
+            ImGui::Text("%*sMeshes Count: %zu", depth * 2, "", model->meshes.size());
+            ImGui::Text("%*sMaterials Count: %zu", depth * 2, "", model->materials.size());
 
-        ImGui::Text("%*sChildren Count: %zu", depth * 2, "", model->children.size());
-        ImGui::Text("%*sMeshes Count: %zu", depth * 2, "", model->meshes.size());
-        ImGui::Text("%*sMaterials Count: %zu", depth * 2, "", model->materials.size());
+            // Añadir botón "Instantiate"
+            if (ImGui::Button(("Instantiate " + model->name).c_str())) {
+                // Lógica de instanciación del modelo
+                EntityManager::GetInstance().CreateGameObjectFromModel(model, entt::null);
+            }
 
-        for (const auto& child : model->children) {
-            ShowModelInfo(child, depth + 1);
+            // Mostrar la información de los hijos recursivamente
+            for (const auto& child : model->children) {
+                ShowModelInfo(child, depth + 1);
+            }
+
+            ImGui::TreePop();
         }
     }
-
     void CountMeshesAndMaterials(const Ref<libCore::Model>& model, int& meshCount, int& materialCount)
     {
         if (!model) return;
@@ -917,7 +954,6 @@ namespace libCore
             CountMeshesAndMaterials(child, meshCount, materialCount);
         }
     }
-
     void GuiLayer::ShowModelsPanel()
     {
         auto& assetsManager = libCore::AssetsManager::GetInstance();
@@ -963,6 +999,9 @@ namespace libCore
                     // Lógica de instanciación del modelo
                     EntityManager::GetInstance().CreateGameObjectFromModel(model, entt::null);
                 }
+
+                // Mostrar información detallada del modelo y sus hijos
+                ShowModelInfo(model, 0);
             }
             else {
                 ImGui::Text("Invalid model: %s", modelName.c_str());
@@ -1163,7 +1202,7 @@ namespace libCore
 
         ImGui::End();
     }
-        //Aqui llega la funcion para que el editor de Roofs devuelva a quien sea, la matriz de footPrints
+    //Aqui llega la funcion para que el editor de Roofs devuelva a quien sea, la matriz de footPrints
     void GuiLayer::SetCallBackFunc(CallbackFromGuiLayer callbackFromGuiLayerFunc)
     {
         m_callbackFromGuiLayerFunc = callbackFromGuiLayerFunc;
@@ -1189,7 +1228,6 @@ namespace libCore
             glfwMakeContextCurrent(backup_current_context);
         }
     }
-
     void printMatrix(const glm::mat4& mat, const std::string& name) {
         const float* m = glm::value_ptr(mat);
         std::cout << name << " Matrix:" << std::endl;
