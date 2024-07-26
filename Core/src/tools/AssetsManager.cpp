@@ -70,6 +70,12 @@ namespace libCore
 		}
 		
 	}
+	void AssetsManager::LoadModelAssetAsync(ImportModelData importModelData)
+	{
+		std::thread([=]() {
+			LoadModelAsset(importModelData);
+			}).detach();
+	}
 	Ref<Model> AssetsManager::GetModel(const std::string& name) {
 		auto it = loadedModels.find(name);
 		if (it != loadedModels.end()) {
@@ -79,7 +85,6 @@ namespace libCore
 			return nullptr;
 		}
 	}
-	
 	const std::unordered_map<std::string, Ref<Model>>& AssetsManager::GetAllModels() const {
 		return loadedModels;
 	}
@@ -102,7 +107,7 @@ namespace libCore
 		auto result = loadedMaterials.emplace(materialData->materialName, materialData);
 
 		if (result.second) {
-			std::cout << "Added new material: " << materialData->materialName << std::endl;
+			ConsoleLog::GetInstance().AddLog(LogLevel::L_INFO, "Added new material: " + materialData->materialName);
 			return materialData;
 		}
 		else {

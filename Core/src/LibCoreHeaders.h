@@ -40,6 +40,8 @@ constexpr Ref<T> CreateRef(Args&& ... args)
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "Core/ConsoleLog.h"
+
 #define M_PI 3.14159265358979323846
 
 
@@ -87,3 +89,12 @@ struct ImportModelData {
 	bool processLights = false;
 	float globalScaleFactor = 1.0f; // Ajusta según tus necesidades
 };
+
+
+struct ImageData {
+	unsigned char* data;
+	int width;
+	int height;
+	int numChannels;
+};
+

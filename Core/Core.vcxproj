@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\AABB.h" />
+    <ClInclude Include="src\Core\ConsoleLog.h" />
     <ClInclude Include="src\Core\EBO.h" />
     <ClInclude Include="src\Core\EngineOpenGL.h" />
     <ClInclude Include="src\Core\GBO.hpp" />

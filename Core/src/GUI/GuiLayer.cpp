@@ -170,6 +170,7 @@ namespace libCore
             DrawMaterialsPanel();
             ShowTexturesPanel();
             ShowModelsPanel();
+            ShowLogPanel();
             //RenderCheckerMatrix(); //Panel para el editor de roofs
 
             Renderer::getInstance().ShowControlsGUI();
@@ -1203,6 +1204,60 @@ namespace libCore
     }
     //-----------------------------------------------------------------------------------------------------
 
+    //--CONSOLE LOG PANEL
+    void GuiLayer::ShowLogPanel() {
+        static bool showInfo = true;
+        static bool showWarning = true;
+        static bool showError = true;
+
+        ImGui::Begin("Console Log");
+
+        if (ImGui::Button("Clear")) {
+            ConsoleLog::GetInstance().ClearLogs();
+        }
+
+        ImGui::SameLine();
+        ImGui::Checkbox("Info", &showInfo);
+        ImGui::SameLine();
+        ImGui::Checkbox("Warning", &showWarning);
+        ImGui::SameLine();
+        ImGui::Checkbox("Error", &showError);
+
+        ImGui::Separator();
+
+        ImGui::BeginChild("LogScrolling");
+        const auto& logs = ConsoleLog::GetInstance().GetLogs();
+        for (const auto& log : logs) {
+            bool show = false;
+            ImVec4 color;
+
+            switch (log.level) {
+            case LogLevel::L_INFO:
+                show = showInfo;
+                color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+                break;
+            case LogLevel::L_WARNING:
+                show = showWarning;
+                color = ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
+                break;
+            case LogLevel::L_ERROR:
+                show = showError;
+                color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+                break;
+            }
+
+            if (show) {
+                ImGui::PushStyleColor(ImGuiCol_Text, color);
+                ImGui::TextUnformatted(log.message.c_str());
+                ImGui::PopStyleColor();
+            }
+        }
+        ImGui::EndChild();
+
+        ImGui::End();
+    }
+    //-----------------------------------------------------------------------------------------------------
+ 
 
     //Especial para el editor de Roofs
     void GuiLayer::RenderCheckerMatrix() {

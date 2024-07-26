@@ -1,8 +1,6 @@
 #pragma once
 
 #include "../LibCoreHeaders.h"
-//
-
 #include "../Core/Texture.h"
 #include "../Core/Model.h"
 
@@ -33,6 +31,7 @@ namespace libCore
 
 		//--MODELS
 		void LoadModelAsset(ImportModelData importModelData);
+		void LoadModelAssetAsync(ImportModelData importModelData);
 		Ref<Model> GetModel(const std::string& name);
 		const std::unordered_map<std::string, Ref<Model>>& GetAllModels() const;
 		//---------------------------------------------------------------------------------------------------------------------------

@@ -56,6 +56,8 @@ namespace libCore
         void DrawComponentEditor(entt::entity entity);
         void DrawToolBarEditor();
 
+        void ShowLogPanel();
+
         void checkGizmo(const Ref<Viewport>& viewport);
 
         //void DrawMaterial(const Ref<Material> materialData);
