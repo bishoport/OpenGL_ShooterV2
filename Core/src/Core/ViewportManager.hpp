@@ -4,7 +4,7 @@
 #include "Viewport.hpp"
 #include "FBO.hpp"
 #include "../tools/EditorCamera.h"
-#include "../tools/FPSCamera.h"
+#include "../tools/GameCamera.h"
 #include "Renderer.hpp"
 
 namespace libCore
@@ -27,15 +27,23 @@ namespace libCore
             viewport->viewportSize.x = static_cast<float>(viewportWidth);
             viewport->viewportSize.y = static_cast<float>(viewportHeight);
 
+            // Cameras
+            viewport->gameCamera   = CreateRef<libCore::GameCamera>(viewport->viewportSize.x, viewport->viewportSize.y, cameraPosition);
+            viewport->editorCamera = CreateRef<libCore::EditorCamera>(viewport->viewportSize.x, viewport->viewportSize.y, cameraPosition);
+
+            viewport->camera = viewport->editorCamera;
+            //----------------------------------------------------------
+           
+
             // Camera
-            if (controller == CAMERA_CONTROLLERS::FPS)
+            /*if (controller == CAMERA_CONTROLLERS::GAME)
             {
-                viewport->camera = CreateRef<libCore::FPSCamera>(viewport->viewportSize.x, viewport->viewportSize.y, cameraPosition);
+                viewport->camera = CreateRef<libCore::GameCamera>(viewport->viewportSize.x, viewport->viewportSize.y, cameraPosition);
             }
             else if (controller == CAMERA_CONTROLLERS::EDITOR)
             {
                 viewport->camera = CreateRef<libCore::EditorCamera>(viewport->viewportSize.x, viewport->viewportSize.y, cameraPosition);
-            }
+            }*/
             //----------------------------------------------------------
 
 

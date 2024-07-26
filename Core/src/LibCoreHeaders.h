@@ -72,7 +72,7 @@ enum PRIMITIVES_3D
 enum CAMERA_CONTROLLERS
 {
     EDITOR,
-	FPS
+	GAME
 };
 
 // Struct para las opciones de importación

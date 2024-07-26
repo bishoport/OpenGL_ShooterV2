@@ -245,7 +245,7 @@ namespace libCore
         Ref<Material> material;
 
         if (existingMaterial) {
-            std::cout << "Using existing material: " << materialName << std::endl;
+            //std::cout << "Using existing material: " << materialName << std::endl;
             material = existingMaterial;
         }
         else {

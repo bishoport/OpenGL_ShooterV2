@@ -24,6 +24,10 @@ namespace libCore
 
         //--Camera
         Ref<libCore::Camera> camera = nullptr;
+
+        Ref<libCore::Camera> editorCamera = nullptr;
+        Ref<libCore::Camera> gameCamera = nullptr;
+
         
         //--FBO´s
         Ref<libCore::FBO> framebuffer_shadowmap = nullptr;

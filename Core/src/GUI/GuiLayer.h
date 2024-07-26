@@ -69,6 +69,11 @@ namespace libCore
         GizmoOperation m_GizmoOperation;
 
     private:
+        // Variables globales para controlar el estado del popup
+        bool allowPopupClose = false;
+        bool popupJustClosed = false;
+        std::chrono::steady_clock::time_point popupOpenTime;
+        std::chrono::steady_clock::time_point popupCloseTime;
 
         CallbackFromGuiLayer m_callbackFromGuiLayerFunc;
         std::vector<std::pair<int, int>> selectedOrder;

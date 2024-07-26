@@ -94,28 +94,71 @@ namespace libCore
         if (EngineOpenGL::GetInstance().engineState == EDITOR || EngineOpenGL::GetInstance().engineState == EDITOR_PLAY)
         {
             //--SELECT MODEL FROM RAY POPUP
-            if (isSelectingObject == true)
+            if (isSelectingObject == true && !popupJustClosed)
             {
                 ImGui::OpenPopup("Select Model");
+                allowPopupClose = false; // Deshabilitar el cierre inmediato
+                popupOpenTime = std::chrono::steady_clock::now(); // Marcar el tiempo de apertura
             }
+
             if (ImGui::BeginPopup("Select Model"))
             {
+                // Habilitar el cierre después de que haya pasado suficiente tiempo
+                auto currentTime = std::chrono::steady_clock::now();
+                if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - popupOpenTime).count() > 500)
+                {
+                    allowPopupClose = true;
+                }
+
+                // Verifica si se hace clic fuera del popup
+                if (allowPopupClose && ImGui::IsMouseClicked(0) && !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
+                {
+                    libCore::EntityManager::GetInstance().currentSelectedEntityInScene = entt::null;
+                    EntityManager::GetInstance().entitiesInRay.clear();
+                    isSelectingObject = false; // Esta asignación cerrará el popup al finalizar el frame
+                    showModelSelectionCombo = false;
+                    ImGui::CloseCurrentPopup();
+                    popupCloseTime = std::chrono::steady_clock::now();
+                    popupJustClosed = true;
+                }
+
+                if (ImGui::Button("Cancel")) {
+                    libCore::EntityManager::GetInstance().currentSelectedEntityInScene = entt::null;
+                    EntityManager::GetInstance().entitiesInRay.clear();
+                    isSelectingObject = false; // Esta asignación cerrará el popup al finalizar el frame
+                    showModelSelectionCombo = false;
+                    ImGui::CloseCurrentPopup();
+                    popupCloseTime = std::chrono::steady_clock::now();
+                    popupJustClosed = true;
+                }
+
                 for (const auto& entity : EntityManager::GetInstance().entitiesInRay) {
-
                     if (libCore::EntityManager::GetInstance().m_registry->has<MeshComponent>(entity)) {
-
                         auto& meshComponent = libCore::EntityManager::GetInstance().m_registry->get<MeshComponent>(entity);
-
                         if (ImGui::Button(meshComponent.mesh->meshName.c_str())) {
                             libCore::EntityManager::GetInstance().currentSelectedEntityInScene = entity;
                             isSelectingObject = false; // Esta asignación cerrará el popup al finalizar el frame
                             ImGui::CloseCurrentPopup();
+                            popupCloseTime = std::chrono::steady_clock::now();
+                            popupJustClosed = true;
                         }
                     }
                 }
                 ImGui::EndPopup();
             }
+            else if (popupJustClosed)
+            {
+                auto currentTime = std::chrono::steady_clock::now();
+                if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - popupCloseTime).count() > 500)
+                {
+                    popupJustClosed = false;
+                }
+            }
             //--------------------------------------------------------
+
+
+
+
 
             //--CHECK ImGizmo
             checkGizmo(ViewportManager::GetInstance().viewports[EngineOpenGL::GetInstance().currentViewport]);
@@ -200,6 +243,10 @@ namespace libCore
           
             if (ImGui::BeginMenu("GameObjects"))
             {
+                if (ImGui::MenuItem("Empty"))
+                {
+                    EntityManager::GetInstance().CreateEmptyGameObject("new_GameObject");
+                }
                 // Basic Shapes Section
                 ImGui::TextColored(ImVec4(1, 1, 1, 1), "Basic Shapes");
                 ImGui::Separator();
@@ -233,6 +280,14 @@ namespace libCore
                     libCore::LightsManager::CreateLight(true, libCore::LightType::AREA, glm::vec3(0.0f, 0.0f, 0.0f));
                 }
 
+                //Prefabs
+                ImGui::Spacing();
+                ImGui::Spacing();
+                ImGui::Spacing();
+                if (ImGui::MenuItem("Camera"))
+                {
+                    EntityManager::GetInstance().CreateCamera();
+                }
                 ImGui::EndMenu();
             }
             ImGui::EndMainMenuBar();
@@ -355,7 +410,6 @@ namespace libCore
 
         ImGui::End();
     }
-
     void GuiLayer::DrawEntityNode(entt::entity entity) {
         ImGui::PushID(static_cast<int>(entity));
 
@@ -481,7 +535,6 @@ namespace libCore
                     ImGui::Text("Parent Entity: %s", parentTag.c_str());
                 }
             }
-
             //--CHILD_COMPONENT
             if (EntityManager::GetInstance().HasComponent<ChildComponent>(selectedEntity)) {
                 auto& childComponent = EntityManager::GetInstance().GetComponent<ChildComponent>(selectedEntity);
@@ -586,6 +639,44 @@ namespace libCore
                     }
                 }
                 
+            }
+            //--CAMERA_COMPONENT
+            if (EntityManager::GetInstance().HasComponent<CameraComponent>(selectedEntity)) {
+                auto& cameraComponent = EntityManager::GetInstance().GetComponent<CameraComponent>(selectedEntity);
+                if (ImGui::CollapsingHeader("Camera")) {
+                    ImGui::Text("Width: %d", cameraComponent.width);
+                    ImGui::Text("Height: %d", cameraComponent.height);
+
+                    ImGui::Text("Up Vector");
+                    ImGui::DragFloat3("Up", glm::value_ptr(cameraComponent.Up), 0.1f);
+
+                    ImGui::Text("FOV: %.2f", cameraComponent.FOVdeg);
+                    ImGui::DragFloat("FOV", &cameraComponent.FOVdeg, 0.1f, 1.0f, 180.0f);
+
+                    ImGui::Text("Near Plane: %.2f", cameraComponent.nearPlane);
+                    ImGui::DragFloat("Near Plane", &cameraComponent.nearPlane, 0.01f, 0.01f, cameraComponent.farPlane - 0.1f);
+
+                    ImGui::Text("Far Plane: %.2f", cameraComponent.farPlane);
+                    ImGui::DragFloat("Far Plane", &cameraComponent.farPlane, 1.0f, cameraComponent.nearPlane + 0.1f, 10000.0f);
+
+                    ImGui::Text("View Matrix");
+                    ImGui::InputFloat4("##ViewRow1", glm::value_ptr(cameraComponent.view[0]));
+                    ImGui::InputFloat4("##ViewRow2", glm::value_ptr(cameraComponent.view[1]));
+                    ImGui::InputFloat4("##ViewRow3", glm::value_ptr(cameraComponent.view[2]));
+                    ImGui::InputFloat4("##ViewRow4", glm::value_ptr(cameraComponent.view[3]));
+
+                    ImGui::Text("Projection Matrix");
+                    ImGui::InputFloat4("##ProjRow1", glm::value_ptr(cameraComponent.projection[0]));
+                    ImGui::InputFloat4("##ProjRow2", glm::value_ptr(cameraComponent.projection[1]));
+                    ImGui::InputFloat4("##ProjRow3", glm::value_ptr(cameraComponent.projection[2]));
+                    ImGui::InputFloat4("##ProjRow4", glm::value_ptr(cameraComponent.projection[3]));
+
+                    ImGui::Text("Camera Matrix");
+                    ImGui::InputFloat4("##CamRow1", glm::value_ptr(cameraComponent.cameraMatrix[0]));
+                    ImGui::InputFloat4("##CamRow2", glm::value_ptr(cameraComponent.cameraMatrix[1]));
+                    ImGui::InputFloat4("##CamRow3", glm::value_ptr(cameraComponent.cameraMatrix[2]));
+                    ImGui::InputFloat4("##CamRow4", glm::value_ptr(cameraComponent.cameraMatrix[3]));
+                }
             }
             //--SCRIPT_COMPONENT
             if (EntityManager::GetInstance().HasComponent<ScriptComponent>(selectedEntity)) {
@@ -922,24 +1013,28 @@ namespace libCore
         for (const auto& texturePair : textures) {
             const auto& textureName = texturePair.first;
             const auto& texture = texturePair.second;
+            if (texture != nullptr)
+            {
+                if (texture->IsValid()) {
+                    // Mostrar la imagen de la textura
+                    ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(texture->GetTextureID())), ImVec2(imageSize, imageSize));
 
-            if (texture->IsValid()) {
-                // Mostrar la imagen de la textura
-                ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(texture->GetTextureID())), ImVec2(imageSize, imageSize));
+                    // Mostrar información adicional debajo de la imagen
+                    ImGui::TextWrapped("Name: %s", textureName.c_str());
+                    ImGui::TextWrapped("Path: %s", texture->texturePath.c_str());
+                    ImGui::TextWrapped("File: %s", texture->m_textureName.c_str());
+                    ImGui::TextWrapped("Slot: %u", texture->m_unit);
 
-                // Mostrar información adicional debajo de la imagen
-                ImGui::TextWrapped("Name: %s", textureName.c_str());
-                ImGui::TextWrapped("Path: %s", texture->texturePath.c_str());
-                ImGui::TextWrapped("File: %s", texture->m_textureName.c_str());
-                ImGui::TextWrapped("Slot: %u", texture->m_unit);
-
-                // Añadir espacio extra entre celdas
-                ImGui::Dummy(ImVec2(0.0f, cellPadding));
+                    // Añadir espacio extra entre celdas
+                    ImGui::Dummy(ImVec2(0.0f, cellPadding));
+                }
+                else {
+                    ImGui::Text("Invalid texture: %s", textureName.c_str());
+                }
             }
             else {
                 ImGui::Text("Invalid texture: %s", textureName.c_str());
             }
-
             ImGui::NextColumn();
         }
 
@@ -1063,7 +1158,7 @@ namespace libCore
         // Lista de todos los componentes disponibles, incluyendo ScriptComponent
         std::vector<std::string> componentNames = {
             "TransformComponent", "MeshComponent", "MaterialComponent",
-            "LightComponent", "DirectionalLightComponent", "ScriptComponent"
+            "CameraComponent","LightComponent", "DirectionalLightComponent", "ScriptComponent"
         };
 
         // ComboBox para seleccionar el componente
@@ -1090,6 +1185,9 @@ namespace libCore
             }
             else if (selectedComponent == "MaterialComponent") {
                 entityManager.AddComponent<MaterialComponent>(entity);
+            }
+            else if (selectedComponent == "CameraComponent") {
+                entityManager.AddComponent<CameraComponent>(entity);
             }
             /*else if (selectedComponent == "LightComponent") {
                 entityManager.AddComponent<LightComponent>(entity);

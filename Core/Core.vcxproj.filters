@@ -255,7 +255,7 @@
     <ClInclude Include="src\tools\EditorCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\tools\FPSCamera.h">
+    <ClInclude Include="src\tools\GameCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\tools\DepthBufferPicking.hpp">
@@ -473,7 +473,7 @@
     <ClCompile Include="src\tools\EditorCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\tools\FPSCamera.cpp">
+    <ClCompile Include="src\tools\GameCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ECS\Scene.cpp">

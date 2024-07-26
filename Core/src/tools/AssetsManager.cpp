@@ -116,7 +116,7 @@ namespace libCore
 		if (it != loadedMaterials.end()) {
 			return it->second;
 		}
-		std::cout << key << " material does exist" << std::endl;
+		//std::cout << key << " material does exist" << std::endl;
 		return nullptr; // O manejar el error como prefieras
 	}
 	bool AssetsManager::removeMaterial(const std::string& key)

@@ -14,6 +14,7 @@
 #include "../Timestep.h"
 #include "../tools/AssetsManager.h"
 
+
 namespace libCore 
 {
     class EntityManager {
@@ -127,7 +128,27 @@ namespace libCore
             auto& materialComponent = AddComponent<MaterialComponent>(gameObject);
             materialComponent.material = AssetsManager::GetInstance().getMaterial("default_material");
         }
-        
+        void CreateCamera()
+        {
+            // Crear una nueva entidad para el modelo
+            entt::entity gameObject = CreateEmptyGameObject("MainCamera");
+
+            //Mesh Component
+            auto& cameraComponent = AddComponent<CameraComponent>(gameObject);
+        }
+
+        entt::entity GetEntityByName(const std::string& name) 
+        {
+            auto view = m_registry->view<TagComponent>();
+            for (auto entity : view) {
+                auto& tag = view.get<TagComponent>(entity);
+                if (tag.Tag == name) {
+                    return entity;
+                }
+            }
+            return entt::null; // Si no se encuentra ninguna entidad con el nombre dado
+        }
+
         void AddChild(entt::entity parent, entt::entity child)
         {
             if (!m_registry->valid(parent) || !m_registry->valid(child)) {
@@ -401,6 +422,25 @@ namespace libCore
             }
             //-------------------------------------------------------------------------------------------------------------------
 
+            //-UPDATE CAMERA MATRIX Component.
+            auto CameraCompView = m_registry->view<CameraComponent, TransformComponent>();
+            for (auto entity : CameraCompView) {
+                auto& cameraComponent = GetComponent<CameraComponent>(entity);
+                auto& transformComponent = GetComponent<TransformComponent>(entity);
+
+                // Asegúrate de que la dirección de la mirada es correcta
+                glm::vec3 forward = transformComponent.transform->rotation * glm::vec3(0.0f, 0.0f, -1.0f);
+
+                cameraComponent.view = glm::lookAt(transformComponent.transform->position, transformComponent.transform->position + forward, cameraComponent.Up);
+
+                // Verificar si width y height son válidos para evitar división por cero
+                if (cameraComponent.width > 0 && cameraComponent.height > 0) {
+                    cameraComponent.projection = glm::perspective(glm::radians(cameraComponent.FOVdeg), (float)cameraComponent.width / (float)cameraComponent.height, cameraComponent.nearPlane, cameraComponent.farPlane);
+                }
+
+                cameraComponent.cameraMatrix = cameraComponent.projection * cameraComponent.view;   
+            }
+            
 
             //-UPDATE AABB Component´s
             auto viewAABB = m_registry->view<TransformComponent, AABBComponent>();

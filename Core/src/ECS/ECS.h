@@ -11,6 +11,7 @@
 #include "../Core/Lights/DirectionalLight.h"
 #include "../Core/AABB.h"
 #include "../Core/UUID.h"
+#include "../tools/Camera.h"
 
 namespace libCore
 {
@@ -70,8 +71,6 @@ namespace libCore
 
     
 
-
-
     struct ParentComponent {
         entt::entity parent = entt::null;
     };
@@ -125,6 +124,21 @@ namespace libCore
             glm::mat4 newLocalTransform = glm::inverse(parentGlobalTransform) * globalTransform;
             transform->setMatrix(newLocalTransform);
         }
+    };
+
+    struct CameraComponent
+    {
+        glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
+        float FOVdeg = 45.0f;
+        float nearPlane = 0.1f;
+        float farPlane = 1000.0f;
+
+        glm::mat4 view = glm::mat4(1.0f);
+        glm::mat4 projection = glm::mat4(1.0f);
+        glm::mat4 cameraMatrix = glm::mat4(1.0f);
+
+        int width = 800;
+        int height = 600;
     };
 
     /*struct LightComponent

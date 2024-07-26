@@ -1,4 +1,3 @@
-// Camera.h
 #pragma once
 
 #include "../LibCoreHeaders.h"

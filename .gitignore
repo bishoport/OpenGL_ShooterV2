@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /MapEditor/assets/models/CyberpunkStreet
 *.env
 /MapEditor/assets/models/GLTF
+MapEditor/assets/models/

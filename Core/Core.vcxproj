@@ -90,7 +90,7 @@
     <ClInclude Include="src\tools\DepthBufferPicking.hpp" />
     <ClInclude Include="src\tools\EditorCamera.h" />
     <ClInclude Include="src\tools\EventManager.h" />
-    <ClInclude Include="src\tools\FPSCamera.h" />
+    <ClInclude Include="src\tools\GameCamera.h" />
     <ClInclude Include="src\tools\FreeTypeManager.h" />
     <ClInclude Include="src\tools\LightsManager.hpp" />
     <ClInclude Include="src\tools\LUTGenerator.hpp" />
@@ -165,7 +165,7 @@
     <ClCompile Include="src\tools\AssetsManager.cpp" />
     <ClCompile Include="src\tools\Camera.cpp" />
     <ClCompile Include="src\tools\EditorCamera.cpp" />
-    <ClCompile Include="src\tools\FPSCamera.cpp" />
+    <ClCompile Include="src\tools\GameCamera.cpp" />
     <ClCompile Include="src\tools\ModelLoader.cpp" />
     <ClCompile Include="src\tools\PrimitivesHelper.cpp" />
     <ClCompile Include="src\tools\Raycast.cpp" />

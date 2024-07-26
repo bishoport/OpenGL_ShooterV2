@@ -16,7 +16,6 @@ namespace libCore
 {
 	//--MANAGERS
 	Scope<GuiLayer> guiLayer = nullptr; //esto se declara en el cpp porque si se pone en el h, hay errores de includes cíclicos
-	
 	// -------------------------------------------------
 	// -------------------------------------------------
 	
@@ -183,12 +182,10 @@ namespace libCore
 		// -------------------------------------------------
 		
 
-
 		//-- FREETYPE
 		FreeTypeManager::GetInstance().init();
 		//---------------------------------------------------------------------------
 
-		
 
 		//-- ROOF GENERATOR
 		//roofGenerator = CreateScope<RoofGenerator>();
@@ -327,7 +324,7 @@ namespace libCore
 		}
 		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F3)) //Play
 		{
-			currentViewport = 1;
+			currentViewport = 0;
 			engineState = PLAY;
 		}
 		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_ESCAPE)) //BACK TO EDITOR MODE WITH ESC FROM PLAY MODE
@@ -356,6 +353,32 @@ namespace libCore
 		EntityManager::GetInstance().UpdateGameObjects(m_deltaTime);
 		//-------------------------------------------
 		
+		//--UPDATE GAME CAMERA IN VIEWPORT
+		entt::entity mainCameraEntity = EntityManager::GetInstance().GetEntityByName("MainCamera");
+
+		if (mainCameraEntity != entt::null)
+		{
+			auto& cameraComponent = EntityManager::GetInstance().GetComponent<CameraComponent>(mainCameraEntity);
+
+			ViewportManager::GetInstance().viewports[currentViewport]->gameCamera->Up = cameraComponent.Up;
+			ViewportManager::GetInstance().viewports[currentViewport]->gameCamera->view = cameraComponent.view;
+			ViewportManager::GetInstance().viewports[currentViewport]->gameCamera->projection = cameraComponent.projection;
+			ViewportManager::GetInstance().viewports[currentViewport]->gameCamera->cameraMatrix = cameraComponent.cameraMatrix;
+			ViewportManager::GetInstance().viewports[currentViewport]->gameCamera->updateMatrix(cameraComponent.FOVdeg,
+				cameraComponent.nearPlane,
+				cameraComponent.farPlane);
+		}
+
+		if (engineState == EDITOR )
+		{
+			ViewportManager::GetInstance().viewports[currentViewport]->camera = ViewportManager::GetInstance().viewports[currentViewport]->editorCamera;
+		}
+		else if (engineState == PLAY || engineState == EDITOR_PLAY)
+		{
+			ViewportManager::GetInstance().viewports[currentViewport]->camera = ViewportManager::GetInstance().viewports[currentViewport]->gameCamera;
+		}
+		
+
 
 		if (engineState == EDITOR || engineState == EDITOR_PLAY)
 		{
@@ -405,6 +428,7 @@ namespace libCore
 						guiLayer->isSelectingObject = false; // No selection
 						guiLayer->showModelSelectionCombo = false;
 						EntityManager::GetInstance().currentSelectedEntityInScene = entt::null;
+						EntityManager::GetInstance().entitiesInRay.clear();
 					}
 				}
 			}
