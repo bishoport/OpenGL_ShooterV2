@@ -142,7 +142,6 @@ namespace libCore {
             //-----------------------DIRECTIONAL LIGHT SHADOW PASS----------------------------
             //--------------------------------------------------------------------------------
             auto& directionalLight = LightsManager::GetInstance().GetDirectionalLight();
-
             if (directionalLight != nullptr && directionalLight->drawShadows) {
                 PushDebugGroup("Directional Light Shadow Pass");
 
@@ -174,7 +173,6 @@ namespace libCore {
                 viewport->framebuffer_shadowmap->unbindFBO();
                 PopDebugGroup();
             }
-
             glViewport(0, 0, static_cast<GLsizei>(viewport->viewportSize.x), static_cast<GLsizei>(viewport->viewportSize.y));
             //--------------------------------------------------------------------------------
             //--------------------------------------------------------------------------------
@@ -204,14 +202,6 @@ namespace libCore {
             else {
                 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             }
-
-
-
-            //// Dibujar los modelos en la escena
-            /*for (auto& modelContainer : modelsInScene) 
-            {
-                modelContainer->Draw("geometryPass");
-            }*/
 
             EntityManager::GetInstance().DrawGameObjects("geometryPass");
 

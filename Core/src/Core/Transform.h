@@ -6,10 +6,8 @@
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-namespace libCore
-{
-    class Transform
-    {
+namespace libCore {
+    class Transform {
     public:
         // Inicializa la Transformación
         Transform() = default;

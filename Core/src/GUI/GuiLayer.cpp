@@ -595,7 +595,11 @@ namespace libCore
             if (EntityManager::GetInstance().HasComponent<MeshComponent>(selectedEntity)) {
                 if (ImGui::CollapsingHeader("Mesh")) {
                     auto& meshComponent = EntityManager::GetInstance().GetComponent<MeshComponent>(selectedEntity);
-                    ImGui::Text("Mesh Name:", &meshComponent.mesh->meshName);
+                    ImGui::Text("Mesh Name: %s", meshComponent.mesh->meshName.c_str());
+                    ImGui::Text("Instance: %s", meshComponent.isInstance ? "Yes" : "No");
+                    if (meshComponent.isInstance) {
+                        ImGui::Text("Original Model: %s", meshComponent.originalModel->name.c_str());
+                    }
                 }
             }
             //--AABB_COMPONENT

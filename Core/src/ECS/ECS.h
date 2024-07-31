@@ -83,9 +83,12 @@ namespace libCore
     {
         Ref<Mesh> mesh = CreateRef<Mesh>();
         std::vector<glm::mat4> instanceMatrices;
+        Ref<Model> originalModel = nullptr; // Referencia al modelo original
+        bool isInstance = false; // Indica si es una instancia
 
         MeshComponent() = default;
-        MeshComponent(const Ref<Mesh>& mesh) : mesh(mesh) {}
+        MeshComponent(const Ref<Mesh>& mesh, const Ref<Model>& originalModel = nullptr, bool isInstance = false)
+            : mesh(mesh), originalModel(originalModel), isInstance(isInstance) {}
     };
 
     struct AABBComponent
@@ -107,7 +110,7 @@ namespace libCore
             if (registry.has<ParentComponent>(entity)) {
                 entt::entity parentEntity = registry.get<ParentComponent>(entity).parent;
                 if (registry.valid(parentEntity)) {
-                    globalTransform = registry.get<TransformComponent>(parentEntity).getGlobalTransform(parentEntity, registry) * globalTransform;
+                    globalTransform = registry.get<TransformComponent>(parentEntity).accumulatedTransform * globalTransform;
                 }
             }
             return globalTransform;
@@ -118,13 +121,15 @@ namespace libCore
             if (registry.has<ParentComponent>(entity)) {
                 entt::entity parentEntity = registry.get<ParentComponent>(entity).parent;
                 if (registry.valid(parentEntity)) {
-                    parentGlobalTransform = registry.get<TransformComponent>(parentEntity).getGlobalTransform(parentEntity, registry);
+                    parentGlobalTransform = registry.get<TransformComponent>(parentEntity).accumulatedTransform;
                 }
             }
             glm::mat4 newLocalTransform = glm::inverse(parentGlobalTransform) * globalTransform;
             transform->setMatrix(newLocalTransform);
         }
     };
+
+
 
     struct CameraComponent
     {
@@ -211,6 +216,12 @@ namespace libCore
         ScriptFactory& operator=(const ScriptFactory&) = delete;
     };
 }
+
+
+
+
+
+
 
 
 //#pragma once

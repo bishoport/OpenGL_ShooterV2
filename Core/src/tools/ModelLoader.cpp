@@ -222,7 +222,7 @@ namespace libCore
         //-MESH ID
         std::string meshNameBase = mesh->mName.C_Str();
         meshNameBase.append(" id:");
-        meshBuild->meshName = meshNameBase + std::to_string(importOptions.modelID);
+        meshBuild->meshName = meshNameBase;
 
         modelBuild->meshes.push_back(meshBuild);
 
