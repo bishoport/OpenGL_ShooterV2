@@ -248,19 +248,6 @@ namespace libCore
                 {
                     EntityManager::GetInstance().CreateEmptyGameObject("new_GameObject");
                 }
-                // Basic Shapes Section
-                ImGui::TextColored(ImVec4(1, 1, 1, 1), "Basic Shapes");
-                ImGui::Separator();
-
-                if (ImGui::MenuItem("Cube"))
-                {
-                    EntityManager::GetInstance().CreateCubeGameObject();
-                }
-                if (ImGui::MenuItem("Sphere"))
-                {
-                    EntityManager::GetInstance().CreateSphereGameObject();
-                }
-
                 // Lights Section
                 ImGui::Spacing();
                 ImGui::Spacing();
@@ -926,7 +913,15 @@ namespace libCore
             std::string key = pair.first;
             Ref<Material> material = pair.second;
 
-            if (ImGui::TreeNode(key.c_str(), "Material: %s", material->materialName.c_str())) {
+            // Asegurarse de que el key no está vacío
+            if (key.empty()) {
+                key = "Unnamed Material";
+            }
+
+            // Añadir un identificador único al nodo del árbol
+            std::string nodeId = key + "##" + key;
+
+            if (ImGui::TreeNode(nodeId.c_str(), "Material: %s", material->materialName.c_str())) {
                 ImGui::Text("Shader: %s", material->shaderName.c_str());
 
                 // Manipulate material values
@@ -934,7 +929,7 @@ namespace libCore
                 ImGui::DragFloat("Normal Strength", &material->normalStrength, 0.1f, -10.0f, 10.0f);
                 ImGui::DragFloat("Metallic Value", &material->metallicValue, 0.1f, 0.0f, 10.0f);
                 ImGui::DragFloat("Roughness Value", &material->roughnessValue, 0.1f, 0.0f, 10.0f);
-                //ImGui::DragFloat("AO Value", &material->aoValue, 0.1f, 0.0f, 10.0f);
+                // ImGui::DragFloat("AO Value", &material->aoValue, 0.1f, 0.0f, 10.0f);
 
                 // Display material textures
                 ImGui::Text("Textures:");
@@ -969,6 +964,7 @@ namespace libCore
 
         ImGui::End();
     }
+
     void GuiLayer::ShowTexture(const char* label, Ref<Texture> texture)
     {
         if (texture && texture->IsValid()) {
