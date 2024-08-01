@@ -18,13 +18,6 @@ namespace libCore
 {
     class EntityManager {
     public:
-        // Método para obtener la instancia de la clase
-        static EntityManager& GetInstance() {
-            static EntityManager instance;
-            return instance;
-        }
-
-
         //--ENTITY REGISTRY & COLLECTIONS 
         Ref<entt::registry> m_registry = CreateRef<entt::registry>();
         std::vector<entt::entity> entitiesInRay;
@@ -292,67 +285,6 @@ namespace libCore
         //------------------------------------------------------------------------------------
 
 
-        //--DRAW MESH Component
-        void DrawGameObjects(const std::string& shader) {
-            auto view = m_registry->view<TransformComponent, MeshComponent, MaterialComponent>();
-            for (auto entity : view) {
-                auto& transform = view.get<TransformComponent>(entity);
-                auto& mesh = view.get<MeshComponent>(entity);
-                auto& material = view.get<MaterialComponent>(entity);
-
-                DrawOneGameObject(transform, mesh, material, shader);
-            }
-        }
-        void DrawOneGameObject(TransformComponent& transformComponent, MeshComponent& meshComponent, MaterialComponent& materialComponent, const std::string& shader)
-        {
-            // Valores
-            libCore::ShaderManager::Get(shader)->setVec3("albedoColor", materialComponent.material->albedoColor);
-            libCore::ShaderManager::Get(shader)->setFloat("normalStrength", materialComponent.material->normalStrength);
-            libCore::ShaderManager::Get(shader)->setFloat("metallicValue", materialComponent.material->metallicValue);
-            libCore::ShaderManager::Get(shader)->setFloat("roughnessValue", materialComponent.material->roughnessValue);
-
-            // Texturas
-            materialComponent.material->albedoMap->Bind(shader);
-            materialComponent.material->normalMap->Bind(shader);
-            materialComponent.material->metallicMap->Bind(shader);
-            materialComponent.material->roughnessMap->Bind(shader);
-
-            // Usar la transformación acumulada
-            libCore::ShaderManager::Get(shader)->setMat4("model", transformComponent.accumulatedTransform);
-
-            // Si hay instancias, dibujarlas
-            if (!meshComponent.instanceMatrices.empty())
-            {
-                meshComponent.mesh->DrawInstanced(static_cast<GLsizei>(meshComponent.instanceMatrices.size()), meshComponent.instanceMatrices);
-            }
-
-        }
-        //------------------------------------------------------------------------------------
-        //------------------------------------------------------------------------------------
-
-
-        //--DRAW AABB Component
-        void DrawABBGameObjectMeshComponent(const std::string& shader) {
-            auto viewAABB = m_registry->view<TransformComponent, AABBComponent>();
-            for (auto entity : viewAABB) {
-                auto& transformComponent = viewAABB.get<TransformComponent>(entity);
-                auto& aabbComponent = viewAABB.get<AABBComponent>(entity);
-
-                if (aabbComponent.aabb->showAABB) {
-                    // Obtener la transformación global correcta
-                    glm::mat4 globalTransform = transformComponent.getGlobalTransform(entity, *m_registry);
-
-                    libCore::ShaderManager::Get(shader)->setVec4("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-                    libCore::ShaderManager::Get(shader)->setMat4("model", globalTransform);
-
-                    aabbComponent.aabb->DrawAABB();
-                }
-            }
-        }
-        //------------------------------------------------------------------------------------
-        //------------------------------------------------------------------------------------
-
-
         //--ACTUALIZADOR DE FUNCIONES UPDATES ANTES DEL RENDER DE LOS COMPONENTES
         void UpdateGameObjects(Timestep deltaTime) 
         {
@@ -413,6 +345,66 @@ namespace libCore
         //------------------------------------------------------------------------------------
 
 
+        //--DRAW MESH Component (Son llamadas desde el Renderer cuando le toque)
+        void DrawGameObjects(const std::string& shader) {
+            auto view = m_registry->view<TransformComponent, MeshComponent, MaterialComponent>();
+            for (auto entity : view) {
+                auto& transform = view.get<TransformComponent>(entity);
+                auto& mesh = view.get<MeshComponent>(entity);
+                auto& material = view.get<MaterialComponent>(entity);
+
+                DrawOneGameObject(transform, mesh, material, shader);
+            }
+        }
+        void DrawOneGameObject(TransformComponent& transformComponent, MeshComponent& meshComponent, MaterialComponent& materialComponent, const std::string& shader)
+        {
+            // Valores
+            libCore::ShaderManager::Get(shader)->setVec3("albedoColor", materialComponent.material->albedoColor);
+            libCore::ShaderManager::Get(shader)->setFloat("normalStrength", materialComponent.material->normalStrength);
+            libCore::ShaderManager::Get(shader)->setFloat("metallicValue", materialComponent.material->metallicValue);
+            libCore::ShaderManager::Get(shader)->setFloat("roughnessValue", materialComponent.material->roughnessValue);
+
+            // Texturas
+            materialComponent.material->albedoMap->Bind(shader);
+            materialComponent.material->normalMap->Bind(shader);
+            materialComponent.material->metallicMap->Bind(shader);
+            materialComponent.material->roughnessMap->Bind(shader);
+
+            // Usar la transformación acumulada
+            libCore::ShaderManager::Get(shader)->setMat4("model", transformComponent.accumulatedTransform);
+
+            // Si hay instancias, dibujarlas
+            if (!meshComponent.instanceMatrices.empty())
+            {
+                meshComponent.mesh->DrawInstanced(static_cast<GLsizei>(meshComponent.instanceMatrices.size()), meshComponent.instanceMatrices);
+            }
+        }
+        //------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------
+
+
+        //--DRAW AABB Component (Son llamadas desde el Renderer cuando le toque)
+        void DrawABBGameObjectMeshComponent(const std::string& shader) {
+            auto viewAABB = m_registry->view<TransformComponent, AABBComponent>();
+            for (auto entity : viewAABB) {
+                auto& transformComponent = viewAABB.get<TransformComponent>(entity);
+                auto& aabbComponent = viewAABB.get<AABBComponent>(entity);
+
+                if (aabbComponent.aabb->showAABB) {
+                    // Obtener la transformación global correcta
+                    glm::mat4 globalTransform = transformComponent.getGlobalTransform(entity, *m_registry);
+
+                    libCore::ShaderManager::Get(shader)->setVec4("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+                    libCore::ShaderManager::Get(shader)->setMat4("model", globalTransform);
+
+                    aabbComponent.aabb->DrawAABB();
+                }
+            }
+        }
+        //------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------
+
+
         //--AABB Component MOUSE CHECKER
         void CheckRayModelIntersection(const glm::vec3& rayOrigin, const glm::vec3& rayDirection)
         {
@@ -454,6 +446,9 @@ namespace libCore
         //------------------------------------------------------------------------------------
 
 
+
+
+
         //--COMPONENTS HANDLERS
         template<typename T>
         T& GetComponent(entt::entity entity) {
@@ -470,7 +465,6 @@ namespace libCore
             return m_registry->emplace<T>(entity, std::forward<Args>(args)...);
         }
 
-        // Método plantilla para agregar un componente con script
         template<typename ScriptType>
         ScriptComponent& AddComponentWithScript(entt::entity entity, const std::string& scriptName) {
             auto& scriptComponent = m_registry->emplace<ScriptComponent>(entity);
@@ -482,6 +476,14 @@ namespace libCore
         template<typename T>
         void RemoveComponent(entt::entity entity) {
             m_registry->remove<T>(entity);
+        }
+        //------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------
+
+        //--INSTANCE METHOD
+        static EntityManager& GetInstance() {
+            static EntityManager instance;
+            return instance;
         }
         //------------------------------------------------------------------------------------
         //------------------------------------------------------------------------------------

@@ -46,17 +46,17 @@ namespace libCore
 		void DrawHierarchyPanel();
         void DrawLightsPanel(const std::vector<Ref<libCore::Light>>& lightsInScene);
         void DrawMaterialsPanel();
-        void ShowTexturesPanel();
+        void DrawTexturesPanel();
 
-        void ShowModelInfo(const Ref<libCore::Model>& model, int depth = 0);
-        void ShowModelsPanel();
+        void DrawModelInfo(const Ref<libCore::Model>& model, int depth = 0);
+        void DrawModelsPanel();
 
         void ShowTexture(const char* label, Ref<Texture> texture);
         void RenderCheckerMatrix();
         void DrawComponentEditor(entt::entity entity);
         void DrawToolBarEditor();
 
-        void ShowLogPanel();
+        void DrawLogPanel();
 
         void checkGizmo(const Ref<Viewport>& viewport);
 

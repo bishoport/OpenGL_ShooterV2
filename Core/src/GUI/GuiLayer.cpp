@@ -156,10 +156,6 @@ namespace libCore
             }
             //--------------------------------------------------------
 
-
-
-
-
             //--CHECK ImGizmo
             checkGizmo(ViewportManager::GetInstance().viewports[EngineOpenGL::GetInstance().currentViewport]);
             //--------------------------------------------------------
@@ -168,9 +164,9 @@ namespace libCore
             DrawSelectedEntityComponentsPanel();
             DrawLightsPanel(LightsManager::GetLights());
             DrawMaterialsPanel();
-            ShowTexturesPanel();
-            ShowModelsPanel();
-            ShowLogPanel();
+            DrawTexturesPanel();
+            DrawModelsPanel();
+            DrawLogPanel();
             //RenderCheckerMatrix(); //Panel para el editor de roofs
 
             Renderer::getInstance().ShowControlsGUI();
@@ -598,40 +594,56 @@ namespace libCore
             }
             //--MATERIAL_COMPONENT
             if (EntityManager::GetInstance().HasComponent<MaterialComponent>(selectedEntity)) {
-                
                 auto& materialComponent = EntityManager::GetInstance().GetComponent<MaterialComponent>(selectedEntity);
                 auto& material = *materialComponent.material;
 
                 if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen)) {
                     ImGui::Text("Material Name: %s", material.materialName.c_str());
+                    // Drag Target for the whole material
+                    if (ImGui::BeginDragDropTarget()) {
+                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("MATERIAL")) {
+                            IM_ASSERT(payload->DataSize == sizeof(Ref<Material>));
+                            Ref<Material> newMaterial = *(const Ref<Material>*)payload->Data;
+                            materialComponent.material = newMaterial;
+                        }
+                        ImGui::EndDragDropTarget();
+                    }
                     ImGui::Text("Shader Name: %s", material.shaderName.c_str());
 
-                    // Manipulate material values
                     ImGui::ColorEdit3("Albedo Color", (float*)&materialComponent.material->albedoColor);
                     ImGui::DragFloat("Normal Strength", &materialComponent.material->normalStrength, 0.1f, -10.0f, 10.0f);
                     ImGui::DragFloat("Metallic Value", &materialComponent.material->metallicValue, 0.1f, 0.0f, 10.0f);
                     ImGui::DragFloat("Roughness Value", &materialComponent.material->roughnessValue, 0.1f, 0.0f, 10.0f);
 
-                    // Display material textures
-                    if (materialComponent.material->albedoMap && materialComponent.material->albedoMap->IsValid()) {
-                        ImGui::Text("Albedo Map");
-                        ImGui::Image((void*)(intptr_t)materialComponent.material->albedoMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
-                    }
-                    if (materialComponent.material->normalMap && materialComponent.material->normalMap->IsValid()) {
-                        ImGui::Text("Normal Map");
-                        ImGui::Image((void*)(intptr_t)materialComponent.material->normalMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
-                    }
-                    if (materialComponent.material->metallicMap && materialComponent.material->metallicMap->IsValid()) {
-                        ImGui::Text("Metallic Map");
-                        ImGui::Image((void*)(intptr_t)materialComponent.material->metallicMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
-                    }
-                    if (materialComponent.material->roughnessMap && materialComponent.material->roughnessMap->IsValid()) {
-                        ImGui::Text("Roughness Map");
-                        ImGui::Image((void*)(intptr_t)materialComponent.material->roughnessMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
-                    }
+                    auto drawTextureSlot = [](const char* label, Ref<Texture>& texture) {
+                        ImGui::Text("%s", label);
+                        if (texture && texture->IsValid()) {
+                            ImGui::Image((void*)(intptr_t)texture->GetTextureID(), ImVec2(128, 128));
+                        }
+                        else {
+                            ImGui::Text("None");
+                        }
+
+                        if (ImGui::BeginDragDropTarget()) {
+                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TEXTURE")) {
+                                IM_ASSERT(payload->DataSize == sizeof(Ref<Texture>));
+                                texture = *(const Ref<Texture>*)payload->Data;
+                            }
+                            ImGui::EndDragDropTarget();
+                        }
+                    };
+
+                    drawTextureSlot("Albedo Map", materialComponent.material->albedoMap);
+                    drawTextureSlot("Normal Map", materialComponent.material->normalMap);
+                    drawTextureSlot("Metallic Map", materialComponent.material->metallicMap);
+                    drawTextureSlot("Roughness Map", materialComponent.material->roughnessMap);
+
+                    
                 }
-                
             }
+
+
+
             //--CAMERA_COMPONENT
             if (EntityManager::GetInstance().HasComponent<CameraComponent>(selectedEntity)) {
                 auto& cameraComponent = EntityManager::GetInstance().GetComponent<CameraComponent>(selectedEntity);
@@ -716,6 +728,262 @@ namespace libCore
         ImGui::End();
     }
     //-------------------------------------------------------------------------------
+
+
+    //--MATERIAL PANEL
+    void GuiLayer::DrawMaterialsPanel() {
+        ImGui::Begin("Materials In Scene");
+
+        // Añadir un control deslizante para ajustar el tamaño de la previsualización
+        float previewSize = 64.0f; // Tamaño inicial de la previsualización
+        float cellPadding = 0.0f;  // Padding inicial entre celdas
+        ImGui::SliderFloat("Preview Size", &previewSize, 32.0f, 256.0f);
+
+        for (auto& pair : AssetsManager::GetInstance().GetAllMaterials()) {
+            std::string key = pair.first;
+            Ref<Material> material = pair.second;
+
+            if (key.empty()) {
+                key = "Unnamed Material";
+            }
+
+            std::string nodeId = key + "##" + key;
+
+            if (ImGui::TreeNode(nodeId.c_str(), "Material: %s", material->materialName.c_str())) {
+
+                ImGui::Spacing();
+
+                //-Drag Source
+                ImGui::Text("Material: %s", material->materialName.c_str());
+                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                    ImGui::SetDragDropPayload("MATERIAL", &material, sizeof(Ref<Material>)); // Set payload
+                    ImGui::Text("Drag Material: %s", material->materialName.c_str());
+                    ImGui::EndDragDropSource();
+                }
+                //----------------------
+
+                ImGui::Spacing();
+                ImGui::Spacing();
+
+                ImGui::ColorEdit3("Albedo Color", (float*)&material->albedoColor);
+                ImGui::DragFloat("Normal Strength", &material->normalStrength, 0.1f, -10.0f, 10.0f);
+                ImGui::DragFloat("Metallic Value", &material->metallicValue, 0.1f, 0.0f, 10.0f);
+                ImGui::DragFloat("Roughness Value", &material->roughnessValue, 0.1f, 0.0f, 10.0f);
+
+                // Calcular el número de columnas basado en el tamaño de la imagen y el padding
+                float panelWidth = ImGui::GetContentRegionAvail().x;
+                int columns = static_cast<int>(panelWidth / (previewSize + cellPadding));
+                if (columns < 1) columns = 1;
+
+                ImGui::Columns(columns, nullptr, false);
+
+                // Display material textures and allow them to accept drag and drop
+                auto drawTextureSlot = [previewSize, cellPadding](const char* label, Ref<Texture>& texture) {
+                    ImGui::BeginGroup(); // Comienza un grupo para que el nombre y la imagen estén juntos
+                    ImGui::Text("%s", label);
+                    if (texture && texture->IsValid()) {
+                        ImGui::Image((void*)(intptr_t)texture->GetTextureID(), ImVec2(previewSize, previewSize));
+                    }
+                    else {
+                        ImGui::Text("None");
+                    }
+
+                    if (ImGui::BeginDragDropTarget()) {
+                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TEXTURE")) {
+                            IM_ASSERT(payload->DataSize == sizeof(Ref<Texture>));
+                            texture = *(const Ref<Texture>*)payload->Data;
+                        }
+                        ImGui::EndDragDropTarget();
+                    }
+                    ImGui::EndGroup(); // Termina el grupo
+                    ImGui::SameLine(); // Coloca el siguiente elemento en la misma línea
+                    ImGui::Dummy(ImVec2(0.0f, cellPadding)); // Añadir espacio extra entre celdas
+                    ImGui::NextColumn();
+                };
+
+                drawTextureSlot("Albedo Map", material->albedoMap);
+                drawTextureSlot("Normal Map", material->normalMap);
+                drawTextureSlot("Metallic Map", material->metallicMap);
+                drawTextureSlot("Roughness Map", material->roughnessMap);
+
+                ImGui::Columns(1); // Volver a una sola columna
+                ImGui::NewLine(); // Asegura que el siguiente elemento se coloque en una nueva línea
+
+                ImGui::TreePop();
+            }
+
+            ImGui::Separator();
+        }
+
+        ImGui::End();
+    }
+    //-----------------------------------------------------------------------------------------------------
+
+
+    //--GLOBAL TEXTURES PANEL
+    void GuiLayer::DrawTexturesPanel() {
+        auto& assetsManager = libCore::AssetsManager::GetInstance();
+        const auto& textures = assetsManager.GetAllTextures();
+        std::size_t numberOfTextures = assetsManager.GetNumberOfTextures();
+
+        static float imageSize = 128.0f; // Tamaño inicial de la imagen
+        static float cellPadding = 0.0f; // Padding inicial entre celdas
+
+        ImGui::Begin("Textures Panel");
+
+        ImGui::Spacing();
+        ImGui::Text("Texture Count: %zu", numberOfTextures);
+        ImGui::Spacing();
+
+        ImGui::SliderFloat("Image Size", &imageSize, 32.0f, 256.0f);
+        //ImGui::SliderFloat("Cell Padding", &cellPadding, 0.0f, 20.0f);
+        ImGui::Spacing();
+
+        float panelWidth = ImGui::GetContentRegionAvail().x;
+        int columns = static_cast<int>(panelWidth / (imageSize + cellPadding));
+        if (columns < 1) columns = 1;
+
+        ImGui::Columns(columns, nullptr, false);
+
+        for (const auto& texturePair : textures) {
+            const auto& textureName = texturePair.first;
+            const auto& texture = texturePair.second;
+
+            if (texture != nullptr && texture->IsValid()) {
+                ImGui::PushID(textureName.c_str());
+
+                //-Drag area
+                ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(texture->GetTextureID())), ImVec2(imageSize, imageSize));
+                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                    ImGui::SetDragDropPayload("TEXTURE", &texture, sizeof(Ref<Texture>));
+                    ImGui::Text("Drag Texture: %s", textureName.c_str());
+                    ImGui::EndDragDropSource();
+                }
+                //-----------
+
+                ImGui::TextWrapped("Name: %s", textureName.c_str());
+                //ImGui::TextWrapped("Path: %s", texture->texturePath.c_str());
+                ImGui::TextWrapped("Slot: %u", texture->m_unit);
+
+                ImGui::Dummy(ImVec2(0.0f, cellPadding));
+                ImGui::NextColumn();
+
+                ImGui::PopID();
+            }
+            else {
+                ImGui::Text("Invalid texture: %s", textureName.c_str());
+            }
+        }
+
+        ImGui::Columns(1);
+        ImGui::End();
+    }
+    //-----------------------------------------------------------------------------------------------------
+
+    //--GLOBAL MODELS PANEL
+    void GuiLayer::DrawModelInfo(const Ref<libCore::Model>& model, int depth)
+    {
+        if (!model) return;
+
+        // Crear un nodo del árbol
+        if (ImGui::TreeNode((void*)(intptr_t)model.get(), "%*sModel: %s", depth * 2, "", model->name.c_str()))
+        {
+            if (model->modelParent) {
+                ImGui::Text("%*sParent Model: %s", depth * 2, "", model->modelParent->name.c_str());
+                ImGui::Text("%*sParent Position: (%f, %f, %f)", depth * 2, "", model->modelParent->transform->position.x, model->modelParent->transform->position.y, model->modelParent->transform->position.z);
+            }
+            else {
+                ImGui::Text("%*sParent Model: None", depth * 2, "");
+            }
+
+            ImGui::Text("%*sChildren Count: %zu", depth * 2, "", model->children.size());
+            ImGui::Text("%*sMeshes Count: %zu", depth * 2, "", model->meshes.size());
+            ImGui::Text("%*sMaterials Count: %zu", depth * 2, "", model->materials.size());
+
+            // Añadir botón "Instantiate"
+            if (ImGui::Button(("Instantiate " + model->name).c_str())) {
+                // Lógica de instanciación del modelo
+                EntityManager::GetInstance().CreateGameObjectFromModel(model, entt::null);
+            }
+
+            // Mostrar la información de los hijos recursivamente
+            for (const auto& child : model->children) {
+                DrawModelInfo(child, depth + 1);
+            }
+
+            ImGui::TreePop();
+        }
+    }
+    void CountMeshesAndMaterials(const Ref<libCore::Model>& model, int& meshCount, int& materialCount)
+    {
+        if (!model) return;
+
+        // Contar los meshes y materials del modelo actual
+        meshCount += model->meshes.size();
+        materialCount += model->materials.size();
+
+        // Recorrer recursivamente los hijos
+        for (const auto& child : model->children) {
+            CountMeshesAndMaterials(child, meshCount, materialCount);
+        }
+    }
+    void GuiLayer::DrawModelsPanel()
+    {
+        auto& assetsManager = libCore::AssetsManager::GetInstance();
+        const auto& models = assetsManager.GetAllModels();
+        std::size_t numberOfModels = models.size();
+
+        // Comenzar la ventana de ImGui
+        ImGui::Begin("Models Panel");
+
+        // Mostrar el número de modelos cargados
+        ImGui::Spacing();
+        ImGui::Text("Model Count: %zu", numberOfModels);
+        ImGui::Spacing();
+
+        for (const auto& modelPair : models) {
+            const auto& modelName = modelPair.first;
+            const auto& model = modelPair.second;
+
+            if (model) {
+                int totalMeshes = 0;
+                int totalMaterials = 0;
+
+                // Contar todos los meshes y materials del modelo y sus hijos
+                CountMeshesAndMaterials(model, totalMeshes, totalMaterials);
+
+                ImGui::Separator();
+                ImGui::Text("Model: %s", model->name.c_str());
+
+                if (model->modelParent) {
+                    ImGui::Text("Parent Model: %s", model->modelParent->name.c_str());
+                    ImGui::Text("Parent Position: (%f, %f, %f)", model->modelParent->transform->position.x, model->modelParent->transform->position.y, model->modelParent->transform->position.z);
+                }
+                else {
+                    ImGui::Text("Parent Model: None");
+                }
+
+                ImGui::Text("Children Count: %zu", model->children.size());
+                ImGui::Text("Meshes Count: %d", totalMeshes);
+                ImGui::Text("Materials Count: %d", totalMaterials);
+
+                // Añadir botón "Instantiate"
+                if (ImGui::Button(("Instantiate " + model->name).c_str())) {
+                    // Lógica de instanciación del modelo
+                    EntityManager::GetInstance().CreateGameObjectFromModel(model, entt::null);
+                }
+
+                // Mostrar información detallada del modelo y sus hijos
+                DrawModelInfo(model, 0);
+            }
+            else {
+                ImGui::Text("Invalid model: %s", modelName.c_str());
+            }
+        }
+
+        ImGui::End();
+    }
+    //-----------------------------------------------------------------------------------------------------
 
 
     //--GLOBAL LIGHT´s PANEL (ESTO CAMBIARÁ)
@@ -813,7 +1081,7 @@ namespace libCore
                     ImGui::Separator();
                     ImGui::DragFloat("Intensity", &light->intensity, 0.1f, 0.0f, 1000.0f, "%.2f");
                     ImGui::Separator();
-                   
+
                     // Common Controls
                     ImGui::BulletText("Transform:");
                     if (ImGui::DragFloat3("Position", &light->transform.position[0], 0.1f)) {
@@ -902,252 +1170,6 @@ namespace libCore
         ImGui::End();
     }
     //-----------------------------------------------------------------------------------------------------
-    
-
-    //--GLOBAL MATERIAL PANEL
-    void GuiLayer::DrawMaterialsPanel() {
-        ImGui::Begin("Materials In Scene"); // Comienza el panel de materiales
-
-        // Muestra todos los materiales desplegados
-        for (auto& pair : AssetsManager::GetInstance().GetAllMaterials()) {
-            std::string key = pair.first;
-            Ref<Material> material = pair.second;
-
-            // Asegurarse de que el key no está vacío
-            if (key.empty()) {
-                key = "Unnamed Material";
-            }
-
-            // Añadir un identificador único al nodo del árbol
-            std::string nodeId = key + "##" + key;
-
-            if (ImGui::TreeNode(nodeId.c_str(), "Material: %s", material->materialName.c_str())) {
-                ImGui::Text("Shader: %s", material->shaderName.c_str());
-
-                // Manipulate material values
-                ImGui::ColorEdit3("Albedo Color", (float*)&material->albedoColor);
-                ImGui::DragFloat("Normal Strength", &material->normalStrength, 0.1f, -10.0f, 10.0f);
-                ImGui::DragFloat("Metallic Value", &material->metallicValue, 0.1f, 0.0f, 10.0f);
-                ImGui::DragFloat("Roughness Value", &material->roughnessValue, 0.1f, 0.0f, 10.0f);
-                // ImGui::DragFloat("AO Value", &material->aoValue, 0.1f, 0.0f, 10.0f);
-
-                // Display material textures
-                ImGui::Text("Textures:");
-                ImGui::Columns(4, NULL, false); // Crear 4 columnas sin bordes entre ellas
-                if (material->albedoMap && material->albedoMap->IsValid()) {
-                    ImGui::Text("Albedo Map");
-                    ImGui::Image((void*)(intptr_t)material->albedoMap->GetTextureID(), ImVec2(64, 64), ImVec2(0, 1), ImVec2(1, 0));
-                    ImGui::NextColumn();
-                }
-                if (material->normalMap && material->normalMap->IsValid()) {
-                    ImGui::Text("Normal Map");
-                    ImGui::Image((void*)(intptr_t)material->normalMap->GetTextureID(), ImVec2(64, 64), ImVec2(0, 1), ImVec2(1, 0));
-                    ImGui::NextColumn();
-                }
-                if (material->metallicMap && material->metallicMap->IsValid()) {
-                    ImGui::Text("Metallic Map");
-                    ImGui::Image((void*)(intptr_t)material->metallicMap->GetTextureID(), ImVec2(64, 64), ImVec2(0, 1), ImVec2(1, 0));
-                    ImGui::NextColumn();
-                }
-                if (material->roughnessMap && material->roughnessMap->IsValid()) {
-                    ImGui::Text("Roughness Map");
-                    ImGui::Image((void*)(intptr_t)material->roughnessMap->GetTextureID(), ImVec2(64, 64), ImVec2(0, 1), ImVec2(1, 0));
-                    ImGui::NextColumn();
-                }
-                ImGui::Columns(1); // Volver a una sola columna
-
-                ImGui::TreePop();
-            }
-
-            ImGui::Separator(); // Añade una separación visual entre materiales
-        }
-
-        ImGui::End();
-    }
-
-    void GuiLayer::ShowTexture(const char* label, Ref<Texture> texture)
-    {
-        if (texture && texture->IsValid()) {
-            ImGui::Image((void*)(intptr_t)texture->GetTextureID(), ImVec2(128, 128)); // Ajustar según el tamaño deseado
-            ImGui::Text("%s", label); // Muestra el nombre de la textura
-        }
-        else {
-            ImGui::Text("%s: None", label); // Para texturas que no existen
-        }
-    }
-    //-----------------------------------------------------------------------------------------------------
-
-    //--GLOBAL TEXTURES PANEL
-    void GuiLayer::ShowTexturesPanel()
-    {
-        auto& assetsManager = libCore::AssetsManager::GetInstance();
-        const auto& textures = assetsManager.GetAllTextures();
-        std::size_t numberOfTextures = assetsManager.GetNumberOfTextures();
-
-        static float imageSize = 128.0f; // Tamaño inicial de la imagen
-        static float cellPadding = 0.0f; // Padding inicial entre celdas
-
-        // Comenzar la ventana de ImGui
-        ImGui::Begin("Textures Panel");
-
-        // Mostrar el número de texturas cargadas
-        ImGui::Spacing();
-        ImGui::Text("Texture Count: %zu", numberOfTextures);
-        ImGui::Spacing();
-
-        // Slider para ajustar el tamaño de la imagen
-        ImGui::SliderFloat("Image Size", &imageSize, 32.0f, 256.0f);
-        ImGui::SliderFloat("Cell Padding", &cellPadding, 0.0f, 20.0f);
-        ImGui::Spacing();
-
-        // Obtener el ancho disponible del panel
-        float panelWidth = ImGui::GetContentRegionAvail().x;
-
-        // Calcular el número de columnas basado en el tamaño de la imagen y el padding
-        int columns = static_cast<int>(panelWidth / (imageSize + cellPadding));
-        if (columns < 1) columns = 1;
-
-        // Configurar las columnas
-        ImGui::Columns(columns, nullptr, false);
-
-        int textureIndex = 0;
-        for (const auto& texturePair : textures) {
-            const auto& textureName = texturePair.first;
-            const auto& texture = texturePair.second;
-            if (texture != nullptr)
-            {
-                if (texture->IsValid()) {
-                    // Mostrar la imagen de la textura
-                    ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(texture->GetTextureID())), ImVec2(imageSize, imageSize));
-
-                    // Mostrar información adicional debajo de la imagen
-                    ImGui::TextWrapped("Name: %s", textureName.c_str());
-                    ImGui::TextWrapped("Path: %s", texture->texturePath.c_str());
-                    ImGui::TextWrapped("File: %s", texture->m_textureName.c_str());
-                    ImGui::TextWrapped("Slot: %u", texture->m_unit);
-
-                    // Añadir espacio extra entre celdas
-                    ImGui::Dummy(ImVec2(0.0f, cellPadding));
-                }
-                else {
-                    ImGui::Text("Invalid texture: %s", textureName.c_str());
-                }
-            }
-            else {
-                ImGui::Text("Invalid texture: %s", textureName.c_str());
-            }
-            ImGui::NextColumn();
-        }
-
-        ImGui::Columns(1);
-        ImGui::End();
-    }
-    //-----------------------------------------------------------------------------------------------------
-
-    //--GLOBAL MODELS PANEL
-    void GuiLayer::ShowModelInfo(const Ref<libCore::Model>& model, int depth)
-    {
-        if (!model) return;
-
-        // Crear un nodo del árbol
-        if (ImGui::TreeNode((void*)(intptr_t)model.get(), "%*sModel: %s", depth * 2, "", model->name.c_str()))
-        {
-            if (model->modelParent) {
-                ImGui::Text("%*sParent Model: %s", depth * 2, "", model->modelParent->name.c_str());
-                ImGui::Text("%*sParent Position: (%f, %f, %f)", depth * 2, "", model->modelParent->transform->position.x, model->modelParent->transform->position.y, model->modelParent->transform->position.z);
-            }
-            else {
-                ImGui::Text("%*sParent Model: None", depth * 2, "");
-            }
-
-            ImGui::Text("%*sChildren Count: %zu", depth * 2, "", model->children.size());
-            ImGui::Text("%*sMeshes Count: %zu", depth * 2, "", model->meshes.size());
-            ImGui::Text("%*sMaterials Count: %zu", depth * 2, "", model->materials.size());
-
-            // Añadir botón "Instantiate"
-            if (ImGui::Button(("Instantiate " + model->name).c_str())) {
-                // Lógica de instanciación del modelo
-                EntityManager::GetInstance().CreateGameObjectFromModel(model, entt::null);
-            }
-
-            // Mostrar la información de los hijos recursivamente
-            for (const auto& child : model->children) {
-                ShowModelInfo(child, depth + 1);
-            }
-
-            ImGui::TreePop();
-        }
-    }
-    void CountMeshesAndMaterials(const Ref<libCore::Model>& model, int& meshCount, int& materialCount)
-    {
-        if (!model) return;
-
-        // Contar los meshes y materials del modelo actual
-        meshCount += model->meshes.size();
-        materialCount += model->materials.size();
-
-        // Recorrer recursivamente los hijos
-        for (const auto& child : model->children) {
-            CountMeshesAndMaterials(child, meshCount, materialCount);
-        }
-    }
-    void GuiLayer::ShowModelsPanel()
-    {
-        auto& assetsManager = libCore::AssetsManager::GetInstance();
-        const auto& models = assetsManager.GetAllModels();
-        std::size_t numberOfModels = models.size();
-
-        // Comenzar la ventana de ImGui
-        ImGui::Begin("Models Panel");
-
-        // Mostrar el número de modelos cargados
-        ImGui::Spacing();
-        ImGui::Text("Model Count: %zu", numberOfModels);
-        ImGui::Spacing();
-
-        for (const auto& modelPair : models) {
-            const auto& modelName = modelPair.first;
-            const auto& model = modelPair.second;
-
-            if (model) {
-                int totalMeshes = 0;
-                int totalMaterials = 0;
-
-                // Contar todos los meshes y materials del modelo y sus hijos
-                CountMeshesAndMaterials(model, totalMeshes, totalMaterials);
-
-                ImGui::Separator();
-                ImGui::Text("Model: %s", model->name.c_str());
-
-                if (model->modelParent) {
-                    ImGui::Text("Parent Model: %s", model->modelParent->name.c_str());
-                    ImGui::Text("Parent Position: (%f, %f, %f)", model->modelParent->transform->position.x, model->modelParent->transform->position.y, model->modelParent->transform->position.z);
-                }
-                else {
-                    ImGui::Text("Parent Model: None");
-                }
-
-                ImGui::Text("Children Count: %zu", model->children.size());
-                ImGui::Text("Meshes Count: %d", totalMeshes);
-                ImGui::Text("Materials Count: %d", totalMaterials);
-
-                // Añadir botón "Instantiate"
-                if (ImGui::Button(("Instantiate " + model->name).c_str())) {
-                    // Lógica de instanciación del modelo
-                    EntityManager::GetInstance().CreateGameObjectFromModel(model, entt::null);
-                }
-
-                // Mostrar información detallada del modelo y sus hijos
-                ShowModelInfo(model, 0);
-            }
-            else {
-                ImGui::Text("Invalid model: %s", modelName.c_str());
-            }
-        }
-
-        ImGui::End();
-    }
-    //-----------------------------------------------------------------------------------------------------
 
 
     //--SCRIPTS-EDITOR PANEL
@@ -1205,7 +1227,7 @@ namespace libCore
     //-----------------------------------------------------------------------------------------------------
 
     //--CONSOLE LOG PANEL
-    void GuiLayer::ShowLogPanel() {
+    void GuiLayer::DrawLogPanel() {
         static bool showInfo = true;
         static bool showWarning = true;
         static bool showError = true;
@@ -1431,139 +1453,3 @@ namespace libCore
         std::cout << m[12] << ", " << m[13] << ", " << m[14] << ", " << m[15] << std::endl;
     }
 }
-
-
-
-
-
-
-
-//void GuiLayer::DrawMaterialsPanel() {
-//    ImGui::Begin("Materials In Scene"); // Comienza el panel de materiales
-
-//    if (ImGui::TreeNode("Materials")) {
-//        for (auto& pair : MaterialManager::getInstance().materials) {
-//            std::string key = pair.first;
-//            Ref<Material> material = pair.second;
-
-//            // Haz que cada nodo de material sea una fuente de arrastre
-//            bool treeNodeOpen = ImGui::TreeNodeEx(key.c_str(), ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth);
-//            if (treeNodeOpen) {
-//                // Iniciar una fuente de arrastre
-//                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
-//                    // Establecer la carga útil para el arrastre, que es el nombre del material
-//                    ImGui::SetDragDropPayload("MATERIAL_NAME", key.c_str(), key.size() + 1);
-
-//                    // Muestra una vista previa (opcional)
-//                    ImGui::Text("Assign %s", key.c_str());
-//                    ImGui::EndDragDropSource();
-//                }
-//                DrawMaterial(material); // Dibuja la interfaz para este material específico
-//                ImGui::TreePop();
-//            }
-//        }
-//        ImGui::TreePop();
-//    }
-
-//    ImGui::End();
-//}
-
-//void GuiLayer::DrawMaterial(const Ref<Material> materialData) {
-//    // Asegúrate de que no haya elementos previos que puedan afectar la alineación vertical.
-//    ImGui::Columns(2);
-
-//    // Calcular el ancho de las columnas en proporción al ancho del panel
-//    float windowWidth = ImGui::GetWindowSize().x; // Obtener el ancho de la ventana
-//    float columnWidthLeft = windowWidth * 0.4f; // 40% para la columna izquierda
-//    float columnWidthRight = windowWidth * 0.6f; // 60% para la columna derecha
-
-//    ImGui::SetColumnWidth(0, columnWidthLeft); // Establecer el ancho de la columna izquierda
-//    ImGui::SetColumnWidth(1, columnWidthRight); // Establecer el ancho de la columna derecha
-
-//    bool treeNodeOpen = ImGui::TreeNode((void*)(&materialData), "Material: %s", materialData->materialName.c_str());
-//    if (treeNodeOpen) {
-//        ImGui::Text("Shader: %s", materialData->shaderName.c_str());
-
-//        // Manipulate material values
-//        ImGui::ColorEdit3("Albedo Color", (float*)&materialData->albedoColor);
-//        ImGui::DragFloat("Normal Strength", &materialData->normalStrength, 0.1f, -10.0f, 10.0f);
-//        ImGui::DragFloat("Metallic Value", &materialData->metallicValue, 0.1f, 0.0f, 10.0f);
-//        ImGui::DragFloat("Roughness Value", &materialData->roughnessValue, 0.1f, 0.0f, 10.0f);
-//        //ImGui::DragFloat("AO Value", &materialData->aoValue, 0.1f, 0.0f, 10.0f);
-
-//        // Display material textures
-//        if (materialData->albedoMap && materialData->albedoMap->IsValid()) {
-//            ImGui::Text("Albedo Map");
-//            ImGui::Image((void*)(intptr_t)materialData->albedoMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
-//        }
-//        if (materialData->normalMap && materialData->normalMap->IsValid()) {
-//            ImGui::Text("Normal Map");
-//            ImGui::Image((void*)(intptr_t)materialData->normalMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
-//        }
-//        if (materialData->metallicMap && materialData->metallicMap->IsValid()) {
-//            ImGui::Text("Metallic Map");
-//            ImGui::Image((void*)(intptr_t)materialData->metallicMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
-//        }
-//        if (materialData->roughnessMap && materialData->roughnessMap->IsValid()) {
-//            ImGui::Text("Roughness Map");
-//            ImGui::Image((void*)(intptr_t)materialData->roughnessMap->GetTextureID(), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
-//        }
-//        ImGui::TreePop();
-//    }
-
-//    ImGui::NextColumn(); // Pasar a la columna de la derecha
-
-//    // Comienza un child window para las previsualizaciones de texturas
-//    if (ImGui::BeginChild("TexturePreviews", ImVec2(-1, -1), true)) {
-//        ImGui::Columns(2); // Establece dos columnas para el grid
-
-//        // Llama a showTexture para cada textura en el grid de 2 columnas
-//        ShowTexture("Albedo Map", materialData->albedoMap);
-//        ImGui::NextColumn(); // Mueve a la siguiente columna
-//        ShowTexture("Normal Map", materialData->normalMap);
-//        ImGui::NextColumn(); // Vuelve a la primera columna para la siguiente fila
-//        ShowTexture("Metallic Map", materialData->metallicMap);
-//        ImGui::NextColumn();
-//        ShowTexture("Roughness Map", materialData->roughnessMap);
-
-//        ImGui::Columns(1); // Restablece a una columna antes de cerrar el child window
-//        ImGui::EndChild();
-//    }
-
-//    ImGui::Columns(1); // Restablece a una columna después de dibujar el material
-//}
-
-//void GuiLayer::ShowTexture(const char* label, Ref<Texture> texture)
-//{
-//    if (texture && texture->IsValid()) {
-//        ImGui::Image((void*)(intptr_t)texture->GetTextureID(), ImVec2(128, 128)); // Ajustar según el tamaño deseado
-//        ImGui::Text("%s", label); // Muestra el nombre de la textura
-//    }
-//    else {
-//        ImGui::Text("%s: None", label); // Para texturas que no existen
-//    }
-//}
-
-
-
-
-
-//ImGui::SetColumnWidth(0, columnWidthLeft); // Establecer el ancho de la columna izquierda
-        //ImGui::ColorEdit3("Color", glm::value_ptr(materialData->albedoColor));
-        //ImGui::SliderFloat("Shininess", &materialData->shininess, 0.0f, 128.0f);
-        //ImGui::SliderFloat("HDR Multiply", &materialData->hdrMultiply, 0.0f, 10.0f);
-        //ImGui::SliderFloat("HDR Intensity", &materialData->hdrIntensity, 0.0f, 10.0f);
-        //ImGui::SliderFloat("Exposure", &materialData->exposure, 0.1f, 10.0f);
-        //ImGui::SliderFloat("Gamma", &materialData->gamma, 0.1f, 3.0f);
-        //ImGui::SliderFloat("Max Reflection LOD", &materialData->max_reflection_lod, 0.0f, 10.0f);
-        //ImGui::SliderFloat("IBL Intensity", &materialData->iblIntensity, 0.0f, 10.0f);
-        //ImGui::SliderFloat("Normal Intensity", &materialData->normalIntensity, 0.0f, 10.0f);
-        //ImGui::SliderFloat("Metallic Value", &materialData->metallicValue, 0.0f, 1.0f);
-        //ImGui::SliderFloat("Roughness Value", &materialData->roughnessValue, 0.0f, 1.0f);
-        //ImGui::SliderFloat("Reflectance Value", &materialData->reflectanceValue, 0.0f, 1.0f);
-        //ImGui::SliderFloat("Fresnel Coefficient", &materialData->fresnelCoefValue, 0.1f, 10.0f);
-
-        /*if (ImGui::Button("Reset Values"))
-        {
-            materialData->ResetToDefaultValues();
-        }*/
