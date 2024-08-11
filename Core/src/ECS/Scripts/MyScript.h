@@ -15,7 +15,7 @@ namespace libCore
                 auto& transform = GetComponent<TransformComponent>().transform;
                 if (InputManager::Instance().IsKeyPressed(GLFW_KEY_M))
                 {
-                    transform->position.x += 0.1f * deltaTime;
+                    GetComponent<TransformComponent>().transform->position.x += 0.1f * deltaTime;
                 }
             }
         }

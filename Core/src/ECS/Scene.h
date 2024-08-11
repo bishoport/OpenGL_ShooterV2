@@ -9,8 +9,8 @@ namespace libCore {
     class Scene {
 
     public:
-
         std::string sceneName = "new_scene";
+
 
         Scene();
         static Scene& GetInstance() {
@@ -22,6 +22,8 @@ namespace libCore {
         void Init();
         void Update(Timestep m_deltaTime);
         void Render(Timestep m_deltaTime);
+
+        //--YALM
         void SerializeScene();
         void DeserializeScene();
 

@@ -38,6 +38,8 @@ namespace libCore
         void CreateViewport(std::string name, glm::vec3 cameraPosition, CAMERA_CONTROLLERS controller);
         void RenderViewports();
 
+        void ChangeEngineState(EngineStates newState);
+
 
         // Función estática para obtener la ventana GLFW
         static GLFWwindow* GetWindow()

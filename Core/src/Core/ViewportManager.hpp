@@ -28,7 +28,7 @@ namespace libCore
             viewport->viewportSize.y = static_cast<float>(viewportHeight);
 
             // Cameras
-            viewport->gameCamera   = CreateRef<libCore::GameCamera>(viewport->viewportSize.x, viewport->viewportSize.y, cameraPosition);
+            viewport->gameCamera   = CreateRef<libCore::GameCamera>();
             viewport->editorCamera = CreateRef<libCore::EditorCamera>(viewport->viewportSize.x, viewport->viewportSize.y, cameraPosition);
 
             viewport->camera = viewport->editorCamera;

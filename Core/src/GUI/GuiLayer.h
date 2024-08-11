@@ -51,7 +51,6 @@ namespace libCore
         void DrawModelInfo(const Ref<libCore::Model>& model, int depth = 0);
         void DrawModelsPanel();
 
-        void ShowTexture(const char* label, Ref<Texture> texture);
         void RenderCheckerMatrix();
         void DrawComponentEditor(entt::entity entity);
         void DrawToolBarEditor();

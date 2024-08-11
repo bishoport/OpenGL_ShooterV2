@@ -1,15 +1,30 @@
 Scene: Untitled
 Entities:
-  - Entity: 1
+  - Entity: 13
     TransformComponent:
       Transform:
         Position:
-          - 0
-          - 0
-          - 0
+          - 136.593918
+          - 16.5144157
+          - -83.595459
         Rotation:
           - 0
+          - -0
           - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+  - Entity: 12
+    TransformComponent:
+      Transform:
+        Position:
+          - -27.7490902
+          - 16.1483555
+          - -0.00346978754
+        Rotation:
+          - 0
+          - -0
           - 0
         Scale:
           - 1
@@ -17,32 +32,553 @@ Entities:
           - 1
     MaterialComponent:
       Material:
-        MaterialName: turbina
+        MaterialName: Mat_08
         ShaderName: default
         AlbedoColor:
-          - 0.800000012
-          - 0.800000012
-          - 0.800000012
+          - 1
+          - 1
+          - 1
         NormalStrength: 1
         MetallicValue: 0
-        RoughnessValue: 0.800000012
+        RoughnessValue: 0.699999988
         AoValue: 1
       AlbedoMap:
-        TexturePath: assets\models\Turbina\turbina.fbm\Material_BaseColor.jpg
+        TexturePath: assets\models\Scenario_1\Textures\08_basecolor.jpg
         TextureType: 0
         TextureUnit: 0
       NormalMap:
-        TexturePath: assets\models\Turbina\turbina.fbm\Material_OpenGL_Normal.png
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_normal.jpg
         TextureType: 1
         TextureUnit: 1
       MetallicMap:
-        TexturePath: assets\models\Turbina\turbina.fbm\Material_Metallic.png
+        TexturePath: assets\models\Scenario_1\Textures\08_metallic.jpg
         TextureType: 2
         TextureUnit: 2
       RoughnessMap:
-        TexturePath: assets\models\Turbina\turbina.fbm\Material_Roughness.jpg
+        TexturePath: assets\models\Scenario_1\Textures\08_roughness.jpg
         TextureType: 3
         TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+  - Entity: 11
+    TransformComponent:
+      Transform:
+        Position:
+          - -27.9034348
+          - 16.1483555
+          - -0.00346978754
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Mat_09
+        ShaderName: default
+        AlbedoColor:
+          - 0.496970206
+          - 0.486842066
+          - 0.740045011
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Scenario_1\Textures\09_basecolor.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_normal.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: assets\models\Scenario_1\Textures\09_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: assets\models\Scenario_1\Textures\09_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+  - Entity: 10
+    TransformComponent:
+      Transform:
+        Position:
+          - 6.20137215
+          - -46.9379578
+          - -43.6656647
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: default_material
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 0
+          - 0
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_albedo.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_normal.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+  - Entity: 9
+    TransformComponent:
+      Transform:
+        Position:
+          - 16.1555481
+          - 16.5591774
+          - -43.6656151
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Mat_09
+        ShaderName: default
+        AlbedoColor:
+          - 0.496970206
+          - 0.486842066
+          - 0.740045011
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Scenario_1\Textures\09_basecolor.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_normal.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: assets\models\Scenario_1\Textures\09_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: assets\models\Scenario_1\Textures\09_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+  - Entity: 8
+    TransformComponent:
+      Transform:
+        Position:
+          - 16.155529
+          - 16.5591774
+          - -43.6656189
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Mat_04
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Scenario_1\Textures\04_basecolor.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_normal.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: assets\models\Scenario_1\Textures\04_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: assets\models\Scenario_1\Textures\04_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+  - Entity: 7
+    TransformComponent:
+      Transform:
+        Position:
+          - 16.1554337
+          - 16.5808773
+          - -43.6656647
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Mat_07
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Scenario_1\Textures\07_basecolor.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_normal.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: assets\models\Scenario_1\Textures\07_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: assets\models\Scenario_1\Textures\06_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+  - Entity: 6
+    TransformComponent:
+      Transform:
+        Position:
+          - 16.1554337
+          - 16.5808773
+          - -43.6656647
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Mat_05
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Scenario_1\Textures\05_basecolor.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_normal.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: assets\models\Scenario_1\Textures\05_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: assets\models\Scenario_1\Textures\05_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+  - Entity: 5
+    TransformComponent:
+      Transform:
+        Position:
+          - -1.30636406
+          - 16.5808716
+          - 59.4599953
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Mat_03
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Scenario_1\Textures\03_basecolor.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_normal.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: assets\models\Scenario_1\Textures\03_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: assets\models\Scenario_1\Textures\03_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+  - Entity: 4
+    TransformComponent:
+      Transform:
+        Position:
+          - 1.0035553
+          - 16.5808449
+          - -73.5214691
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Mat_02
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/checker.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_normal.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: assets\models\Scenario_1\Textures\02_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: assets\models\Scenario_1\Textures\02_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+  - Entity: 3
+    TransformComponent:
+      Transform:
+        Position:
+          - -0.131530762
+          - 16.5808716
+          - -43.6656647
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Mat_01
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/checker.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_normal.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: assets\models\Scenario_1\Textures\01_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: assets\models\Scenario_1\Textures\01_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+  - Entity: 2
+    TransformComponent:
+      Transform:
+        Position:
+          - 25.1297569
+          - 15.5419827
+          - 53.8854599
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Mat_06
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Scenario_1\Textures\06_basecolor.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_normal.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: assets\models\Scenario_1\Textures\06_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: assets\models\Scenario_1\Textures\06_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+  - Entity: 1
+    TransformComponent:
+      Transform:
+        Position:
+          - 304.700806
+          - 15.5419827
+          - 41.7137985
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Mat_06
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Scenario_1\Textures\06_basecolor.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_normal.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: assets\models\Scenario_1\Textures\06_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: assets\models\Scenario_1\Textures\06_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
   - Entity: 0
     TransformComponent:
       Transform:

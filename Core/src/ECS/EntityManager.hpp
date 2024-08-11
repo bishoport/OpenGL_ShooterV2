@@ -13,6 +13,7 @@
 #include "Scripts/MyScript.h"
 #include "../Timestep.h"
 #include "../tools/AssetsManager.h"
+#include "Scripts/CameraControllerFPS.h"
 
 namespace libCore
 {
@@ -76,10 +77,8 @@ namespace libCore
         }
         void CreateCamera()
         {
-            // Crear una nueva entidad para el modelo
             entt::entity gameObject = CreateEmptyGameObject("MainCamera");
-            //Mesh Component
-            auto& cameraComponent = AddComponent<CameraComponent>(gameObject);
+            AddComponent<CameraComponent>(gameObject);
         }
         entt::entity GetEntityByName(const std::string& name)
         {
@@ -284,6 +283,25 @@ namespace libCore
         //------------------------------------------------------------------------------------
         //------------------------------------------------------------------------------------
 
+        //--INIT SCRIPTS Components
+        void InitScripts()
+        {
+            auto scriptView = m_registry->view<ScriptComponent>();
+            for (auto entity : scriptView) {
+                auto& scriptComponent = scriptView.get<ScriptComponent>(entity);
+                scriptComponent.Init();
+            }
+        }
+
+        void UpdateScripts(Timestep deltaTime)
+        {
+            auto scriptView = m_registry->view<ScriptComponent>();
+            for (auto entity : scriptView) {
+                auto& scriptComponent = scriptView.get<ScriptComponent>(entity);
+                scriptComponent.Update(deltaTime.GetMilliseconds());
+            }
+        }
+
 
         //--ACTUALIZADOR DE FUNCIONES UPDATES ANTES DEL RENDER DE LOS COMPONENTES
         void UpdateGameObjects(Timestep deltaTime) 
@@ -300,11 +318,7 @@ namespace libCore
 
             // Actualizar scripts (si es necesario)
             if (EngineOpenGL::GetInstance().engineState == EDITOR_PLAY || EngineOpenGL::GetInstance().engineState == PLAY) {
-                auto scriptView = m_registry->view<ScriptComponent>();
-                for (auto entity : scriptView) {
-                    auto& scriptComponent = scriptView.get<ScriptComponent>(entity);
-                    scriptComponent.Update(deltaTime.GetMilliseconds());
-                }
+                UpdateScripts(deltaTime);
             }
 
             //UPDATE ALL TRANSFORM CHILDREN
@@ -315,20 +329,21 @@ namespace libCore
 
 
             // Actualizar las cámaras
-            auto CameraCompView = m_registry->view<CameraComponent, TransformComponent>();
-            for (auto entity : CameraCompView) {
-                auto& cameraComponent = GetComponent<CameraComponent>(entity);
-                auto& transformComponent = GetComponent<TransformComponent>(entity);
-
-                glm::vec3 forward = transformComponent.transform->rotation * glm::vec3(0.0f, 0.0f, -1.0f);
-                cameraComponent.view = glm::lookAt(transformComponent.transform->position, transformComponent.transform->position + forward, cameraComponent.Up);
-
-                if (cameraComponent.width > 0 && cameraComponent.height > 0) {
-                    cameraComponent.projection = glm::perspective(glm::radians(cameraComponent.FOVdeg), (float)cameraComponent.width / (float)cameraComponent.height, cameraComponent.nearPlane, cameraComponent.farPlane);
-                }
-
-                cameraComponent.cameraMatrix = cameraComponent.projection * cameraComponent.view;
-            }
+            //auto CameraCompView = m_registry->view<CameraComponent, TransformComponent>();
+            //
+            //for (auto entity : CameraCompView) {
+            //    auto& cameraComponent = GetComponent<CameraComponent>(entity);
+            //    auto& transformComponent = GetComponent<TransformComponent>(entity);
+            //
+            //    glm::vec3 forward = transformComponent.transform->rotation * glm::vec3(0.0f, 0.0f, -1.0f);
+            //    cameraComponent.view = glm::lookAt(transformComponent.transform->position, transformComponent.transform->position + forward, cameraComponent.Up);
+            //
+            //    if (cameraComponent.width > 0 && cameraComponent.height > 0) {
+            //        cameraComponent.projection = glm::perspective(glm::radians(cameraComponent.FOVdeg), (float)cameraComponent.width / (float)cameraComponent.height, cameraComponent.nearPlane, cameraComponent.farPlane);
+            //    }
+            //
+            //    cameraComponent.cameraMatrix = cameraComponent.projection * cameraComponent.view;
+            //}
 
 
             // Actualizar los AABB
@@ -498,6 +513,7 @@ namespace libCore
         void RegisterScripts()
         {
             ScriptFactory::GetInstance().RegisterScript<MyScript>("MyScript");
+            ScriptFactory::GetInstance().RegisterScript<CameraControllerFPS>("CameraControllerFPS");
         }
     };
 }

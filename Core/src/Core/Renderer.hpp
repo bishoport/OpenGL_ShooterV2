@@ -130,7 +130,7 @@ namespace libCore {
 
             // Actualizar la cámara
             viewport->camera->Inputs(m_deltaTime);
-            viewport->camera->updateMatrix(45.0f, 0.1f, 1000.0f);
+            viewport->camera->updateMatrix();
 
             glEnable(GL_DEPTH_TEST); // Habilitar el test de profundidad
 
@@ -210,8 +210,6 @@ namespace libCore {
             PopDebugGroup();
             //--------------------------------------------------------------------------------
             //--------------------------------------------------------------------------------
-
-
 
 
 

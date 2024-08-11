@@ -125,6 +125,9 @@ namespace YAML {
     };
 }
 
+
+
+
 namespace libCore {
 
     YAML::Node SerializeTransformComponent(const TransformComponent& transformComponent) {

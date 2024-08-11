@@ -5,15 +5,26 @@
 #include "../Core/Material.h"
 #include "SerializatorManager.h"
 
-namespace libCore {
-
+namespace libCore 
+{
     Scene::Scene() {}
 
-    void Scene::Init() {}
-
-    void Scene::Update(Timestep m_deltaTime) {}
-
+    //--PLAY LIFE CYCLE
+    void Scene::Init() 
+    {
+        EntityManager::GetInstance().InitScripts();
+    }
+    void Scene::Update(Timestep deltaTime) 
+    {
+        EntityManager::GetInstance().UpdateScripts(deltaTime);
+    }
     void Scene::Render(Timestep m_deltaTime) {}
+    //---------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
+
+
+
+
 
     void Scene::SerializeScene() {
         YAML::Emitter out;
@@ -47,7 +58,6 @@ namespace libCore {
         std::ofstream fout("assets/Scenes/" + sceneName + ".yaml");
         fout << out.c_str();
     }
-
     void Scene::DeserializeScene() {
         YAML::Node data = YAML::LoadFile("assets/Scenes/" + sceneName + ".yaml");
         if (!data["Scene"]) {
@@ -73,5 +83,4 @@ namespace libCore {
             }
         }
     }
-
-} // namespace libCore
+}

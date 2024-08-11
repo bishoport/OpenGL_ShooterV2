@@ -2,8 +2,7 @@
 
 namespace libCore
 {
-    EditorCamera::EditorCamera(int width, int height, glm::vec3 position)
-        : Camera(width, height, position)
+    EditorCamera::EditorCamera(int width, int height, glm::vec3 position) : Camera(width, height, position)
     {
     }
 
@@ -59,7 +58,7 @@ namespace libCore
         }
 
         // Actualizar la matriz de cámara
-        updateMatrix(45.0f, 0.1f, 100.0f); // Puedes ajustar los parámetros de FOV, nearPlane y farPlane según sea necesario
+        updateMatrix(); // Puedes ajustar los parámetros de FOV, nearPlane y farPlane según sea necesario
     }
 }
 

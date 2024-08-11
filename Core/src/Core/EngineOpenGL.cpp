@@ -305,6 +305,27 @@ namespace libCore
 	// -------------------------------------------------
 	// -------------------------------------------------
 
+	//--ENGINE CONTROL STATES
+	void libCore::EngineOpenGL::ChangeEngineState(EngineStates newState)
+	{
+		EngineOpenGL::GetInstance().engineState = newState;
+
+		if (EngineOpenGL::GetInstance().engineState == EDITOR)
+		{
+
+		}
+		else if (EngineOpenGL::GetInstance().engineState == EDITOR_PLAY)
+		{
+			EntityManager::GetInstance().InitScripts();
+		}
+		else if (EngineOpenGL::GetInstance().engineState == PLAY)
+		{
+			EntityManager::GetInstance().InitScripts();
+		}
+
+	}
+	// -------------------------------------------------
+	// -------------------------------------------------
 
 	//--UPDATES
 	void EngineOpenGL::UpdateBeforeRender()
@@ -314,26 +335,19 @@ namespace libCore
 
 		if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F1)) //Editor
 		{
-			currentViewport = 0;
-			engineState = EDITOR;
+			ChangeEngineState(EngineStates::EDITOR);
 		}
 		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F2)) //Editor Play
 		{
-			currentViewport = 0;
-			engineState = EDITOR_PLAY;
+			ChangeEngineState(EngineStates::EDITOR_PLAY);
 		}
 		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F3)) //Play
 		{
-			currentViewport = 0;
-			engineState = PLAY;
+			ChangeEngineState(EngineStates::PLAY);
 		}
 		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_ESCAPE)) //BACK TO EDITOR MODE WITH ESC FROM PLAY MODE
 		{
-			if (engineState == PLAY)
-			{
-				currentViewport = 0;
-				engineState = EDITOR;
-			}
+			ChangeEngineState(EngineStates::EDITOR);
 		}
 		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_C)) //CLONE
 		{
@@ -358,15 +372,15 @@ namespace libCore
 
 		if (mainCameraEntity != entt::null)
 		{
-			auto& cameraComponent = EntityManager::GetInstance().GetComponent<CameraComponent>(mainCameraEntity);
+			auto& cameraComponent    = EntityManager::GetInstance().GetComponent<CameraComponent>(mainCameraEntity);
+			auto& transformComponent = EntityManager::GetInstance().GetComponent<TransformComponent>(mainCameraEntity);
 
-			ViewportManager::GetInstance().viewports[currentViewport]->gameCamera->Up = cameraComponent.Up;
-			ViewportManager::GetInstance().viewports[currentViewport]->gameCamera->view = cameraComponent.view;
-			ViewportManager::GetInstance().viewports[currentViewport]->gameCamera->projection = cameraComponent.projection;
-			ViewportManager::GetInstance().viewports[currentViewport]->gameCamera->cameraMatrix = cameraComponent.cameraMatrix;
-			ViewportManager::GetInstance().viewports[currentViewport]->gameCamera->updateMatrix(cameraComponent.FOVdeg,
-				cameraComponent.nearPlane,
-				cameraComponent.farPlane);
+			if (cameraComponent.camera == nullptr)
+			{
+				cameraComponent.camera = ViewportManager::GetInstance().viewports[0]->gameCamera;
+			}
+
+			ViewportManager::GetInstance().viewports[currentViewport]->gameCamera->Position = transformComponent.transform->GetPosition();
 		}
 
 		if (engineState == EDITOR )

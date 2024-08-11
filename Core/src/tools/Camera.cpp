@@ -5,13 +5,13 @@ namespace libCore
     {
         this->width = width;
         this->height = height;
-        Position = position;
+        this->Position = position;
     }
 
-    void Camera::updateMatrix(float FOVdeg, float nearPlane, float farPlane)
+    void Camera::updateMatrix()
     {
-        view = glm::lookAt(Position, Position + Orientation, Up);
-        projection = glm::perspective(glm::radians(FOVdeg), (float)width / height, nearPlane, farPlane);
-        cameraMatrix = projection * view;
+        this->view = glm::lookAt(Position, Position + Orientation, Up);
+        this->projection = glm::perspective(glm::radians(FOVdeg), (float)width / height, nearPlane, farPlane);
+        this->cameraMatrix = projection * view;
     }
 }

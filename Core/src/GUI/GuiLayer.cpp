@@ -281,15 +281,15 @@ namespace libCore
     {
         if (ImGui::Begin("Engine State")) {
             if (ImGui::Button("Editor")) {
-                EngineOpenGL::GetInstance().engineState = EngineStates::EDITOR;
+                EngineOpenGL::GetInstance().ChangeEngineState(EngineStates::EDITOR);
             }
             ImGui::SameLine();
             if (ImGui::Button("Editor Play")) {
-                EngineOpenGL::GetInstance().engineState = EngineStates::EDITOR_PLAY;
+                EngineOpenGL::GetInstance().ChangeEngineState(EngineStates::EDITOR_PLAY);
             }
             ImGui::SameLine();
             if (ImGui::Button("Play")) {
-                EngineOpenGL::GetInstance().engineState = EngineStates::PLAY;
+                EngineOpenGL::GetInstance().ChangeEngineState(EngineStates::PLAY);
             }
         }
         ImGui::End();
@@ -641,45 +641,43 @@ namespace libCore
                     
                 }
             }
-
-
-
             //--CAMERA_COMPONENT
             if (EntityManager::GetInstance().HasComponent<CameraComponent>(selectedEntity)) {
                 auto& cameraComponent = EntityManager::GetInstance().GetComponent<CameraComponent>(selectedEntity);
-                if (ImGui::CollapsingHeader("Camera")) {
-                    ImGui::Text("Width: %d", cameraComponent.width);
-                    ImGui::Text("Height: %d", cameraComponent.height);
+                if (ImGui::CollapsingHeader("Camera")) 
+                {
+                    ImGui::Text("Width: %d", cameraComponent.camera->width);
+                    ImGui::Text("Height: %d", cameraComponent.camera->height);
 
                     ImGui::Text("Up Vector");
-                    ImGui::DragFloat3("Up", glm::value_ptr(cameraComponent.Up), 0.1f);
+                    ImGui::DragFloat3("Up", glm::value_ptr(cameraComponent.camera->Up), 0.1f);
 
-                    ImGui::Text("FOV: %.2f", cameraComponent.FOVdeg);
-                    ImGui::DragFloat("FOV", &cameraComponent.FOVdeg, 0.1f, 1.0f, 180.0f);
+                    ImGui::Text("FOV: %.2f", cameraComponent.camera->FOVdeg);
+                    ImGui::DragFloat("FOV", &cameraComponent.camera->FOVdeg, 0.1f, 1.0f, 180.0f);
 
-                    ImGui::Text("Near Plane: %.2f", cameraComponent.nearPlane);
-                    ImGui::DragFloat("Near Plane", &cameraComponent.nearPlane, 0.01f, 0.01f, cameraComponent.farPlane - 0.1f);
+                    ImGui::Text("Near Plane: %.2f", cameraComponent.camera->nearPlane);
+                    ImGui::DragFloat("Near Plane", &cameraComponent.camera->nearPlane, 0.01f, 0.01f, cameraComponent.camera->farPlane - 0.1f);
 
-                    ImGui::Text("Far Plane: %.2f", cameraComponent.farPlane);
-                    ImGui::DragFloat("Far Plane", &cameraComponent.farPlane, 1.0f, cameraComponent.nearPlane + 0.1f, 10000.0f);
+                    ImGui::Text("Far Plane: %.2f", cameraComponent.camera->farPlane);
+                    ImGui::DragFloat("Far Plane", &cameraComponent.camera->farPlane, 1.0f, cameraComponent.camera->nearPlane + 0.1f, 10000.0f);
 
                     ImGui::Text("View Matrix");
-                    ImGui::InputFloat4("##ViewRow1", glm::value_ptr(cameraComponent.view[0]));
-                    ImGui::InputFloat4("##ViewRow2", glm::value_ptr(cameraComponent.view[1]));
-                    ImGui::InputFloat4("##ViewRow3", glm::value_ptr(cameraComponent.view[2]));
-                    ImGui::InputFloat4("##ViewRow4", glm::value_ptr(cameraComponent.view[3]));
+                    ImGui::InputFloat4("##ViewRow1", glm::value_ptr(cameraComponent.camera->view[0]));
+                    ImGui::InputFloat4("##ViewRow2", glm::value_ptr(cameraComponent.camera->view[1]));
+                    ImGui::InputFloat4("##ViewRow3", glm::value_ptr(cameraComponent.camera->view[2]));
+                    ImGui::InputFloat4("##ViewRow4", glm::value_ptr(cameraComponent.camera->view[3]));
 
                     ImGui::Text("Projection Matrix");
-                    ImGui::InputFloat4("##ProjRow1", glm::value_ptr(cameraComponent.projection[0]));
-                    ImGui::InputFloat4("##ProjRow2", glm::value_ptr(cameraComponent.projection[1]));
-                    ImGui::InputFloat4("##ProjRow3", glm::value_ptr(cameraComponent.projection[2]));
-                    ImGui::InputFloat4("##ProjRow4", glm::value_ptr(cameraComponent.projection[3]));
+                    ImGui::InputFloat4("##ProjRow1", glm::value_ptr(cameraComponent.camera->projection[0]));
+                    ImGui::InputFloat4("##ProjRow2", glm::value_ptr(cameraComponent.camera->projection[1]));
+                    ImGui::InputFloat4("##ProjRow3", glm::value_ptr(cameraComponent.camera->projection[2]));
+                    ImGui::InputFloat4("##ProjRow4", glm::value_ptr(cameraComponent.camera->projection[3]));
 
                     ImGui::Text("Camera Matrix");
-                    ImGui::InputFloat4("##CamRow1", glm::value_ptr(cameraComponent.cameraMatrix[0]));
-                    ImGui::InputFloat4("##CamRow2", glm::value_ptr(cameraComponent.cameraMatrix[1]));
-                    ImGui::InputFloat4("##CamRow3", glm::value_ptr(cameraComponent.cameraMatrix[2]));
-                    ImGui::InputFloat4("##CamRow4", glm::value_ptr(cameraComponent.cameraMatrix[3]));
+                    ImGui::InputFloat4("##CamRow1", glm::value_ptr(cameraComponent.camera->cameraMatrix[0]));
+                    ImGui::InputFloat4("##CamRow2", glm::value_ptr(cameraComponent.camera->cameraMatrix[1]));
+                    ImGui::InputFloat4("##CamRow3", glm::value_ptr(cameraComponent.camera->cameraMatrix[2]));
+                    ImGui::InputFloat4("##CamRow4", glm::value_ptr(cameraComponent.camera->cameraMatrix[3]));
                 }
             }
             //--SCRIPT_COMPONENT

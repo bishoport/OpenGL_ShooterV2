@@ -30,28 +30,28 @@ namespace libCore
         // Verificar si la textura ya está cargada
         auto it = loadedTextures.find(textureKey);
         if (it != loadedTextures.end()) {
-            std::cout << "LA TEXTURA " << textureKey << " YA EXISTE EN LOADEDTEXTURES" << std::endl;
+            //std::cout << "LA TEXTURA " << textureKey << " YA EXISTE EN LOADEDTEXTURES" << std::endl;
             return it->second;  // Retorna la textura si ya está cargada
         }
 
         // Cargamos la textura si no existe en la biblioteca:
         if (!fs::exists(imagePathFS))
         {
-            std::cout << "Texture not found at initial path. Searching in subfolders..." << std::endl;
+            //std::cout << "Texture not found at initial path. Searching in subfolders..." << std::endl;
             fs::path foundPath = findTextureInSubfolders(directoryPath, fileName);
 
             if (foundPath.empty())
             {
-                std::cerr << "Texture not found in any subfolder." << std::endl;
+                //std::cerr << "Texture not found in any subfolder." << std::endl;
                 return nullptr;
             }
 
             imagePathFS = foundPath;
             textureKey = imagePathFS.string();
-            std::cout << "Texture found at: " << imagePathFS << std::endl;
+            //std::cout << "Texture found at: " << imagePathFS << std::endl;
         }
 
-        std::cout << "Loading Texture->" << imagePathFS << std::endl;
+        //std::cout << "Loading Texture->" << imagePathFS << std::endl;
         auto texture = CreateRef<Texture>(imagePathFS.string().c_str(), type, slot);
 
         // Guardar la textura en loadedTextures

@@ -60,54 +60,57 @@ namespace libCore
         {
             //--RESIZE EVENT´s
             EventManager::OnPanelResizedEvent().subscribe([this](const std::string name, const glm::vec2& size, const glm::vec2& position)
-                {
-                    if (camera != nullptr)
-                    {
-                        viewportSize.x = size.x;
-                        viewportSize.y = size.y;
+            {
+                viewportSize.x = size.x;
+                viewportSize.y = size.y;
 
-                        viewportPos.x = position.x;
-                        viewportPos.y = viewportSize.y - position.y;
+                viewportPos.x = position.x;
+                viewportPos.y = viewportSize.y - position.y;
 
-                        gBuffer->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                gBuffer->resize(static_cast<int>(size.x), static_cast<int>(size.y));
 
-                        framebuffer_deferred->resize(static_cast<int>(size.x), static_cast<int>(size.y));
-                        framebuffer_shadowmap->resize(static_cast<int>(size.x), static_cast<int>(size.y));
-                        framebuffer_forward->resize(static_cast<int>(size.x), static_cast<int>(size.y));
-                        framebuffer_final->resize(static_cast<int>(size.x), static_cast<int>(size.y));
-                        framebuffer_HDR->resize(static_cast<int>(size.x), static_cast<int>(size.y));
-                        framebuffer_SSAO->resize(static_cast<int>(size.x), static_cast<int>(size.y));
-                        framebuffer_SSAOBlur->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                framebuffer_deferred->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                framebuffer_shadowmap->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                framebuffer_forward->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                framebuffer_final->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                framebuffer_HDR->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                framebuffer_SSAO->resize(static_cast<int>(size.x), static_cast<int>(size.y));
+                framebuffer_SSAOBlur->resize(static_cast<int>(size.x), static_cast<int>(size.y));
 
-                        camera->width = static_cast<int>(size.x);
-                        camera->height = static_cast<int>(size.y);
-                    }
-                    
-                });
+                UpdateCameraSizeView(editorCamera, static_cast<int>(size.x), static_cast<int>(size.y));
+                UpdateCameraSizeView(gameCamera, static_cast<int>(size.x), static_cast<int>(size.y)); 
+            });
+
             EventManager::OnWindowResizeEvent().subscribe([this](const int width, const int height)
-                {
-                    if (camera != nullptr)
-                    {
-                        viewportSize.x = static_cast<float>(width);
-                        viewportSize.y = static_cast<float>(height);
+            {
+                viewportSize.x = static_cast<float>(width);
+                viewportSize.y = static_cast<float>(height);
 
-                        gBuffer->resize(width, height);
+                gBuffer->resize(width, height);
 
-                        framebuffer_deferred->resize(width, height);
-                        framebuffer_shadowmap->resize(width, height);
-                        framebuffer_forward->resize(width, height);
-                        framebuffer_final->resize(width, height);
-                        framebuffer_HDR->resize(width, height);
-                        framebuffer_SSAO->resize(width, height);
-                        framebuffer_SSAOBlur->resize(width, height);
+                framebuffer_deferred->resize(width, height);
+                framebuffer_shadowmap->resize(width, height);
+                framebuffer_forward->resize(width, height);
+                framebuffer_final->resize(width, height);
+                framebuffer_HDR->resize(width, height);
+                framebuffer_SSAO->resize(width, height);
+                framebuffer_SSAOBlur->resize(width, height);
 
-                        camera->width = static_cast<int>(width);
-                        camera->height = static_cast<int>(height);
-                    }
-
-                });
+                UpdateCameraSizeView(editorCamera, width, height);
+                UpdateCameraSizeView(gameCamera, width, height);
+            });
             //---------------------------------------------------
         }
+
+        void UpdateCameraSizeView(Ref<Camera> _camera, const int width, const int height)
+        {
+            if (_camera != nullptr)
+            {
+                _camera->width = static_cast<int>(width);
+                _camera->height = static_cast<int>(height);
+            }
+        }
+
         Viewport(const std::string& name) :viewportName(name), viewportSize(0, 0), viewportPos(0, 0), previousViewportSize(0, 0), previousViewportPos(0, 0), mouseInviewport(false) {}
     };
 }
