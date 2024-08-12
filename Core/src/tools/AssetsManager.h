@@ -5,6 +5,8 @@
 #include "../Core/Model.h"
 
 
+
+
 namespace libCore
 {
 	class AssetsManager
@@ -18,7 +20,8 @@ namespace libCore
 		}
 
 		//--TEXTURES
-		std::string defaultAssetsPathTexture = "C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/";
+		//std::string defaultAssetsPathTexture = "C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/";
+		std::string defaultAssetsPathTexture = "C:/Users/bisho/OneDrive/Escritorio/OPENGL_GAME/OpenGL_ShooterV2/Core/assets/textures/";
 		void UnloadTexture(const std::string& name);
 		void LoadDefaultAssets();
 		Ref<Texture> LoadTextureAsset(const std::string& key, const char* directoryPath, const char* fileName, TEXTURE_TYPES type);
@@ -33,8 +36,11 @@ namespace libCore
 		void LoadModelAsset(ImportModelData importModelData);
 		void LoadModelAssetAsync(ImportModelData importModelData);
 		Ref<Model> GetModel(const std::string& name);
+		Ref<Model> GetModelByMeshName(const std::string& meshName);
 		const std::unordered_map<std::string, Ref<Model>>& GetAllModels() const;
 		//---------------------------------------------------------------------------------------------------------------------------
+
+		Ref<Mesh> GetMesh(const std::string& name);
 
 		//--MATERIALS
 		void CreateDefaultMaterial();

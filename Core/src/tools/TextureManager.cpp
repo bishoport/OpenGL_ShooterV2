@@ -7,7 +7,6 @@ namespace fs = std::filesystem;
 
 namespace libCore
 {
-
     Ref<Texture> TextureManager::LoadTexture(const char* directoryPath, const char* fileName, TEXTURE_TYPES type, GLuint slot)
     {
         // Función auxiliar para buscar la textura recursivamente en subcarpetas
@@ -37,21 +36,21 @@ namespace libCore
         // Cargamos la textura si no existe en la biblioteca:
         if (!fs::exists(imagePathFS))
         {
-            //std::cout << "Texture not found at initial path. Searching in subfolders..." << std::endl;
+            std::cout << "Texture not found at initial path. Searching in subfolders..." << std::endl;
             fs::path foundPath = findTextureInSubfolders(directoryPath, fileName);
 
             if (foundPath.empty())
             {
-                //std::cerr << "Texture not found in any subfolder." << std::endl;
+                std::cerr << "Texture not found in any subfolder." << std::endl;
                 return nullptr;
             }
 
             imagePathFS = foundPath;
             textureKey = imagePathFS.string();
-            //std::cout << "Texture found at: " << imagePathFS << std::endl;
+            std::cout << "Texture found at: " << imagePathFS << std::endl;
         }
 
-        //std::cout << "Loading Texture->" << imagePathFS << std::endl;
+        std::cout << "Loading Texture->" << imagePathFS << std::endl;
         auto texture = CreateRef<Texture>(imagePathFS.string().c_str(), type, slot);
 
         // Guardar la textura en loadedTextures
@@ -59,11 +58,6 @@ namespace libCore
 
         return texture;
     }
-
-
-
-
-
 
     GLuint TextureManager::LoadImagesForCubemap(std::vector<const char*> faces)
     {

@@ -1,6 +1,9 @@
 #pragma once
 #include <cstdint>
 #include <cstddef>
+#include <string>
+#include <sstream>
+#include <iomanip>
 
 namespace libCore {
 
@@ -9,9 +12,13 @@ namespace libCore {
 	public:
 		UUID();
 		UUID(uint64_t uuid);
+		UUID(const std::string& uuidStr); // Constructor desde cadena
 		UUID(const UUID&) = default;
 
 		operator uint64_t() const { return m_UUID; }
+
+		std::string ToString() const; // Convertir UUID a cadena
+
 	private:
 		uint64_t m_UUID;
 	};
@@ -31,4 +38,3 @@ namespace std {
 	};
 
 }
-

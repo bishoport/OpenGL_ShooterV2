@@ -85,6 +85,38 @@ namespace libCore
 			return nullptr;
 		}
 	}
+	Ref<Model> AssetsManager::GetModelByMeshName(const std::string& meshName) {
+		// Función lambda recursiva para buscar en la jerarquía de modelos
+		std::function<Ref<Model>(const Ref<Model>&)> findModelByMeshName;
+		findModelByMeshName = [&](const Ref<Model>& model) -> Ref<Model> {
+			// Recorre todas las mallas en el modelo actual
+			for (const auto& mesh : model->meshes) {
+				if (mesh->meshName == meshName) {
+					return model;  // Devuelve el modelo si se encuentra la malla
+				}
+			}
+
+			// Recorre los modelos hijos de forma recursiva
+			for (const auto& childModel : model->children) {
+				Ref<Model> result = findModelByMeshName(childModel);
+				if (result != nullptr) {
+					return result;  // Devuelve el resultado si se encuentra en un submodelo
+				}
+			}
+
+			return nullptr;  // Devuelve nullptr si no se encuentra en el modelo actual ni en sus hijos
+		};
+
+		// Recorre todos los modelos cargados en el AssetsManager
+		for (const auto& [modelName, model] : loadedModels) {
+			Ref<Model> foundModel = findModelByMeshName(model);
+			if (foundModel != nullptr) {
+				return foundModel;  // Devuelve el modelo si se encuentra la malla en cualquier parte de la jerarquía
+			}
+		}
+
+		return nullptr;  // Devuelve nullptr si no se encuentra ningún modelo con la malla especificada
+	}
 	const std::unordered_map<std::string, Ref<Model>>& AssetsManager::GetAllModels() const {
 		return loadedModels;
 	}
@@ -133,4 +165,19 @@ namespace libCore
 		return loadedMaterials;
 	}
 	//---------------------------------------------------------------------------------------------------------------------------
+
+
+	Ref<Mesh> AssetsManager::GetMesh(const std::string& name) {
+		// Buscar el modelo por su nombre en los modelos cargados
+		auto model = GetModel(name);
+		if (model) {
+			// Si el modelo existe y tiene al menos un mesh, devolver el primer mesh
+			if (!model->meshes.empty()) {
+				return model->meshes[0];
+			}
+		}
+		std::cout << "Mesh " << name << " not found" << std::endl;
+		return nullptr;
+	}
+
 }

@@ -1,7 +1,8 @@
 #include "UUID.h"
 #include <random>
 #include <unordered_map>
-
+#include <sstream>
+#include <iomanip>
 
 namespace libCore {
 
@@ -19,5 +20,18 @@ namespace libCore {
 	{
 	}
 
-}
+	UUID::UUID(const std::string& uuidStr)
+	{
+		std::stringstream ss;
+		ss << std::hex << uuidStr;
+		ss >> m_UUID;
+	}
 
+	std::string UUID::ToString() const
+	{
+		std::stringstream ss;
+		ss << std::hex << std::setw(16) << std::setfill('0') << m_UUID;
+		return ss.str();
+	}
+
+}

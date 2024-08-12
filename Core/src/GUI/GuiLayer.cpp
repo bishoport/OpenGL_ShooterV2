@@ -965,6 +965,10 @@ namespace libCore
                 ImGui::Text("Meshes Count: %d", totalMeshes);
                 ImGui::Text("Materials Count: %d", totalMaterials);
 
+                // Mostrar los nombres de las mallas del modelo y sus hijos
+                ImGui::Text("Meshes:");
+                DisplayModelMeshes(model);
+
                 // Añadir botón "Instantiate"
                 if (ImGui::Button(("Instantiate " + model->name).c_str())) {
                     // Lógica de instanciación del modelo
@@ -981,6 +985,18 @@ namespace libCore
 
         ImGui::End();
     }
+
+    void GuiLayer::DisplayModelMeshes(const Ref<Model>& model)
+    {
+        for (const auto& mesh : model->meshes) {
+            ImGui::BulletText("Mesh: %s", mesh->meshName.c_str());
+        }
+        for (const auto& child : model->children) {
+            DisplayModelMeshes(child);
+        }
+    }
+
+
     //-----------------------------------------------------------------------------------------------------
 
 

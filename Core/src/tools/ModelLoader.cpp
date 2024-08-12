@@ -23,7 +23,7 @@ namespace libCore
     {
         auto modelParent = CreateRef<Model>();
              modelParent->skeletal = false;// importOptions.skeletal;
-
+             modelParent->importModelData = importOptions;
         Assimp::Importer importer;
         std::string completePath = importOptions.filePath + importOptions.fileName;
 
@@ -221,7 +221,6 @@ namespace libCore
 
         //-MESH ID
         std::string meshNameBase = mesh->mName.C_Str();
-        meshNameBase.append(" id:");
         meshBuild->meshName = meshNameBase;
 
         modelBuild->meshes.push_back(meshBuild);

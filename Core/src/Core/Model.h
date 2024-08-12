@@ -14,12 +14,13 @@ namespace libCore
     {
     public:
 
-        Model()
-        {
-            transform = CreateRef<Transform>();
-        }
+        // Constructor por defecto
+        Model() = default;
 
-        Ref<Transform> transform;
+        Model(ImportModelData _importModelData) : importModelData(_importModelData){}
+
+        ImportModelData importModelData;
+        Ref<Transform> transform = CreateRef<Transform>();
         std::string name = "no_name_model";
 
         //--MODEL DATA

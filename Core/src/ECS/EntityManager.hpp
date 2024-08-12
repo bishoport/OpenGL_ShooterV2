@@ -37,7 +37,7 @@ namespace libCore
             m_registry->emplace<TransformComponent>(entity);
             return entity;
         }
-        void CreateGameObjectFromModel(Ref<Model> model, entt::entity parent)
+        entt::entity CreateGameObjectFromModel(Ref<Model> model, entt::entity parent)
         {
             // Crear una nueva entidad para el modelo
             entt::entity entity = CreateEmptyGameObject(model->name);
@@ -74,6 +74,8 @@ namespace libCore
             for (auto& child : model->children) {
                 CreateGameObjectFromModel(child, entity);
             }
+
+            return entity;
         }
         void CreateCamera()
         {

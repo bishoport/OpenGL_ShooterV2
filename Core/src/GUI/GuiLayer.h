@@ -50,6 +50,7 @@ namespace libCore
 
         void DrawModelInfo(const Ref<libCore::Model>& model, int depth = 0);
         void DrawModelsPanel();
+        void DisplayModelMeshes(const Ref<Model>& model);
 
         void RenderCheckerMatrix();
         void DrawComponentEditor(entt::entity entity);
