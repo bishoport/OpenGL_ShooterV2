@@ -65,6 +65,7 @@ namespace libCore {
                     "assets/Skybox/front.jpg",
                     "assets/Skybox/back.jpg"
             };
+
             dynamicSkybox = CreateScope<DynamicSkybox>(faces);
             //-------------------------------------------------------
 
@@ -72,7 +73,6 @@ namespace libCore {
             //--IBL
             ibl = CreateScope<IBL>();
             ibl->prepareIBL(1080, 720,dynamicIBL);
-            
             //-------------------------------------------------------
 
 

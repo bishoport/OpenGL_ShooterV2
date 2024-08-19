@@ -16,9 +16,9 @@ Entities:
     TransformComponent:
       Transform:
         Position:
-          - 16.7129822
-          - -7.44800673e-06
-          - 10.8471489
+          - -6.52832699
+          - 0
+          - -25.5419044
         Rotation:
           - 0
           - -0
@@ -32,9 +32,9 @@ Entities:
         MaterialName: turbina
         ShaderName: default
         AlbedoColor:
-          - 0.800000012
-          - 0.800000012
-          - 0.800000012
+          - 0.0676593035
+          - 0.683003128
+          - 0.0843422115
         NormalStrength: 1
         MetallicValue: 0
         RoughnessValue: 0.699999988
@@ -56,7 +56,7 @@ Entities:
         TextureType: 3
         TextureUnit: 3
       AOMap:
-        TexturePath: C:/Users/bisho/OneDrive/Escritorio/OPENGL_GAME/OpenGL_ShooterV2/Core/assets/textures/default_ao.jpg
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
         TextureType: 4
         TextureUnit: 4
     MeshComponent:
@@ -71,19 +71,17 @@ Entities:
         - 4.87183905
         - 4.52236223
     IDComponent:
-      ID: c80ea8a06d355be0
+      ID: de019b0bd22e493d
       MarkToDelete: false
     TagComponent:
-      Tag: turbina_clone_clone
-    ParentComponent:
-      Parent: 0
+      Tag: turbina_clone
   - Entity: 1
     TransformComponent:
       Transform:
         Position:
-          - -60.5673714
-          - -1.54736063e-05
-          - 15.1226168
+          - -26.1254597
+          - 0
+          - -25.5419044
         Rotation:
           - 0
           - -0
@@ -97,9 +95,9 @@ Entities:
         MaterialName: turbina
         ShaderName: default
         AlbedoColor:
-          - 0.800000012
-          - 0.800000012
-          - 0.800000012
+          - 0.0676593035
+          - 0.683003128
+          - 0.0843422115
         NormalStrength: 1
         MetallicValue: 0
         RoughnessValue: 0.699999988
@@ -121,7 +119,7 @@ Entities:
         TextureType: 3
         TextureUnit: 3
       AOMap:
-        TexturePath: C:/Users/bisho/OneDrive/Escritorio/OPENGL_GAME/OpenGL_ShooterV2/Core/assets/textures/default_ao.jpg
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
         TextureType: 4
         TextureUnit: 4
     MeshComponent:
@@ -136,19 +134,17 @@ Entities:
         - 4.87183905
         - 4.52236223
     IDComponent:
-      ID: 3645aeb7f22e9e1a
+      ID: ccea5d491a855aa6
       MarkToDelete: false
     TagComponent:
-      Tag: turbina
-    ChildComponent:
-      - 0
+      Tag: turbina_clone
   - Entity: 0
     TransformComponent:
       Transform:
         Position:
-          - -15.2053719
-          - 7.63094977e-06
-          - 22.2212849
+          - 17.6468372
+          - 0
+          - -25.5419044
         Rotation:
           - 0
           - -0
@@ -162,9 +158,9 @@ Entities:
         MaterialName: turbina
         ShaderName: default
         AlbedoColor:
-          - 0.800000012
-          - 0.800000012
-          - 0.800000012
+          - 0.0676593035
+          - 0.683003128
+          - 0.0843422115
         NormalStrength: 1
         MetallicValue: 0
         RoughnessValue: 0.699999988
@@ -186,7 +182,7 @@ Entities:
         TextureType: 3
         TextureUnit: 3
       AOMap:
-        TexturePath: C:/Users/bisho/OneDrive/Escritorio/OPENGL_GAME/OpenGL_ShooterV2/Core/assets/textures/default_ao.jpg
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
         TextureType: 4
         TextureUnit: 4
     MeshComponent:
@@ -201,11 +197,7 @@ Entities:
         - 4.87183905
         - 4.52236223
     IDComponent:
-      ID: 398eb81fed4d51e7
+      ID: bc8056899bb9b2c4
       MarkToDelete: false
     TagComponent:
-      Tag: turbina_clone
-    ParentComponent:
-      Parent: 1
-    ChildComponent:
-      - 2
+      Tag: turbina

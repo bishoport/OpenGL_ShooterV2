@@ -96,6 +96,7 @@ namespace libCore
 
     struct MaterialComponent
     {
+       // bool overrideValues = false;
         Ref<Material> material;
     };
 

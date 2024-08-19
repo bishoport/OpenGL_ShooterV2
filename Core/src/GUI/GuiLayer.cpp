@@ -68,6 +68,21 @@ namespace libCore
 
         //--PANELS
         assetsPanel = CreateScope<AssetsPanel>();
+
+        RegisterPopup("Save Scene As", [this]() {
+            static char sceneNameBuffer[128] = "";
+            ImGui::Text("Enter scene name:");
+            ImGui::InputText("##SceneName", sceneNameBuffer, IM_ARRAYSIZE(sceneNameBuffer));
+
+            if (ImGui::Button("Save", ImVec2(120, 0))) {
+                EngineOpenGL::GetInstance().currentScene->SerializeScene(sceneNameBuffer);
+                this->ClosePopup("Save Scene As");
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+                this->ClosePopup("Save Scene As");
+            }
+            });
     }
     GuiLayer::~GuiLayer() {
         // Cleanup
@@ -93,6 +108,10 @@ namespace libCore
 
         if (EngineOpenGL::GetInstance().engineState == EDITOR || EngineOpenGL::GetInstance().engineState == EDITOR_PLAY)
         {
+            ShowPopups(); // Llamada para renderizar todos los popups
+
+
+
             //--SELECT MODEL FROM RAY POPUP
             if (isSelectingObject == true && !popupJustClosed)
             {
@@ -131,12 +150,14 @@ namespace libCore
                     popupCloseTime = std::chrono::steady_clock::now();
                     popupJustClosed = true;
                 }
-
                 for (const auto& entity : EntityManager::GetInstance().entitiesInRay) {
-                    if (libCore::EntityManager::GetInstance().m_registry->has<MeshComponent>(entity)) {
-                        auto& meshComponent = libCore::EntityManager::GetInstance().m_registry->get<MeshComponent>(entity);
-                        if (ImGui::Button(meshComponent.mesh->meshName.c_str())) {
-                            libCore::EntityManager::GetInstance().currentSelectedEntityInScene = entity;
+                    // Verificar si la entidad tiene un TagComponent
+                    if (EntityManager::GetInstance().m_registry->has<TagComponent>(entity)) {
+                        auto& tagComponent = EntityManager::GetInstance().m_registry->get<TagComponent>(entity);
+
+                        // Mostrar el nombre del TagComponent en el botón
+                        if (ImGui::Button(tagComponent.Tag.c_str())) {
+                            EntityManager::GetInstance().currentSelectedEntityInScene = entity;
                             isSelectingObject = false; // Esta asignación cerrará el popup al finalizar el frame
                             ImGui::CloseCurrentPopup();
                             popupCloseTime = std::chrono::steady_clock::now();
@@ -218,7 +239,8 @@ namespace libCore
 
 
     //--TOP MAIN MENU & TOOLBAR
-    void GuiLayer::renderMainMenuBar() {
+    void GuiLayer::renderMainMenuBar() 
+    {
 
         // Barra de menu principal
         if (ImGui::BeginMainMenuBar())
@@ -226,24 +248,28 @@ namespace libCore
             if (ImGui::BeginMenu("Scene"))
             {
                 if (ImGui::MenuItem("New Scene")) { /* Abrir archivo */ }
-                if (ImGui::MenuItem("Open Scene")) 
+
+                // Lógica para abrir el popup de guardado
+                if (ImGui::MenuItem("Save Scene"))
                 {
-                    EngineOpenGL::GetInstance().currentScene->DeserializeScene();
+                    OpenPopup("Save Scene As");
                 }
-                if (ImGui::MenuItem("Save Scene")) 
-                {
-                    EngineOpenGL::GetInstance().currentScene->SerializeScene();
-                }
-                //if (ImGui::MenuItem("Exit", "Ctrl+Q")) { glfwSetWindowShouldClose(window, true); }
                 ImGui::EndMenu();
             }
-          
+
             if (ImGui::BeginMenu("GameObjects"))
             {
+                if (ImGui::MenuItem("Check Entities"))
+                {
+                    EntityManager::GetInstance().DebugPrintAllEntityHierarchies();
+                }
+
+                
                 if (ImGui::MenuItem("Empty"))
                 {
                     EntityManager::GetInstance().CreateEmptyGameObject("new_GameObject");
                 }
+
                 // Lights Section
                 ImGui::Spacing();
                 ImGui::Spacing();
@@ -264,7 +290,7 @@ namespace libCore
                     libCore::LightsManager::CreateLight(true, libCore::LightType::AREA, glm::vec3(0.0f, 0.0f, 0.0f));
                 }
 
-                //Prefabs
+                // Prefabs
                 ImGui::Spacing();
                 ImGui::Spacing();
                 ImGui::Spacing();
@@ -297,10 +323,51 @@ namespace libCore
     //-------------------------------------------------------------------------------
 
 
+    //--POPUPS
+    void GuiLayer::RegisterPopup(const std::string& title, const std::function<void()>& content)
+    {
+        popups.emplace_back(title, content);
+    }
+    void libCore::GuiLayer::ShowPopups()
+    {
+        for (auto& popup : popups) {
+            if (popup.isOpen) {
+                ImGui::OpenPopup(popup.title.c_str());
+            }
+
+            if (ImGui::BeginPopupModal(popup.title.c_str(), &popup.isOpen, ImGuiWindowFlags_AlwaysAutoResize)) {
+                popup.content();
+                ImGui::EndPopup();
+            }
+        }
+    }
+    void libCore::GuiLayer::OpenPopup(const std::string& title)
+    {
+        for (auto& popup : popups) {
+            if (popup.title == title) {
+                popup.isOpen = true;
+                break;
+            }
+        }
+    }
+    void libCore::GuiLayer::ClosePopup(const std::string& title)
+    {
+        for (auto& popup : popups) {
+            if (popup.title == title) {
+                popup.isOpen = false;
+                break;
+            }
+        }
+    }
+    //-------------------------------------------------------------------------------
+
+
     //--UPDATES
     void GuiLayer::checkGizmo(const Ref<Viewport>& viewport)
     {
         static bool useLocalTransform = true; // Variable para controlar el modo de transformación
+        static bool snapEnabled = false; // Variable para controlar si el snap está habilitado
+        static float snapValue[3] = { 1.0f, 1.0f, 1.0f }; // Valores de snap para mover, rotar, y escalar
 
         // ImGui button to toggle transform mode
         ImGui::Begin("Gizmo Controls");
@@ -308,6 +375,13 @@ namespace libCore
         {
             useLocalTransform = !useLocalTransform;
         }
+
+        // Toggle snap with a button
+        if (ImGui::Button(snapEnabled ? "Disable Snap" : "Enable Snap"))
+        {
+            snapEnabled = !snapEnabled;
+        }
+
         ImGui::End();
 
         //--INPUTS TOOLS
@@ -346,19 +420,26 @@ namespace libCore
 
             ImGuizmo::MODE transformMode = useLocalTransform ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
 
+            // Habilitar el snap si está activo
+            bool snap = snapEnabled;
+            float* snapValues = nullptr;
+
             switch (m_GizmoOperation)
             {
             case GizmoOperation::Translate:
+                if (snap) snapValues = snapValue; // Snap en las tres dimensiones (X, Y, Z)
                 ImGuizmo::Manipulate(glm::value_ptr(camera_view), glm::value_ptr(camera_projection),
-                    ImGuizmo::TRANSLATE, transformMode, glm::value_ptr(entity_transform));
+                    ImGuizmo::TRANSLATE, transformMode, glm::value_ptr(entity_transform), nullptr, snapValues);
                 break;
             case GizmoOperation::Rotate3D:
+                if (snap) snapValue[0] = 15.0f; // Snap en ángulos de 15 grados (esto depende de tus preferencias)
                 ImGuizmo::Manipulate(glm::value_ptr(camera_view), glm::value_ptr(camera_projection),
-                    ImGuizmo::ROTATE, transformMode, glm::value_ptr(entity_transform));
+                    ImGuizmo::ROTATE, transformMode, glm::value_ptr(entity_transform), nullptr, snap ? snapValue : nullptr);
                 break;
             case GizmoOperation::Scale:
+                if (snap) snapValues = snapValue; // Snap en las tres dimensiones (X, Y, Z)
                 ImGuizmo::Manipulate(glm::value_ptr(camera_view), glm::value_ptr(camera_projection),
-                    ImGuizmo::SCALE, transformMode, glm::value_ptr(entity_transform));
+                    ImGuizmo::SCALE, transformMode, glm::value_ptr(entity_transform), nullptr, snapValues);
                 break;
             }
 
@@ -378,6 +459,7 @@ namespace libCore
             }
         }
     }
+
     //-------------------------------------------------------------------------------
  
 
@@ -553,13 +635,19 @@ namespace libCore
                     ImGui::Text("Rotation");
                     ImGui::TextColored(ImVec4(1, 0, 0, 1), "X");
                     ImGui::SameLine();
-                    ImGui::DragFloat("##RotX", &transform->eulerAngles.x, 0.1f, -360.0f, 360.0f, "X: %.2f");
+                    if (ImGui::DragFloat("##RotX", &transform->eulerAngles.x, 0.1f, -360.0f, 360.0f, "X: %.2f")) {
+                        transform->updateRotationFromEulerAngles();  // Actualizar la rotación cuando se cambien los ángulos de Euler
+                    }
                     ImGui::TextColored(ImVec4(0, 1, 0, 1), "Y");
                     ImGui::SameLine();
-                    ImGui::DragFloat("##RotY", &transform->eulerAngles.y, 0.1f, -360.0f, 360.0f, "Y: %.2f");
+                    if (ImGui::DragFloat("##RotY", &transform->eulerAngles.y, 0.1f, -360.0f, 360.0f, "Y: %.2f")) {
+                        transform->updateRotationFromEulerAngles();  // Actualizar la rotación cuando se cambien los ángulos de Euler
+                    }
                     ImGui::TextColored(ImVec4(0, 0, 1, 1), "Z");
                     ImGui::SameLine();
-                    ImGui::DragFloat("##RotZ", &transform->eulerAngles.z, 0.1f, -360.0f, 360.0f, "Z: %.2f");
+                    if (ImGui::DragFloat("##RotZ", &transform->eulerAngles.z, 0.1f, -360.0f, 360.0f, "Z: %.2f")) {
+                        transform->updateRotationFromEulerAngles();  // Actualizar la rotación cuando se cambien los ángulos de Euler
+                    }
 
                     // Escala
                     ImGui::Text("Scale");
@@ -573,7 +661,8 @@ namespace libCore
                     ImGui::SameLine();
                     ImGui::DragFloat("##ScaleZ", &transform->scale.z, 0.01f, 0.0f, FLT_MAX, "Z: %.2f");
                 }
-            }           
+            }
+
             //--MESH_COMPONENT
             if (EntityManager::GetInstance().HasComponent<MeshComponent>(selectedEntity)) {
                 if (ImGui::CollapsingHeader("Mesh")) {
@@ -985,7 +1074,6 @@ namespace libCore
 
         ImGui::End();
     }
-
     void GuiLayer::DisplayModelMeshes(const Ref<Model>& model)
     {
         for (const auto& mesh : model->meshes) {
@@ -995,8 +1083,6 @@ namespace libCore
             DisplayModelMeshes(child);
         }
     }
-
-
     //-----------------------------------------------------------------------------------------------------
 
 

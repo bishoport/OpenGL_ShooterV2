@@ -23,10 +23,9 @@ namespace libCore {
         void Update(Timestep m_deltaTime);
         void Render(Timestep m_deltaTime);
 
-        //--YALM
-        void SerializeScene();
-        void DeserializeScene();
+        //--SERIALIZATION
+        void SerializeScene(std::string _sceneName);
+        void DeserializeScene(std::string _sceneName);
 
-    private:
     };
 }

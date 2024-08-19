@@ -78,6 +78,7 @@ namespace libCore {
 			}
 
 
+
 			if (iconTexture != 0)
 			{
 				ImGui::ImageButton((ImTextureID)(intptr_t)iconTexture, ImVec2(thumbnailSize - 15, thumbnailSize - 15));
@@ -93,6 +94,12 @@ namespace libCore {
 				if (directoryEntry.is_directory())
 				{
 					m_CurrentDirectory /= path.filename();
+				}
+				else if (path.extension() == ".yaml" || path.extension() == ".yml")
+				{
+					// Aquí llamas a la función para deserializar la escena
+					std::string sceneName = path.stem().string(); // Obtén el nombre del archivo sin extensión
+					EngineOpenGL::GetInstance().currentScene->DeserializeScene(sceneName);
 				}
 				else
 				{
@@ -126,13 +133,14 @@ namespace libCore {
 			ImGui::PopID();
 		}
 
+
 		if (isDialogOpen) {
 			ImGui::OpenPopup("Import Options");
 		}
 
+
 		if (ImGui::BeginPopupModal("Import Options", &isDialogOpen)) 
 		{
-			
 			// Obtener el fullPath y descomponer en filePath y fileName
 			std::filesystem::path fullPath = m_DirectoryEntry;
 			std::string filePath = fullPath.parent_path().string();

@@ -1,0 +1,48 @@
+Scene: Untitled
+Models:
+  - ModelName: Robot.fbx
+    ImportModelData:
+      filePath: assets\models\Robot\
+      fileName: Robot.fbx
+      modelID: 0
+      invertUV: false
+      rotate90: false
+      skeletal: false
+      useCustomTransform: true
+      processLights: false
+      globalScaleFactor: 1
+Entities:
+  - Entity: 0
+    IDComponent:
+      ID: 96fd723b5fab9099
+      MarkToDelete: false
+    TagComponent:
+      Tag: Bot
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 0
+        Rotation:
+          - -0.871694624
+          - 0.287025213
+          - -0.860006273
+        Scale:
+          - 0.999999881
+          - 1.0000006
+          - 1.00000095
+    MeshComponent:
+      MeshName: mesh_bot
+    MaterialComponent:
+      Material:
+        MaterialName: Material.001
+        ShaderName: default
+        AlbedoColor:
+          - 0.800000012
+          - 0.800000012
+          - 0.800000012
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1

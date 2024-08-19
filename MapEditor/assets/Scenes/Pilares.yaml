@@ -1,0 +1,557 @@
+Scene: Untitled
+Models:
+  - ModelName: Primitives.glb
+    ImportModelData:
+      filePath: assets\models\
+      fileName: Primitives.glb
+      modelID: 0
+      invertUV: false
+      rotate90: false
+      skeletal: false
+      useCustomTransform: true
+      processLights: false
+      globalScaleFactor: 1
+Entities:
+  - Entity: 14
+    IDComponent:
+      ID: 45896dd4e9211eed
+      MarkToDelete: false
+    TagComponent:
+      Tag: Torus_1_1_1
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 3.77206707
+          - 7.25792885
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 12
+    MeshComponent:
+      MeshName: Torus
+    MaterialComponent:
+      Material:
+        MaterialName: ""
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 13
+    IDComponent:
+      ID: 6ee02c79bd68ea53
+      MarkToDelete: false
+    TagComponent:
+      Tag: Torus_1_1
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 2.06118393
+          - 3.97748184
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 12
+    MeshComponent:
+      MeshName: Torus
+    MaterialComponent:
+      Material:
+        MaterialName: ""
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 12
+    IDComponent:
+      ID: 0873b895e7968ca0
+      MarkToDelete: false
+    TagComponent:
+      Tag: Torus_1
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 2.39267969
+          - 3.50052261
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 11
+    ChildComponent:
+      - 13
+      - 14
+    MeshComponent:
+      MeshName: Torus
+    MaterialComponent:
+      Material:
+        MaterialName: ""
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 11
+    IDComponent:
+      ID: 1c040305bd50cda0
+      MarkToDelete: false
+    TagComponent:
+      Tag: Torus
+    TransformComponent:
+      Transform:
+        Position:
+          - 15
+          - 4.00734615
+          - -8.5504055
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ChildComponent:
+      - 12
+    MeshComponent:
+      MeshName: Torus
+    MaterialComponent:
+      Material:
+        MaterialName: ""
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 10
+    IDComponent:
+      ID: 0f481e6516195af5
+      MarkToDelete: false
+    TagComponent:
+      Tag: Pilar
+    TransformComponent:
+      Transform:
+        Position:
+          - 5
+          - 0
+          - -10.0563755
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 0
+    ChildComponent:
+      - 9
+    MeshComponent:
+      MeshName: Cube
+    MaterialComponent:
+      Material:
+        MaterialName: ""
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 9
+    IDComponent:
+      ID: 63a47c01ddfb8537
+      MarkToDelete: false
+    TagComponent:
+      Tag: Sphere
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 2.13664532
+          - 0
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 10
+    MeshComponent:
+      MeshName: Sphere
+    MaterialComponent:
+      Material:
+        MaterialName: ""
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 8
+    IDComponent:
+      ID: 30d91f25c6711f39
+      MarkToDelete: false
+    TagComponent:
+      Tag: Pilar_1
+    TransformComponent:
+      Transform:
+        Position:
+          - 5
+          - 0
+          - -5.18269205
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 0
+    ChildComponent:
+      - 7
+    MeshComponent:
+      MeshName: Cube
+    MaterialComponent:
+      Material:
+        MaterialName: ""
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 7
+    IDComponent:
+      ID: f36d142df2a16ac6
+      MarkToDelete: false
+    TagComponent:
+      Tag: Sphere_1
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 2.13664532
+          - 0
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 8
+    MeshComponent:
+      MeshName: Sphere
+    MaterialComponent:
+      Material:
+        MaterialName: ""
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 6
+    IDComponent:
+      ID: 30010c7c32f9d15d
+      MarkToDelete: false
+    TagComponent:
+      Tag: Pilar_1_1
+    TransformComponent:
+      Transform:
+        Position:
+          - 5
+          - 0
+          - -14.4941187
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 0
+    ChildComponent:
+      - 5
+    MeshComponent:
+      MeshName: Cube
+    MaterialComponent:
+      Material:
+        MaterialName: ""
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 5
+    IDComponent:
+      ID: 0e98fa021a20b410
+      MarkToDelete: false
+    TagComponent:
+      Tag: Sphere_1_1
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 2.13664532
+          - 0
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 6
+    MeshComponent:
+      MeshName: Sphere
+    MaterialComponent:
+      Material:
+        MaterialName: ""
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 4
+    IDComponent:
+      ID: e38584c51247dffe
+      MarkToDelete: false
+    TagComponent:
+      Tag: Pilar_1_2
+    TransformComponent:
+      Transform:
+        Position:
+          - 5
+          - 0
+          - -19.8621845
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 0
+    ChildComponent:
+      - 3
+    MeshComponent:
+      MeshName: Cube
+    MaterialComponent:
+      Material:
+        MaterialName: ""
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 3
+    IDComponent:
+      ID: d4942468ffe4d902
+      MarkToDelete: false
+    TagComponent:
+      Tag: Sphere_1_2
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 2.13664532
+          - 0
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 4
+    MeshComponent:
+      MeshName: Sphere
+    MaterialComponent:
+      Material:
+        MaterialName: ""
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 2
+    IDComponent:
+      ID: 6385320befab41ef
+      MarkToDelete: false
+    TagComponent:
+      Tag: Pilar_1_3
+    TransformComponent:
+      Transform:
+        Position:
+          - 5
+          - 0
+          - -25.6444645
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 0
+    ChildComponent:
+      - 1
+    MeshComponent:
+      MeshName: Cube
+    MaterialComponent:
+      Material:
+        MaterialName: ""
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 1
+    IDComponent:
+      ID: 495d3365a5f6ee9d
+      MarkToDelete: false
+    TagComponent:
+      Tag: Sphere_1_3
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 2.13664532
+          - 0
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 2
+    MeshComponent:
+      MeshName: Sphere
+    MaterialComponent:
+      Material:
+        MaterialName: ""
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 0
+    IDComponent:
+      ID: 08b761b33cd7f205
+      MarkToDelete: false
+    TagComponent:
+      Tag: Pilares
+    TransformComponent:
+      Transform:
+        Position:
+          - 13.0240898
+          - 0
+          - -11.8842602
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ChildComponent:
+      - 2
+      - 4
+      - 6
+      - 8
+      - 10

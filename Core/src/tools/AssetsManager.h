@@ -4,6 +4,7 @@
 #include "../Core/Texture.h"
 #include "../Core/Model.h"
 
+#include <filesystem>
 
 
 
@@ -20,8 +21,8 @@ namespace libCore
 		}
 
 		//--TEXTURES
-		//std::string defaultAssetsPathTexture = "C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/";
-		std::string defaultAssetsPathTexture = "C:/Users/bisho/OneDrive/Escritorio/OPENGL_GAME/OpenGL_ShooterV2/Core/assets/textures/";
+		std::string defaultAssetsPathTexture = "C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/";
+		//std::string defaultAssetsPathTexture = "C:/Users/bisho/OneDrive/Escritorio/OPENGL_GAME/OpenGL_ShooterV2/Core/assets/textures/";
 		void UnloadTexture(const std::string& name);
 		void LoadDefaultAssets();
 		Ref<Texture> LoadTextureAsset(const std::string& key, const char* directoryPath, const char* fileName, TEXTURE_TYPES type);
@@ -53,7 +54,13 @@ namespace libCore
 
 	private:
 		// Constructor privado
-		AssetsManager() {}
+		AssetsManager() 
+		{
+			std::filesystem::path basePath = std::filesystem::path("../../");
+			std::filesystem::path fullPath = basePath / "path/to/your/file.txt";
+			std::string fullPathStr = fullPath.string();
+			std::cout << "Full path: " << fullPathStr << std::endl;
+		}
 
 		//-CARGADOS EN MEMORIA
 		std::unordered_map<std::string, Ref<Material>> loadedMaterials;

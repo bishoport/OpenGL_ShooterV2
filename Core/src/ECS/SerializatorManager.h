@@ -45,7 +45,7 @@ namespace YAML {
         static Node encode(const libCore::Transform& rhs) {
             Node node;
             node["Position"] = rhs.position;
-            node["Rotation"] = rhs.eulerAngles;
+            node["Rotation"] = rhs.eulerAngles;  // Se serializan los ángulos de Euler
             node["Scale"] = rhs.scale;
             return node;
         }
@@ -57,9 +57,35 @@ namespace YAML {
             rhs.position = node["Position"].as<glm::vec3>();
             rhs.eulerAngles = node["Rotation"].as<glm::vec3>();
             rhs.scale = node["Scale"].as<glm::vec3>();
+
+            // Asegurarse de que la rotación en cuaternión se actualice correctamente
+            rhs.updateRotationFromEulerAngles();
+
             return true;
         }
     };
+
+    ////--Transform
+    //template<>
+    //struct convert<libCore::Transform> {
+    //    static Node encode(const libCore::Transform& rhs) {
+    //        Node node;
+    //        node["Position"] = rhs.position;
+    //        node["Rotation"] = rhs.eulerAngles;
+    //        node["Scale"] = rhs.scale;
+    //        return node;
+    //    }
+
+    //    static bool decode(const Node& node, libCore::Transform& rhs) {
+    //        if (!node["Position"] || !node["Rotation"] || !node["Scale"]) {
+    //            return false;
+    //        }
+    //        rhs.position = node["Position"].as<glm::vec3>();
+    //        rhs.eulerAngles = node["Rotation"].as<glm::vec3>();
+    //        rhs.scale = node["Scale"].as<glm::vec3>();
+    //        return true;
+    //    }
+    //};
 
     //--Material
     template<>
@@ -192,18 +218,28 @@ namespace libCore {
         return node;
     }
 
-    TransformComponent DeserializeTransformComponent(const YAML::Node& node) {
+    /*TransformComponent DeserializeTransformComponent(const YAML::Node& node) {
         TransformComponent transformComponent;
         transformComponent.transform = CreateRef<Transform>(node["Transform"].as<Transform>());
         return transformComponent;
+    }*/
+
+
+    TransformComponent DeserializeTransformComponent(const YAML::Node& node) {
+        TransformComponent transformComponent;
+        transformComponent.transform = CreateRef<Transform>(node["Transform"].as<Transform>());
+
+        // La función 'as<Transform>()' ya maneja la actualización del cuaternión desde los ángulos de Euler.
+        return transformComponent;
     }
+
 
     //--MaterialComponent
     YAML::Node SerializeMaterialComponent(const MaterialComponent& materialComponent) {
         YAML::Node node;
         node["Material"] = *materialComponent.material;
 
-        if (materialComponent.material->albedoMap) {
+        /*if (materialComponent.material->albedoMap) {
             node["AlbedoMap"] = *materialComponent.material->albedoMap;
         }
         if (materialComponent.material->normalMap) {
@@ -217,7 +253,7 @@ namespace libCore {
         }
         if (materialComponent.material->aOMap) {
             node["AOMap"] = *materialComponent.material->aOMap;
-        }
+        }*/
 
         return node;
     }
@@ -227,29 +263,31 @@ namespace libCore {
         materialComponent.material = CreateRef<Material>();
         *materialComponent.material = node["Material"].as<Material>();
 
-        if (node["AlbedoMap"]) {
-            materialComponent.material->albedoMap = CreateRef<Texture>();
-            *materialComponent.material->albedoMap = node["AlbedoMap"].as<Texture>();
-        }
-        if (node["NormalMap"]) {
-            materialComponent.material->normalMap = CreateRef<Texture>();
-            *materialComponent.material->normalMap = node["NormalMap"].as<Texture>();
-        }
-        if (node["MetallicMap"]) {
-            materialComponent.material->metallicMap = CreateRef<Texture>();
-            *materialComponent.material->metallicMap = node["MetallicMap"].as<Texture>();
-        }
-        if (node["RoughnessMap"]) {
-            materialComponent.material->roughnessMap = CreateRef<Texture>();
-            *materialComponent.material->roughnessMap = node["RoughnessMap"].as<Texture>();
-        }
-        if (node["AOMap"]) {
-            materialComponent.material->aOMap = CreateRef<Texture>();
-            *materialComponent.material->aOMap = node["AOMap"].as<Texture>();
-        }
+        //if (node["AlbedoMap"]) {
+        //    materialComponent.material->albedoMap = CreateRef<Texture>();
+        //    *materialComponent.material->albedoMap = node["AlbedoMap"].as<Texture>();
+        //}
+        //if (node["NormalMap"]) {
+        //    materialComponent.material->normalMap = CreateRef<Texture>();
+        //    *materialComponent.material->normalMap = node["NormalMap"].as<Texture>();
+        //}
+        //if (node["MetallicMap"]) {
+        //    materialComponent.material->metallicMap = CreateRef<Texture>();
+        //    *materialComponent.material->metallicMap = node["MetallicMap"].as<Texture>();
+        //}
+        //if (node["RoughnessMap"]) {
+        //    materialComponent.material->roughnessMap = CreateRef<Texture>();
+        //    *materialComponent.material->roughnessMap = node["RoughnessMap"].as<Texture>();
+        //}
+        //if (node["AOMap"]) {
+        //    materialComponent.material->aOMap = CreateRef<Texture>();
+        //    *materialComponent.material->aOMap = node["AOMap"].as<Texture>();
+        //}
 
         return materialComponent;
     }
+
+
 
     //--MeshComponent
     YAML::Node SerializeMeshComponent(const MeshComponent& meshComponent) {

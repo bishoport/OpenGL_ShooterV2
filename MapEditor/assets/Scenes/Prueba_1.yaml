@@ -1,0 +1,726 @@
+Scene: Untitled
+Models:
+  - ModelName: Robot.fbx
+    ImportModelData:
+      filePath: assets\models\Robot\
+      fileName: Robot.fbx
+      modelID: 0
+      invertUV: false
+      rotate90: false
+      skeletal: false
+      useCustomTransform: true
+      processLights: false
+      globalScaleFactor: 1
+  - ModelName: Kit_1.fbx
+    ImportModelData:
+      filePath: assets\models\Collections\Kit_1\
+      fileName: Kit_1.fbx
+      modelID: 0
+      invertUV: false
+      rotate90: false
+      skeletal: false
+      useCustomTransform: true
+      processLights: false
+      globalScaleFactor: 1
+Entities:
+  - Entity: 10
+    TransformComponent:
+      Transform:
+        Position:
+          - 51.5637016
+          - 0
+          - -237.581497
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Brick.003
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Bricks1.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Bricks1_nmp.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+    MeshComponent:
+      MeshName: Mesh.065
+    AABBComponent:
+      AABBMin:
+        - -24.2474537
+        - 0
+        - -24.2474537
+      AABBMax:
+        - 24.2474537
+        - 18.8407516
+        - 24.2474537
+    IDComponent:
+      ID: 3c79eb459bffc9fb
+      MarkToDelete: false
+    TagComponent:
+      Tag: Blocker_wall_7
+  - Entity: 9
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - -330.162354
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Wall3.010
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Wall3.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Wall3_nmp.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+    MeshComponent:
+      MeshName: Mesh.064
+    AABBComponent:
+      AABBMin:
+        - -26.6028786
+        - -0.124960244
+        - -26.6028786
+      AABBMax:
+        - 26.6028786
+        - 23.579752
+        - 26.6028786
+    IDComponent:
+      ID: 9a5074d11bd7b17d
+      MarkToDelete: false
+    TagComponent:
+      Tag: Blocker_wall_6
+  - Entity: 8
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - -330.162354
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Brick.003
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Bricks1.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Bricks1_nmp.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+    MeshComponent:
+      MeshName: Mesh.064
+    AABBComponent:
+      AABBMin:
+        - -24.2474537
+        - 0
+        - -24.2474537
+      AABBMax:
+        - 24.2474537
+        - 18.8407516
+        - 24.2474537
+    IDComponent:
+      ID: 77e2c7086c9ced61
+      MarkToDelete: false
+    TagComponent:
+      Tag: Blocker_wall_6
+  - Entity: 7
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - -241.126617
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Brick.003
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Bricks1.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Bricks1_nmp.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+    MeshComponent:
+      MeshName: Mesh.063
+    AABBComponent:
+      AABBMin:
+        - -77.7124176
+        - 1.15337372
+        - 5.58899879
+      AABBMax:
+        - 72.2875824
+        - 51.1533737
+        - 5.58899879
+    IDComponent:
+      ID: c0ddf302057515e3
+      MarkToDelete: false
+    TagComponent:
+      Tag: Blocker_wall_5
+  - Entity: 6
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - -241.126617
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Wall2.011
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Wall2.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Wall2_nmp.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+    MeshComponent:
+      MeshName: Mesh.063
+    AABBComponent:
+      AABBMin:
+        - -31.7726517
+        - 1.28318787
+        - 5.3232193
+      AABBMax:
+        - 26.3478088
+        - 50.0008736
+        - 12.7562046
+    IDComponent:
+      ID: 9592897ce62efe42
+      MarkToDelete: false
+    TagComponent:
+      Tag: Blocker_wall_5
+  - Entity: 5
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - -241.126617
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Wall1.001
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Wall1.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Wall1_nmp.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+    MeshComponent:
+      MeshName: Mesh.063
+    AABBComponent:
+      AABBMin:
+        - -79.0495453
+        - 49.5291939
+        - -2.87344456
+      AABBMax:
+        - 82.671196
+        - 53.2636642
+        - 9.50894833
+    IDComponent:
+      ID: 002ce7b86f372c86
+      MarkToDelete: false
+    TagComponent:
+      Tag: Blocker_wall_5
+  - Entity: 4
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - -26.0582695
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Wall3.010
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Wall3.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Wall3_nmp.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+    MeshComponent:
+      MeshName: Mesh.062
+    AABBComponent:
+      AABBMin:
+        - -14.5020599
+        - -0.505245924
+        - -14.8774042
+      AABBMax:
+        - 14.8774042
+        - 44.4194336
+        - 14.152503
+    IDComponent:
+      ID: adbacfa305f602c1
+      MarkToDelete: false
+    TagComponent:
+      Tag: Plataforma_1
+    ChildComponent:
+      - 3
+  - Entity: 3
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 0.0829620361
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Brick.003
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Bricks1.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Bricks1_nmp.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+    MeshComponent:
+      MeshName: Mesh.062
+    AABBComponent:
+      AABBMin:
+        - -12.5790443
+        - -2.80798936
+        - -12.7034359
+      AABBMax:
+        - 12.3935413
+        - 42.8037949
+        - 12.9260397
+    IDComponent:
+      ID: 9807335bb3d036cc
+      MarkToDelete: false
+    TagComponent:
+      Tag: Blocker_wall_4
+    ParentComponent:
+      Parent: 4
+  - Entity: 2
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - -1.21818542
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Brick.003
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Bricks1.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Bricks1_nmp.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+    MeshComponent:
+      MeshName: Mesh.061
+    AABBComponent:
+      AABBMin:
+        - -12.5634718
+        - -2.80798936
+        - -9.93309975
+      AABBMax:
+        - 12.3935413
+        - 20
+        - 10.0669003
+    IDComponent:
+      ID: 6c5ce9e850686595
+      MarkToDelete: false
+    TagComponent:
+      Tag: Blocker_wall_2
+    ParentComponent:
+      Parent: 1
+  - Entity: 1
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 0
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    MaterialComponent:
+      Material:
+        MaterialName: Wall3.010
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Wall3.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: assets\models\Collections\Kit_1\Textures\Wall3_nmp.jpg
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_metallic.jpg
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+    MeshComponent:
+      MeshName: Mesh.061
+    AABBComponent:
+      AABBMin:
+        - -14.1069899
+        - -0.505245924
+        - -12.4108601
+      AABBMax:
+        - 14.152503
+        - 21.6804466
+        - 12.4108601
+    IDComponent:
+      ID: c16a1ba95b55d435
+      MarkToDelete: false
+    TagComponent:
+      Tag: Plataforma_2
+    ChildComponent:
+      - 2
+  - Entity: 0
+    TransformComponent:
+      Transform:
+        Position:
+          - -3.88294888
+          - 20.5555496
+          - 5.0262289
+        Rotation:
+          - 0
+          - 1.10453057
+          - 0
+        Scale:
+          - 1.00000012
+          - 1
+          - 1.00000012
+    MaterialComponent:
+      Material:
+        MaterialName: Material.001
+        ShaderName: default
+        AlbedoColor:
+          - 0.800000012
+          - 0.800000012
+          - 0.800000012
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Robot\base.png
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: assets\models\Robot\normal.png
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: assets\models\Robot\metallic.png
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Produccion/PROPIOS/OpenGL_DEV/OpenGLSandbox/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+    MeshComponent:
+      MeshName: mesh_bot
+    AABBComponent:
+      AABBMin:
+        - 0.18859005
+        - -0.0367102623
+        - -7.1294837
+      AABBMax:
+        - 7.81074953
+        - 18.4584427
+        - 7.58572769
+    IDComponent:
+      ID: 4c52c3e0071c1170
+      MarkToDelete: false
+    TagComponent:
+      Tag: Bot

@@ -37,6 +37,7 @@ namespace libCore
             m_registry->emplace<TransformComponent>(entity);
             return entity;
         }
+        
         entt::entity CreateGameObjectFromModel(Ref<Model> model, entt::entity parent)
         {
             // Crear una nueva entidad para el modelo
@@ -77,6 +78,7 @@ namespace libCore
 
             return entity;
         }
+
         void CreateCamera()
         {
             entt::entity gameObject = CreateEmptyGameObject("MainCamera");
@@ -152,24 +154,66 @@ namespace libCore
                 UpdateAccumulatedTransforms(newEntity);
             }
         }
+
         entt::entity DuplicateEntityRecursively(entt::entity entity, entt::entity parentEntity) {
             if (!m_registry->valid(entity)) {
                 return entt::null;
             }
 
-            // Obtener el nombre original y concatenar con "_clone"
+            // Obtener el nombre original
             std::string originalTag = GetComponent<TagComponent>(entity).Tag;
-            std::string newTag = originalTag + "_clone";
+            std::string newTag = originalTag;
+
+            // Buscar si ya existen clones y agregar un sufijo único
+            int cloneIndex = 1;
+            while (IsTagUsed(newTag + "_" + std::to_string(cloneIndex))) {
+                cloneIndex++;
+            }
+            newTag = originalTag + "_" + std::to_string(cloneIndex);
 
             // Crear una nueva entidad con el nombre modificado
             entt::entity newEntity = CreateEmptyGameObject(newTag);
+
+            // Añadir el hijo al padre usando AddChild
+            if (parentEntity != entt::null) {
+                AddChild(parentEntity, newEntity);
+            }
+
+            // Manejar los hijos
+            if (HasComponent<ChildComponent>(entity)) {
+                auto& srcChild = GetComponent<ChildComponent>(entity);
+                for (auto& child : srcChild.children) {
+                    DuplicateEntityRecursively(child, newEntity);
+                }
+            }
+
+
 
             // Copiar componentes
             if (HasComponent<TransformComponent>(entity)) {
                 auto& srcTransform = GetComponent<TransformComponent>(entity);
                 auto& dstTransform = GetComponent<TransformComponent>(newEntity);
 
-                dstTransform.transform->setMatrix(srcTransform.transform->getMatrix());
+                dstTransform.transform->position = srcTransform.transform->position;
+                dstTransform.transform->scale = srcTransform.transform->scale;
+                dstTransform.transform->rotation = srcTransform.transform->rotation;
+                dstTransform.transform->eulerAngles = srcTransform.transform->eulerAngles;
+
+                //// Si la entidad tiene un padre, calcular la transformación local con respecto al padre original
+                //if (parentEntity != entt::null) {
+                //    glm::mat4 parentGlobalTransform = GetComponent<TransformComponent>(parentEntity).accumulatedTransform;
+                //    glm::mat4 localTransform = glm::inverse(parentGlobalTransform) * srcTransform.accumulatedTransform;
+
+                //    // Aplicar la transformación local al nuevo hijo
+                //    dstTransform.transform->setMatrix(localTransform);
+                //}
+                //else {
+                //    // Si no tiene padre, simplemente copia la transformación global
+                //    dstTransform.transform->position = srcTransform.transform->position;
+                //    dstTransform.transform->scale = srcTransform.transform->scale;
+                //    dstTransform.transform->rotation = srcTransform.transform->rotation;
+                //    dstTransform.transform->eulerAngles = srcTransform.transform->eulerAngles;
+                //}
             }
 
             if (HasComponent<MeshComponent>(entity)) {
@@ -193,21 +237,88 @@ namespace libCore
                 dstAABB.aabb->CalculateAABB(srcMesh.mesh->vertices);
             }
 
-            // Añadir el hijo al padre usando AddChild
-            if (parentEntity != entt::null) {
-                AddChild(parentEntity, newEntity);
-            }
-
-            // Manejar los hijos
-            if (HasComponent<ChildComponent>(entity)) {
-                auto& srcChild = GetComponent<ChildComponent>(entity);
-                for (auto& child : srcChild.children) {
-                    DuplicateEntityRecursively(child, newEntity);
-                }
-            }
-
             return newEntity;
         }
+
+
+
+
+        //entt::entity DuplicateEntityRecursively(entt::entity entity, entt::entity parentEntity) {
+        //    if (!m_registry->valid(entity)) {
+        //        return entt::null;
+        //    }
+
+        //    // Obtener el nombre original
+        //    std::string originalTag = GetComponent<TagComponent>(entity).Tag;
+        //    std::string newTag = originalTag;
+
+        //    // Buscar si ya existen clones y agregar un sufijo único
+        //    int cloneIndex = 1;
+        //    while (IsTagUsed(newTag + "_" + std::to_string(cloneIndex))) {
+        //        cloneIndex++;
+        //    }
+        //    newTag = originalTag + "_" + std::to_string(cloneIndex);
+
+        //    // Crear una nueva entidad con el nombre modificado
+        //    entt::entity newEntity = CreateEmptyGameObject(newTag);
+
+        //    // Copiar componentes
+        //    if (HasComponent<TransformComponent>(entity)) {
+        //        auto& srcTransform = GetComponent<TransformComponent>(entity);
+        //        auto& dstTransform = GetComponent<TransformComponent>(newEntity);
+
+        //        dstTransform.transform->setMatrix(srcTransform.transform->getMatrix());
+        //    }
+
+        //    if (HasComponent<MeshComponent>(entity)) {
+        //        auto& srcMesh = GetComponent<MeshComponent>(entity);
+        //        auto& dstMesh = AddComponent<MeshComponent>(newEntity, srcMesh.mesh, srcMesh.originalModel, srcMesh.isInstance);
+
+        //        // Agregar la matriz de instancia al nuevo MeshComponent
+        //        glm::mat4 instanceMatrix = glm::translate(glm::mat4(1.0f), GetComponent<TransformComponent>(newEntity).transform->position);
+        //        dstMesh.instanceMatrices.push_back(instanceMatrix);
+        //    }
+
+        //    if (HasComponent<MaterialComponent>(entity)) {
+        //        auto& srcMaterial = GetComponent<MaterialComponent>(entity);
+        //        AddComponent<MaterialComponent>(newEntity, srcMaterial.material);
+        //    }
+
+        //    if (HasComponent<AABBComponent>(entity)) {
+        //        auto& srcAABB = GetComponent<AABBComponent>(entity);
+        //        auto& dstAABB = AddComponent<AABBComponent>(newEntity);
+        //        auto& srcMesh = GetComponent<MeshComponent>(entity);
+        //        dstAABB.aabb->CalculateAABB(srcMesh.mesh->vertices);
+        //    }
+
+        //    // Añadir el hijo al padre usando AddChild
+        //    if (parentEntity != entt::null) {
+        //        AddChild(parentEntity, newEntity);
+        //    }
+
+        //    // Manejar los hijos
+        //    if (HasComponent<ChildComponent>(entity)) {
+        //        auto& srcChild = GetComponent<ChildComponent>(entity);
+        //        for (auto& child : srcChild.children) {
+        //            DuplicateEntityRecursively(child, newEntity);
+        //        }
+        //    }
+
+        //    return newEntity;
+        //}
+
+        bool IsTagUsed(const std::string& tag) {
+            auto view = m_registry->view<TagComponent>();
+            for (auto entity : view) {
+                auto& tagComponent = view.get<TagComponent>(entity);
+                if (tagComponent.Tag == tag) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
         void UpdateAccumulatedTransforms(entt::entity entity, const glm::mat4& parentTransform = glm::mat4(1.0f)) {
             if (!m_registry->valid(entity)) {
                 return;
@@ -517,5 +628,73 @@ namespace libCore
             ScriptFactory::GetInstance().RegisterScript<MyScript>("MyScript");
             ScriptFactory::GetInstance().RegisterScript<CameraControllerFPS>("CameraControllerFPS");
         }
+
+
+
+
+        //DEBUG ENTITIES
+    public:
+        // Esta función imprime la información básica de una entidad
+        void PrintEntityInfo(entt::entity entity, const Ref<entt::registry>& registry) {
+            std::cout << "Entity ID: " << static_cast<uint32_t>(entity);
+
+            if (registry->has<TagComponent>(entity)) {
+                auto& tag = registry->get<TagComponent>(entity);
+                std::cout << " (Tag: " << tag.Tag << ")";
+            }
+
+            std::cout << std::endl;
+
+            if (registry->has<ParentComponent>(entity)) {
+                auto& parent = registry->get<ParentComponent>(entity);
+                std::cout << "  Parent ID: " << static_cast<uint32_t>(parent.parent) << std::endl;
+            }
+
+            if (registry->has<ChildComponent>(entity)) {
+                auto& children = registry->get<ChildComponent>(entity).children;
+                std::cout << "  Children: ";
+                for (auto& child : children) {
+                    std::cout << static_cast<uint32_t>(child) << " ";
+                }
+                std::cout << std::endl;
+            }
+        }
+
+        // Esta función recorre todas las entidades en el registro
+        void DebugPrintAllEntities() {
+            auto& registry = EntityManager::GetInstance().m_registry;
+
+            registry->each([&](entt::entity entity) {
+                PrintEntityInfo(entity, registry);
+                });
+        }
+
+        // Esta función recorre las entidades y verifica la estructura de la jerarquía
+        void DebugPrintEntityHierarchy(entt::entity entity, const Ref<entt::registry>& registry, int level = 0) {
+            for (int i = 0; i < level; ++i) {
+                std::cout << "  ";
+            }
+
+            PrintEntityInfo(entity, registry);
+
+            if (registry->has<ChildComponent>(entity)) {
+                auto& children = registry->get<ChildComponent>(entity).children;
+                for (auto& child : children) {
+                    DebugPrintEntityHierarchy(child, registry, level + 1);
+                }
+            }
+        }
+
+        // Esta función imprime la jerarquía completa desde las raíces
+        void DebugPrintAllEntityHierarchies() {
+            auto& registry = EntityManager::GetInstance().m_registry;
+
+            // Filtrar entidades que no tienen un padre (raíz)
+            auto rootView = registry->view<TransformComponent>(entt::exclude<ParentComponent>);
+            for (auto entity : rootView) {
+                DebugPrintEntityHierarchy(entity, registry);
+            }
+        }
+
     };
 }

@@ -349,7 +349,7 @@ namespace libCore
 		{
 			ChangeEngineState(EngineStates::EDITOR);
 		}
-		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_C)) //CLONE
+		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F4)) //CLONE
 		{
 			EntityManager::GetInstance().DuplicateEntity();
 		}

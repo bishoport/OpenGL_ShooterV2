@@ -27,6 +27,8 @@ namespace libCore
         bool isSelectingObject = false;
         bool showModelSelectionCombo = false;
 
+        
+
         using CallbackFromGuiLayer = std::function<void(const std::vector<Vector2d>&, const std::vector<Vector2d>&)>;
 
         GuiLayer(GLFWwindow* window, float window_W, float window_H);
@@ -39,6 +41,11 @@ namespace libCore
         void renderDockers();
         void renderMainMenuBar();
 
+        //Popups
+        void RegisterPopup(const std::string& title, const std::function<void()>& content);
+        void ShowPopups();
+        void OpenPopup(const std::string& title);
+        void ClosePopup(const std::string& title);
 
 		//Panels
         void DrawSelectedEntityComponentsPanel();
@@ -59,8 +66,6 @@ namespace libCore
         void DrawLogPanel();
 
         void checkGizmo(const Ref<Viewport>& viewport);
-
-        //void DrawMaterial(const Ref<Material> materialData);
 
         enum class GizmoOperation
         {
@@ -86,6 +91,17 @@ namespace libCore
         struct Point {
             float x, y;
         };
+
+        struct Popup {
+            std::string title;
+            bool isOpen;
+            std::function<void()> content;
+
+            Popup(const std::string& title, const std::function<void()>& content)
+                : title(title), isOpen(false), content(content) {}
+        };
+
+        std::vector<Popup> popups;
 
 
         //PANELS

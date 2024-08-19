@@ -1,0 +1,161 @@
+Scene: Untitled
+Models:
+  - ModelName: Robot.fbx
+    ImportModelData:
+      filePath: assets\models\Robot\
+      fileName: Robot.fbx
+      modelID: 0
+      invertUV: false
+      rotate90: false
+      skeletal: false
+      useCustomTransform: true
+      processLights: false
+      globalScaleFactor: 1
+Entities:
+  - Entity: 3
+    IDComponent:
+      ID: af416ccefe9169be
+      MarkToDelete: false
+    TagComponent:
+      Tag: Bot
+    TransformComponent:
+      Transform:
+        Position:
+          - 27.2961502
+          - -8.73957015e-06
+          - -17.0397797
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ChildComponent:
+      - 0
+    MeshComponent:
+      MeshName: mesh_bot
+    MaterialComponent:
+      Material:
+        MaterialName: Material.001
+        ShaderName: default
+        AlbedoColor:
+          - 0.800000012
+          - 0.800000012
+          - 0.800000012
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 2
+    IDComponent:
+      ID: c41e11b7019e7fa5
+      MarkToDelete: false
+    TagComponent:
+      Tag: Bot_1_1
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 42.4552689
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 0
+    MeshComponent:
+      MeshName: mesh_bot
+    MaterialComponent:
+      Material:
+        MaterialName: Material.001
+        ShaderName: default
+        AlbedoColor:
+          - 0.800000012
+          - 0.800000012
+          - 0.800000012
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 1
+    IDComponent:
+      ID: 1292699723a9ee3a
+      MarkToDelete: false
+    TagComponent:
+      Tag: Bot_1
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 22.7649498
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 0
+    MeshComponent:
+      MeshName: mesh_bot
+    MaterialComponent:
+      Material:
+        MaterialName: Material.001
+        ShaderName: default
+        AlbedoColor:
+          - 0.800000012
+          - 0.800000012
+          - 0.800000012
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 0
+    IDComponent:
+      ID: 5b84b223120e1eb0
+      MarkToDelete: false
+    TagComponent:
+      Tag: Bot
+    TransformComponent:
+      Transform:
+        Position:
+          - -32.6447067
+          - 8.76757986e-06
+          - -20.2165794
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 3
+    ChildComponent:
+      - 1
+      - 2
+    MeshComponent:
+      MeshName: mesh_bot
+    MaterialComponent:
+      Material:
+        MaterialName: Material.001
+        ShaderName: default
+        AlbedoColor:
+          - 0.800000012
+          - 0.800000012
+          - 0.800000012
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
