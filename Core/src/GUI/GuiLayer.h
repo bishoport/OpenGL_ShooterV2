@@ -67,12 +67,7 @@ namespace libCore
 
         void checkGizmo(const Ref<Viewport>& viewport);
 
-        enum class GizmoOperation
-        {
-            Translate,
-            Rotate2D, Rotate3D,
-            Scale
-        };
+        
         GizmoOperation m_GizmoOperation;
 
     private:

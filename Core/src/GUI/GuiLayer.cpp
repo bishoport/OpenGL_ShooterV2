@@ -384,20 +384,25 @@ namespace libCore
 
         ImGui::End();
 
-        //--INPUTS TOOLS
-        if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_T))
-        {
-            m_GizmoOperation = GizmoOperation::Translate;
-        }
-        else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_Y))
-        {
-            m_GizmoOperation = GizmoOperation::Rotate3D;
-        }
-        else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_U))
-        {
-            m_GizmoOperation = GizmoOperation::Scale;
-        }
-        //------------------------------------------------------------------------------
+
+
+        ////--INPUTS TOOLS
+        //if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_T))
+        //{
+        //    m_GizmoOperation = GizmoOperation::Translate;
+        //}
+        //else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_Y))
+        //{
+        //    m_GizmoOperation = GizmoOperation::Rotate3D;
+        //}
+        //else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_U))
+        //{
+        //    m_GizmoOperation = GizmoOperation::Scale;
+        //}
+        ////------------------------------------------------------------------------------
+
+
+
 
         //---------------------------ImGUIZMO------------------------------------------
         if (EntityManager::GetInstance().currentSelectedEntityInScene != entt::null)

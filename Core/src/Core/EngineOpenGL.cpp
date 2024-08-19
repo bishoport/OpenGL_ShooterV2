@@ -327,9 +327,13 @@ namespace libCore
 	// -------------------------------------------------
 	// -------------------------------------------------
 
+
+
 	//--UPDATES
 	void EngineOpenGL::UpdateBeforeRender()
 	{
+
+
 		//--INPUT UPDATE
 		InputManager::Instance().Update();
 
@@ -349,11 +353,32 @@ namespace libCore
 		{
 			ChangeEngineState(EngineStates::EDITOR);
 		}
-		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F4)) //CLONE
+		else if (InputManager::Instance().IsKeyPressed(GLFW_KEY_LEFT_CONTROL) || InputManager::Instance().IsKeyPressed(GLFW_KEY_RIGHT_CONTROL))
 		{
-			EntityManager::GetInstance().DuplicateEntity();
+			if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_C)) // Ctrl + C
+			{
+				EntityManager::GetInstance().DuplicateEntity();
+			}
 		}
+
+		//--ImGizmo
+		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_T))
+		{
+			guiLayer->m_GizmoOperation = GizmoOperation::Translate;
+		}
+		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_Y))
+		{
+			guiLayer->m_GizmoOperation = GizmoOperation::Rotate3D;
+		}
+		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_U))
+		{
+			guiLayer->m_GizmoOperation = GizmoOperation::Scale;
+		}
+		//------------------------------------------------------------------------------
 		//-------------------------------------------------------------------
+
+
+
 
 
 		//--DIRECTIONAL LIGHT UPDATE

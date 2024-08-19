@@ -1,9 +1,9 @@
 Scene: Untitled
 Models:
-  - ModelName: Kit_1.fbx
+  - ModelName: test.fbx
     ImportModelData:
       filePath: assets\models\Collections\Kit_1\
-      fileName: Kit_1.fbx
+      fileName: test.fbx
       modelID: 0
       invertUV: false
       rotate90: false
@@ -14,16 +14,16 @@ Models:
 Entities:
   - Entity: 3
     IDComponent:
-      ID: 8d97f5e945d1ab60
+      ID: c6a5bafef270c4dd
       MarkToDelete: false
     TagComponent:
-      Tag: Torre_alta_Exterior
+      Tag: Blocker_wall_2_SubMesh_0
     TransformComponent:
       Transform:
         Position:
+          - 7.50680447
           - 0
-          - 0
-          - 0
+          - -204.648499
         Rotation:
           - 0
           - -0
@@ -32,13 +32,13 @@ Entities:
           - 1
           - 1
           - 1
-    ChildComponent:
-      - 2
+    ParentComponent:
+      Parent: 2
     MeshComponent:
-      MeshName: Mesh.062
+      MeshName: Mesh.061_SubMesh_1
     MaterialComponent:
       Material:
-        MaterialName: Wall3.010
+        MaterialName: Brick.003
         ShaderName: default
         AlbedoColor:
           - 1
@@ -50,52 +50,38 @@ Entities:
         AoValue: 1
   - Entity: 2
     IDComponent:
-      ID: 3f75318044713c1a
+      ID: 8a8db40179d47e20
       MarkToDelete: false
     TagComponent:
-      Tag: Torre_alta_interior
+      Tag: Blocker_wall_2
     TransformComponent:
       Transform:
         Position:
+          - 7.50680447
           - 0
-          - 0
-          - 0
+          - -204.648499
         Rotation:
           - 0
-          - -0
+          - 0
           - 0
         Scale:
           - 1
           - 1
           - 1
-    ParentComponent:
-      Parent: 3
-    MeshComponent:
-      MeshName: Mesh.062
-    MaterialComponent:
-      Material:
-        MaterialName: Brick.003
-        ShaderName: default
-        AlbedoColor:
-          - 1
-          - 1
-          - 1
-        NormalStrength: 1
-        MetallicValue: 0
-        RoughnessValue: 0.699999988
-        AoValue: 1
+    ChildComponent:
+      - 3
   - Entity: 1
     IDComponent:
-      ID: d6e1608b60fd0040
+      ID: ad88872d2295ef96
       MarkToDelete: false
     TagComponent:
-      Tag: Blocker_wall_Interior
+      Tag: Blocker_wall_2_SubMesh_0
     TransformComponent:
       Transform:
         Position:
+          - 7.50680447
           - 0
-          - 0
-          - 0
+          - -204.648499
         Rotation:
           - 0
           - -0
@@ -107,43 +93,7 @@ Entities:
     ParentComponent:
       Parent: 0
     MeshComponent:
-      MeshName: Mesh.061
-    MaterialComponent:
-      Material:
-        MaterialName: Brick.003
-        ShaderName: default
-        AlbedoColor:
-          - 1
-          - 1
-          - 1
-        NormalStrength: 1
-        MetallicValue: 0
-        RoughnessValue: 0.699999988
-        AoValue: 1
-  - Entity: 0
-    IDComponent:
-      ID: 0a3ac4d5016b6e21
-      MarkToDelete: false
-    TagComponent:
-      Tag: Blocker_wall_Exterior
-    TransformComponent:
-      Transform:
-        Position:
-          - 0
-          - 0
-          - -21
-        Rotation:
-          - 0
-          - -0
-          - 0
-        Scale:
-          - 1
-          - 1
-          - 1
-    ChildComponent:
-      - 1
-    MeshComponent:
-      MeshName: Mesh.061
+      MeshName: Mesh.061_SubMesh_0
     MaterialComponent:
       Material:
         MaterialName: Wall3.010
@@ -156,3 +106,25 @@ Entities:
         MetallicValue: 0
         RoughnessValue: 0.699999988
         AoValue: 1
+  - Entity: 0
+    IDComponent:
+      ID: dcef11a89b673896
+      MarkToDelete: false
+    TagComponent:
+      Tag: Blocker_wall_2
+    TransformComponent:
+      Transform:
+        Position:
+          - 7.50680447
+          - 0
+          - -204.648499
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ChildComponent:
+      - 1

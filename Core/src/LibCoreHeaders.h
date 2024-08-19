@@ -98,3 +98,10 @@ struct ImageData {
 	int numChannels;
 };
 
+
+enum class GizmoOperation
+{
+	Translate,
+	Rotate2D, Rotate3D,
+	Scale
+};
