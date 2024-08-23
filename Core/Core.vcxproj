@@ -106,6 +106,7 @@
     <ClInclude Include="src\tools\SkeletalModelLoader.h" />
     <ClInclude Include="src\tools\SkyBox.hpp" />
     <ClInclude Include="src\tools\TextureManager.h" />
+    <ClInclude Include="src\tools\ThumbnailGenerator.h" />
     <ClInclude Include="vendor\ApproxMVBB\Config\Config.hpp" />
     <ClInclude Include="vendor\ApproxMVBB\Diameter\EstimateDiameter.hpp" />
     <ClInclude Include="vendor\ApproxMVBB\GeometryPredicates\Predicates.hpp" />
@@ -173,6 +174,7 @@
     <ClCompile Include="src\tools\ShaderManager.cpp" />
     <ClCompile Include="src\tools\SkeletalModelLoader.cpp" />
     <ClCompile Include="src\tools\TextureManager.cpp" />
+    <ClCompile Include="src\tools\ThumbnailGenerator.cpp" />
     <ClCompile Include="vendor\glad\glad.c" />
     <ClCompile Include="vendor\imGizmo\ImGuizmo.cpp" />
     <ClCompile Include="vendor\imgui\imgui.cpp" />

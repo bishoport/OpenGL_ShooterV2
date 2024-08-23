@@ -1,0 +1,516 @@
+Scene: Untitled
+Models:
+  - ModelName: Kit_1.fbx
+    ImportModelData:
+      filePath: assets\models\Collections\Kit_1\
+      fileName: Kit_1.fbx
+      modelID: 0
+      invertUV: false
+      rotate90: false
+      skeletal: false
+      useCustomTransform: true
+      processLights: false
+      globalScaleFactor: 1
+Entities:
+  - Entity: 13
+    IDComponent:
+      ID: b4229fcb23ee017a
+      MarkToDelete: false
+    TagComponent:
+      Tag: Escenario
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 0
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ChildComponent:
+      - 12
+      - 11
+      - 10
+      - 9
+      - 8
+      - 7
+      - 6
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+      - 0
+  - Entity: 12
+    IDComponent:
+      ID: 2cd15601edb5ba79
+      MarkToDelete: false
+    TagComponent:
+      Tag: Base_el_6_3
+    TransformComponent:
+      Transform:
+        Position:
+          - 46.1374512
+          - 6.27451186e-07
+          - 188.588928
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 13
+    MeshComponent:
+      MeshName: Mesh.010
+    MaterialComponent:
+      Material:
+        MaterialName: Wall3.010
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 11
+    IDComponent:
+      ID: 43796a0b0740668a
+      MarkToDelete: false
+    TagComponent:
+      Tag: Base_el_6_2
+    TransformComponent:
+      Transform:
+        Position:
+          - 31.1374512
+          - 6.27451186e-07
+          - 188.588928
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 13
+    MeshComponent:
+      MeshName: Mesh.010
+    MaterialComponent:
+      Material:
+        MaterialName: Wall3.010
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 10
+    IDComponent:
+      ID: 4bbd812019d1eff7
+      MarkToDelete: false
+    TagComponent:
+      Tag: Base_el_6_1
+    TransformComponent:
+      Transform:
+        Position:
+          - 17.1374512
+          - 6.27451186e-07
+          - 188.588928
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 13
+    MeshComponent:
+      MeshName: Mesh.010
+    MaterialComponent:
+      Material:
+        MaterialName: Wall3.010
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 9
+    IDComponent:
+      ID: 0d327560c500ac73
+      MarkToDelete: false
+    TagComponent:
+      Tag: Base_el_5_3
+    TransformComponent:
+      Transform:
+        Position:
+          - 44.9837608
+          - 3.43162537
+          - 224.006866
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 13
+    MeshComponent:
+      MeshName: Mesh.008
+    MaterialComponent:
+      Material:
+        MaterialName: Deco1
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 8
+    IDComponent:
+      ID: 833d945ff9892914
+      MarkToDelete: false
+    TagComponent:
+      Tag: Base_el_5_2
+    TransformComponent:
+      Transform:
+        Position:
+          - 29.9837608
+          - 3.43162537
+          - 224.006866
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 13
+    MeshComponent:
+      MeshName: Mesh.008
+    MaterialComponent:
+      Material:
+        MaterialName: Deco1
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 7
+    IDComponent:
+      ID: 0ae392ad7018bbb9
+      MarkToDelete: false
+    TagComponent:
+      Tag: Base_el_5_1
+    TransformComponent:
+      Transform:
+        Position:
+          - 14.9837599
+          - 3.43162537
+          - 224.006866
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 13
+    MeshComponent:
+      MeshName: Mesh.008
+    MaterialComponent:
+      Material:
+        MaterialName: Deco1
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 6
+    IDComponent:
+      ID: dc101ccaaa3b1903
+      MarkToDelete: false
+    TagComponent:
+      Tag: Base_el_2_2
+    TransformComponent:
+      Transform:
+        Position:
+          - 28.1735573
+          - 0
+          - 209.217987
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 13
+    MeshComponent:
+      MeshName: Mesh.007
+    MaterialComponent:
+      Material:
+        MaterialName: UP_elements1
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 5
+    IDComponent:
+      ID: f34a5d13aa10015e
+      MarkToDelete: false
+    TagComponent:
+      Tag: Base_el_2_1
+    TransformComponent:
+      Transform:
+        Position:
+          - 42.904129
+          - 0
+          - 208.663147
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 13
+    MeshComponent:
+      MeshName: Mesh.007
+    MaterialComponent:
+      Material:
+        MaterialName: UP_elements1
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 4
+    IDComponent:
+      ID: 755ae4c712e97c03
+      MarkToDelete: false
+    TagComponent:
+      Tag: Base_el_2
+    TransformComponent:
+      Transform:
+        Position:
+          - 14.0670223
+          - 0
+          - 208.663147
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 13
+    MeshComponent:
+      MeshName: Mesh.007
+    MaterialComponent:
+      Material:
+        MaterialName: UP_elements1
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 3
+    IDComponent:
+      ID: 2f5873d40a8b9dff
+      MarkToDelete: false
+    TagComponent:
+      Tag: Base_el_6
+    TransformComponent:
+      Transform:
+        Position:
+          - 62.1374512
+          - 6.27451186e-07
+          - 188.588928
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 13
+    MeshComponent:
+      MeshName: Mesh.010
+    MaterialComponent:
+      Material:
+        MaterialName: Wall3.010
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 2
+    IDComponent:
+      ID: 4b5a60c4416ca51c
+      MarkToDelete: false
+    TagComponent:
+      Tag: Base_el_5
+    TransformComponent:
+      Transform:
+        Position:
+          - 59.9837608
+          - 3.43162537
+          - 224.006866
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 13
+    MeshComponent:
+      MeshName: Mesh.008
+    MaterialComponent:
+      Material:
+        MaterialName: Deco1
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 1
+    IDComponent:
+      ID: 102378da56c61ee6
+      MarkToDelete: false
+    TagComponent:
+      Tag: Base_el_2
+    TransformComponent:
+      Transform:
+        Position:
+          - 57.5615463
+          - 3.81469727e-06
+          - 208.477768
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 13
+    MeshComponent:
+      MeshName: Mesh.007
+    MaterialComponent:
+      Material:
+        MaterialName: UP_elements1
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 0
+    IDComponent:
+      ID: f833e8d4db8cd85b
+      MarkToDelete: false
+    TagComponent:
+      Tag: Barrel_1
+    TransformComponent:
+      Transform:
+        Position:
+          - 15.3229523
+          - 0.436169267
+          - 209.413071
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 13
+    MeshComponent:
+      MeshName: Mesh.004
+    MaterialComponent:
+      Material:
+        MaterialName: Material
+        ShaderName: default
+        AlbedoColor:
+          - 0.800000012
+          - 0.800000012
+          - 0.800000012
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1

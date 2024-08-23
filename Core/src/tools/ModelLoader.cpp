@@ -231,6 +231,7 @@ namespace libCore
         }
 
         meshBuild->SetupMesh();
+        meshBuild->drawLike = DRAW_GEOM_LIKE::TRIANGLE;
     }
     void ModelLoader::processMaterials(aiMesh* mesh, const aiScene* scene, Ref<Model> modelBuild, ImportModelData importOptions)
     {

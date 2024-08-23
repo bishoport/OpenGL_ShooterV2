@@ -135,6 +135,7 @@ namespace libCore
 		
 		//-DEBUG & TEXT
 		ShaderManager::setShaderDataLoad("debug", shadersDirectory + "debug.vert", shadersDirectory + "debug.frag");
+		ShaderManager::setShaderDataLoad("snapshot", shadersDirectory + "snapshot.vert", shadersDirectory + "snapshot.frag");
 		ShaderManager::setShaderDataLoad("text",  shadersDirectory + "text.vert",  shadersDirectory + "text.frag");
 
 		//-SSAO
@@ -329,53 +330,67 @@ namespace libCore
 
 
 
+	void EngineOpenGL::pauseRenderer(bool inPause)
+	{
+		Renderer::getInstance().renderInPause = inPause;
+	}
+
 	//--UPDATES
 	void EngineOpenGL::UpdateBeforeRender()
 	{
-
-
 		//--INPUT UPDATE
 		InputManager::Instance().Update();
 
-		if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F1)) //Editor
+		//--CONTROL_KEY + N
+		if (InputManager::Instance().IsKeyPressed(GLFW_KEY_LEFT_CONTROL) || InputManager::Instance().IsKeyPressed(GLFW_KEY_RIGHT_CONTROL))
 		{
-			ChangeEngineState(EngineStates::EDITOR);
-		}
-		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F2)) //Editor Play
-		{
-			ChangeEngineState(EngineStates::EDITOR_PLAY);
-		}
-		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F3)) //Play
-		{
-			ChangeEngineState(EngineStates::PLAY);
-		}
-		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_ESCAPE)) //BACK TO EDITOR MODE WITH ESC FROM PLAY MODE
-		{
-			ChangeEngineState(EngineStates::EDITOR);
-		}
-		else if (InputManager::Instance().IsKeyPressed(GLFW_KEY_LEFT_CONTROL) || InputManager::Instance().IsKeyPressed(GLFW_KEY_RIGHT_CONTROL))
-		{
-			if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_C)) // Ctrl + C
+			if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_D))
 			{
 				EntityManager::GetInstance().DuplicateEntity();
 			}
+			else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_W))
+			{
+				Renderer::getInstance().m_wireframe = !Renderer::getInstance().m_wireframe;
+			}
+			else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_M))
+			{
+				Renderer::getInstance().enableMultisample = !Renderer::getInstance().enableMultisample;
+			}
 		}
-
-		//--ImGizmo
-		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_T))
+		else
 		{
-			guiLayer->m_GizmoOperation = GizmoOperation::Translate;
-		}
-		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_Y))
-		{
-			guiLayer->m_GizmoOperation = GizmoOperation::Rotate3D;
-		}
-		else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_U))
-		{
-			guiLayer->m_GizmoOperation = GizmoOperation::Scale;
+			if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F1)) //Editor
+			{
+				ChangeEngineState(EngineStates::EDITOR);
+			}
+			else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F2)) //Editor Play
+			{
+				ChangeEngineState(EngineStates::EDITOR_PLAY);
+			}
+			else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_F3)) //Play
+			{
+				ChangeEngineState(EngineStates::PLAY);
+			}
+			else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_ESCAPE)) //BACK TO EDITOR MODE WITH ESC FROM PLAY MODE
+			{
+				ChangeEngineState(EngineStates::EDITOR);
+			}
+			//--ImGizmo
+			else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_1))
+			{
+				guiLayer->m_GizmoOperation = GizmoOperation::Translate;
+			}
+			else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_2))
+			{
+				guiLayer->m_GizmoOperation = GizmoOperation::Rotate3D;
+			}
+			else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_3))
+			{
+				guiLayer->m_GizmoOperation = GizmoOperation::Scale;
+			}
 		}
 		//------------------------------------------------------------------------------
-		//-------------------------------------------------------------------
+		//------------------------------------------------------------------------------
 
 
 

@@ -46,5 +46,7 @@
     <None Include="assets\shaders\Stencil.frag" />
     <None Include="assets\shaders\IBL\capture_enviroment.vert" />
     <None Include="assets\shaders\IBL\capture_enviroment.frag" />
+    <None Include="assets\shaders\snapshot.vert" />
+    <None Include="assets\shaders\snapshot.frag" />
   </ItemGroup>
 </Project>

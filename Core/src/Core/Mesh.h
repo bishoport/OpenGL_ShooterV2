@@ -3,6 +3,7 @@
 #include "VAO.h"
 #include "EBO.h"
 #include "Transform.h"
+#include "AABB.h"
 
 namespace libCore
 {
@@ -16,6 +17,10 @@ namespace libCore
         std::vector<Vertex> vertices;
         std::vector<GLuint> indices;
         DRAW_GEOM_LIKE drawLike = DRAW_GEOM_LIKE::TRIANGLE;
+        Ref<AABB> aabb = nullptr;
+
+        //--THUMBNAIL TEXTURE ID
+        GLuint thumbnailTextureID = 0; // Almacena el ID de la textura del thumbnail
 
         //--DRAW MESH
         void SetupMesh();
@@ -23,11 +28,20 @@ namespace libCore
         void DrawInstanced(GLsizei instanceCount, const std::vector<glm::mat4>& instanceMatrices);
         void SetupInstanceVBO(const std::vector<glm::mat4>& instanceMatrices);
 
-    private:
+        void DrawAABB()
+        {
+            VAO.Bind();
+
+            glLineWidth(2.0f);
+            glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
+
+            VAO.Unbind();
+        }
+
         //--MAIN MESH
         VAO VAO;
 
         // Instancing data
-        GLuint instanceVBO = 0;
+        GLuint instanceVBO = 0;        
     };
 }

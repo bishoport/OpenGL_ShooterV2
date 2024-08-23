@@ -55,6 +55,10 @@ namespace libCore
         void DrawMaterialsPanel();
         void DrawTexturesPanel();
 
+        void DrawModelHierarchy(const Ref<libCore::Model>& model);
+        void DrawMeshWithThumbnail(const Ref<Mesh>& mesh, const std::string& modelPath);
+
+
         void DrawModelInfo(const Ref<libCore::Model>& model, int depth = 0);
         void DrawModelsPanel();
         void DisplayModelMeshes(const Ref<Model>& model);
@@ -101,5 +105,10 @@ namespace libCore
 
         //PANELS
         Scope<AssetsPanel> assetsPanel = nullptr;
+
+
+        bool m_useLocalTransform = true; // Variable para controlar el modo de transformación
+        bool m_snapEnabled = false; // Variable para controlar si el snap está habilitado
+        float m_snapValue[3] = { 1.0f, 1.0f, 1.0f }; // Valores de snap para mover, rotar, y escalar
     };	
 }

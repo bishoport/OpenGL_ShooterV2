@@ -214,8 +214,12 @@ namespace libCore
     {
         // Configuración del Docking
         ImGuiViewport* viewport = ImGui::GetMainViewport();
-        ImGui::SetNextWindowPos(viewport->Pos);
-        ImGui::SetNextWindowSize(viewport->Size);
+        float toolbarHeight = 40.0f;
+        //// Configuración del Docking
+        ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y + ImGui::GetFrameHeight() + toolbarHeight));
+        ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, viewport->Size.y - ImGui::GetFrameHeight() - toolbarHeight));
+        /*ImGui::SetNextWindowPos(viewport->Pos);
+        ImGui::SetNextWindowSize(viewport->Size);*/
         ImGui::SetNextWindowViewport(viewport->ID);
 
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;//  ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
@@ -305,7 +309,49 @@ namespace libCore
     }
     void GuiLayer::DrawToolBarEditor()
     {
-        if (ImGui::Begin("Engine State")) {
+        // Barra de herramientas ubicada debajo del menú superior
+        ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetFrameHeight()));
+        ImGui::SetNextWindowSize(ImVec2(ImGui::GetMainViewport()->Size.x, 40));
+
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+        if (ImGui::Begin("Toolbar", nullptr, window_flags))
+        {
+            if (ImGui::Button("Editor")) {
+                EngineOpenGL::GetInstance().ChangeEngineState(EngineStates::EDITOR);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Editor Play")) {
+                EngineOpenGL::GetInstance().ChangeEngineState(EngineStates::EDITOR_PLAY);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Play")) {
+                EngineOpenGL::GetInstance().ChangeEngineState(EngineStates::PLAY);
+            }
+
+            //-- ImGIZMO CONTROLS AREA
+            static bool useLocalTransform = true; // Variable para controlar el modo de transformación
+            static bool snapEnabled = false; // Variable para controlar si el snap está habilitado
+            static float snapValue[3] = { 1.0f, 1.0f, 1.0f }; // Valores de snap para mover, rotar, y escalar
+
+            // ImGui button to toggle transform mode
+            ImGui::SameLine();
+            if (ImGui::Button(useLocalTransform ? "Switch to Global" : "Switch to Local"))
+            {
+                useLocalTransform = !useLocalTransform;
+                m_useLocalTransform = useLocalTransform;
+            }
+            ImGui::SameLine();
+            // Toggle snap with a button
+            if (ImGui::Button(snapEnabled ? "Disable Snap" : "Enable Snap"))
+            {
+                snapEnabled = !snapEnabled;
+                m_snapEnabled = snapEnabled;
+            }
+            //--
+        }
+        ImGui::End();
+
+        /*if (ImGui::Begin("Engine State")) {
             if (ImGui::Button("Editor")) {
                 EngineOpenGL::GetInstance().ChangeEngineState(EngineStates::EDITOR);
             }
@@ -318,7 +364,7 @@ namespace libCore
                 EngineOpenGL::GetInstance().ChangeEngineState(EngineStates::PLAY);
             }
         }
-        ImGui::End();
+        ImGui::End();*/
     }
     //-------------------------------------------------------------------------------
 
@@ -365,44 +411,21 @@ namespace libCore
     //--UPDATES
     void GuiLayer::checkGizmo(const Ref<Viewport>& viewport)
     {
-        static bool useLocalTransform = true; // Variable para controlar el modo de transformación
-        static bool snapEnabled = false; // Variable para controlar si el snap está habilitado
-        static float snapValue[3] = { 1.0f, 1.0f, 1.0f }; // Valores de snap para mover, rotar, y escalar
-
-        // ImGui button to toggle transform mode
-        ImGui::Begin("Gizmo Controls");
-        if (ImGui::Button(useLocalTransform ? "Switch to Global" : "Switch to Local"))
-        {
-            useLocalTransform = !useLocalTransform;
-        }
-
-        // Toggle snap with a button
-        if (ImGui::Button(snapEnabled ? "Disable Snap" : "Enable Snap"))
-        {
-            snapEnabled = !snapEnabled;
-        }
-
-        ImGui::End();
-
-
 
         ////--INPUTS TOOLS
-        //if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_T))
-        //{
-        //    m_GizmoOperation = GizmoOperation::Translate;
-        //}
-        //else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_Y))
-        //{
-        //    m_GizmoOperation = GizmoOperation::Rotate3D;
-        //}
-        //else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_U))
-        //{
-        //    m_GizmoOperation = GizmoOperation::Scale;
-        //}
+        if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_T))
+        {
+            m_GizmoOperation = GizmoOperation::Translate;
+        }
+        else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_Y))
+        {
+            m_GizmoOperation = GizmoOperation::Rotate3D;
+        }
+        else if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_U))
+        {
+            m_GizmoOperation = GizmoOperation::Scale;
+        }
         ////------------------------------------------------------------------------------
-
-
-
 
         //---------------------------ImGUIZMO------------------------------------------
         if (EntityManager::GetInstance().currentSelectedEntityInScene != entt::null)
@@ -423,26 +446,26 @@ namespace libCore
             // Usar la transformación global
             glm::mat4 entity_transform = transformComponent.getGlobalTransform(EntityManager::GetInstance().currentSelectedEntityInScene, *EntityManager::GetInstance().m_registry);
 
-            ImGuizmo::MODE transformMode = useLocalTransform ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
+            ImGuizmo::MODE transformMode = m_useLocalTransform ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
 
             // Habilitar el snap si está activo
-            bool snap = snapEnabled;
+            bool snap = m_snapEnabled;
             float* snapValues = nullptr;
 
             switch (m_GizmoOperation)
             {
             case GizmoOperation::Translate:
-                if (snap) snapValues = snapValue; // Snap en las tres dimensiones (X, Y, Z)
+                if (snap) snapValues = m_snapValue; // Snap en las tres dimensiones (X, Y, Z)
                 ImGuizmo::Manipulate(glm::value_ptr(camera_view), glm::value_ptr(camera_projection),
                     ImGuizmo::TRANSLATE, transformMode, glm::value_ptr(entity_transform), nullptr, snapValues);
                 break;
             case GizmoOperation::Rotate3D:
-                if (snap) snapValue[0] = 15.0f; // Snap en ángulos de 15 grados (esto depende de tus preferencias)
+                if (snap) m_snapValue[0] = 15.0f; // Snap en ángulos de 15 grados (esto depende de tus preferencias)
                 ImGuizmo::Manipulate(glm::value_ptr(camera_view), glm::value_ptr(camera_projection),
-                    ImGuizmo::ROTATE, transformMode, glm::value_ptr(entity_transform), nullptr, snap ? snapValue : nullptr);
+                    ImGuizmo::ROTATE, transformMode, glm::value_ptr(entity_transform), nullptr, snap ? m_snapValue : nullptr);
                 break;
             case GizmoOperation::Scale:
-                if (snap) snapValues = snapValue; // Snap en las tres dimensiones (X, Y, Z)
+                if (snap) snapValues = m_snapValue; // Snap en las tres dimensiones (X, Y, Z)
                 ImGuizmo::Manipulate(glm::value_ptr(camera_view), glm::value_ptr(camera_projection),
                     ImGuizmo::SCALE, transformMode, glm::value_ptr(entity_transform), nullptr, snapValues);
                 break;
@@ -464,7 +487,6 @@ namespace libCore
             }
         }
     }
-
     //-------------------------------------------------------------------------------
  
 
@@ -972,123 +994,112 @@ namespace libCore
     }
     //-----------------------------------------------------------------------------------------------------
 
-    //--GLOBAL MODELS PANEL
-    void GuiLayer::DrawModelInfo(const Ref<libCore::Model>& model, int depth)
+    //--GLOBAL MODELS PANEL  
+    // Renderiza el árbol de jerarquía de modelos y sus meshes
+    void GuiLayer::DrawModelHierarchy(const Ref<libCore::Model>& model)
     {
         if (!model) return;
 
-        // Crear un nodo del árbol
-        if (ImGui::TreeNode((void*)(intptr_t)model.get(), "%*sModel: %s", depth * 2, "", model->name.c_str()))
+        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+
+        // Crear un nodo del árbol para el modelo
+        if (ImGui::TreeNode(model->name.c_str()))
         {
-            if (model->modelParent) {
-                ImGui::Text("%*sParent Model: %s", depth * 2, "", model->modelParent->name.c_str());
-                ImGui::Text("%*sParent Position: (%f, %f, %f)", depth * 2, "", model->modelParent->transform->position.x, model->modelParent->transform->position.y, model->modelParent->transform->position.z);
-            }
-            else {
-                ImGui::Text("%*sParent Model: None", depth * 2, "");
-            }
-
-            ImGui::Text("%*sChildren Count: %zu", depth * 2, "", model->children.size());
-            ImGui::Text("%*sMeshes Count: %zu", depth * 2, "", model->meshes.size());
-            ImGui::Text("%*sMaterials Count: %zu", depth * 2, "", model->materials.size());
-
-            // Añadir botón "Instantiate"
-            if (ImGui::Button(("Instantiate " + model->name).c_str())) {
-                // Lógica de instanciación del modelo
-                EntityManager::GetInstance().CreateGameObjectFromModel(model, entt::null);
+            // Recorrer los meshes del modelo
+            for (const auto& mesh : model->meshes)
+            {
+                DrawMeshWithThumbnail(mesh, model->modelParent->importModelData.filePath);
+                
+                if (ImGui::Button(("Instantiate " + model->name).c_str())) 
+                {
+                    // Lógica de instanciación del modelo
+                    EntityManager::GetInstance().CreateGameObjectFromModel(model, entt::null);
+                }
             }
 
-            // Mostrar la información de los hijos recursivamente
-            for (const auto& child : model->children) {
-                DrawModelInfo(child, depth + 1);
+            // Recorrer recursivamente los hijos del modelo
+            for (const auto& child : model->children)
+            {
+                DrawModelHierarchy(child);
             }
 
             ImGui::TreePop();
         }
     }
-    void CountMeshesAndMaterials(const Ref<libCore::Model>& model, int& meshCount, int& materialCount)
+    // Muestra el thumbnail junto con el nombre del mesh
+    void GuiLayer::DrawMeshWithThumbnail(const Ref<Mesh>& mesh, const std::string& modelPath)
     {
-        if (!model) return;
+        if (mesh->thumbnailTextureID == 0)
+        {
+            // Obtener la ruta absoluta del directorio de trabajo actual
+            std::filesystem::path projectBasePath = std::filesystem::current_path();
 
-        // Contar los meshes y materials del modelo actual
-        meshCount += model->meshes.size();
-        materialCount += model->materials.size();
+            std::string assetsPath = "assets/models";
 
-        // Recorrer recursivamente los hijos
-        for (const auto& child : model->children) {
-            CountMeshesAndMaterials(child, meshCount, materialCount);
+            // Construir la ruta completa para el thumbnail
+            std::filesystem::path thumbnailPath = projectBasePath / modelPath / "thumbnails" / (mesh->meshName + "_thumbnail.png");
+
+            // Convertir la ruta a string y cargar la textura
+            mesh->thumbnailTextureID = TextureManager::getInstance().LoadTextureFromFile(thumbnailPath.string().c_str());
         }
+
+
+        ImVec2 imageSize(128, 128);
+
+        if (mesh->thumbnailTextureID != 0)
+        {
+            ImGui::Image((void*)(intptr_t)mesh->thumbnailTextureID, imageSize);
+        }
+        else
+        {
+            ImGui::Text("No thumbnail");
+        }
+
+        ImGui::SameLine();
+        ImGui::Text("Mesh: %s", mesh->meshName.c_str());
     }
+    // Panel de Modelos con la jerarquía y los thumbnails
     void GuiLayer::DrawModelsPanel()
     {
         auto& assetsManager = libCore::AssetsManager::GetInstance();
         const auto& models = assetsManager.GetAllModels();
-        std::size_t numberOfModels = models.size();
 
         // Comenzar la ventana de ImGui
         ImGui::Begin("Models Panel");
 
         // Mostrar el número de modelos cargados
         ImGui::Spacing();
-        ImGui::Text("Model Count: %zu", numberOfModels);
+        ImGui::Text("Model Count: %zu", models.size());
         ImGui::Spacing();
 
-        for (const auto& modelPair : models) {
-            const auto& modelName = modelPair.first;
+        for (const auto& modelPair : models)
+        {
             const auto& model = modelPair.second;
 
-            if (model) {
-                int totalMeshes = 0;
-                int totalMaterials = 0;
-
-                // Contar todos los meshes y materials del modelo y sus hijos
-                CountMeshesAndMaterials(model, totalMeshes, totalMaterials);
-
+            if (model)
+            {
                 ImGui::Separator();
                 ImGui::Text("Model: %s", model->name.c_str());
 
-                if (model->modelParent) {
-                    ImGui::Text("Parent Model: %s", model->modelParent->name.c_str());
-                    ImGui::Text("Parent Position: (%f, %f, %f)", model->modelParent->transform->position.x, model->modelParent->transform->position.y, model->modelParent->transform->position.z);
-                }
-                else {
-                    ImGui::Text("Parent Model: None");
-                }
-
-                ImGui::Text("Children Count: %zu", model->children.size());
-                ImGui::Text("Meshes Count: %d", totalMeshes);
-                ImGui::Text("Materials Count: %d", totalMaterials);
-
-                // Mostrar los nombres de las mallas del modelo y sus hijos
-                ImGui::Text("Meshes:");
-                DisplayModelMeshes(model);
-
-                // Añadir botón "Instantiate"
-                if (ImGui::Button(("Instantiate " + model->name).c_str())) {
+                if (ImGui::Button(("Instantiate " + model->name).c_str()))
+                {
                     // Lógica de instanciación del modelo
                     EntityManager::GetInstance().CreateGameObjectFromModel(model, entt::null);
                 }
 
-                // Mostrar información detallada del modelo y sus hijos
-                DrawModelInfo(model, 0);
+                // Dibujar la jerarquía del modelo
+                DrawModelHierarchy(model);
             }
-            else {
-                ImGui::Text("Invalid model: %s", modelName.c_str());
+            else
+            {
+                ImGui::Text("Invalid model");
             }
         }
 
         ImGui::End();
     }
-    void GuiLayer::DisplayModelMeshes(const Ref<Model>& model)
-    {
-        for (const auto& mesh : model->meshes) {
-            ImGui::BulletText("Mesh: %s", mesh->meshName.c_str());
-        }
-        for (const auto& child : model->children) {
-            DisplayModelMeshes(child);
-        }
-    }
     //-----------------------------------------------------------------------------------------------------
+
 
 
     //--GLOBAL LIGHT´s PANEL (ESTO CAMBIARÁ)

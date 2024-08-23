@@ -1,5 +1,4 @@
 #include "TextureManager.h"
-
 #include <filesystem> // Necesario para la navegación por directorios
 #include <iostream>
 
@@ -124,5 +123,50 @@ namespace libCore
         }
 
         return hdrTexture;
+    }
+
+    void libCore::TextureManager::SaveImage(const std::string& filePath, int width, int height, int channels, unsigned char* data)
+    {
+        stbi_flip_vertically_on_write(false); // Voltear verticalmente la imagen para coincidir con las coordenadas de OpenGL
+        stbi_write_png(filePath.c_str(), width, height, channels, data, width * channels);
+    }
+
+
+    // Carga una textura desde un archivo y la devuelve como GLuint
+    GLuint TextureManager::LoadTextureFromFile(const char* filePath)
+    {
+        int width, height, nrChannels;
+        unsigned char* data = stbi_load(filePath, &width, &height, &nrChannels, 0);
+
+        if (data)
+        {
+            GLuint textureID;
+            glGenTextures(1, &textureID);
+            glBindTexture(GL_TEXTURE_2D, textureID);
+
+            GLenum format = GL_RGB;
+            if (nrChannels == 1)
+                format = GL_RED;
+            else if (nrChannels == 3)
+                format = GL_RGB;
+            else if (nrChannels == 4)
+                format = GL_RGBA;
+
+            glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+            stbi_image_free(data);
+            return textureID;
+        }
+        else
+        {
+            std::cout << "Failed to load texture: " << filePath << std::endl;
+            return 0;
+        }
     }
 }

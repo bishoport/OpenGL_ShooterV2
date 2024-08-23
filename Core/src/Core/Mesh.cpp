@@ -38,6 +38,9 @@ namespace libCore
         glBindVertexArray(0);
         VBO.Unbind();
         EBO.Unbind();
+
+        aabb = CreateRef<AABB>();
+        aabb->CalculateAABB(vertices);
     }
 
     void Mesh::SetupInstanceVBO(const std::vector<glm::mat4>& instanceMatrices)

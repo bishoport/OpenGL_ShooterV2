@@ -22,163 +22,89 @@ Models:
       useCustomTransform: true
       processLights: false
       globalScaleFactor: 1
+  - ModelName: Primitives.glb
+    ImportModelData:
+      filePath: assets\models\
+      fileName: Primitives.glb
+      modelID: 0
+      invertUV: false
+      rotate90: false
+      skeletal: false
+      useCustomTransform: true
+      processLights: false
+      globalScaleFactor: 1
 Entities:
-  - Entity: 6
+  - Entity: 7
     IDComponent:
-      ID: 7f789d1ed9bd7f4a
+      ID: 8c2fcdff3e0bb8fd
       MarkToDelete: false
     TagComponent:
-      Tag: Nivel
+      Tag: Plane
     TransformComponent:
       Transform:
         Position:
           - 0
-          - 0
-          - 0
-        Rotation:
-          - 0
-          - 0
-          - 0
-        Scale:
-          - 1
-          - 1
-          - 1
-    ChildComponent:
-      - 1048577
-      - 2
-  - Entity: 5
-    IDComponent:
-      ID: a6fa0a92dacb0710
-      MarkToDelete: false
-    TagComponent:
-      Tag: Bots
-    TransformComponent:
-      Transform:
-        Position:
-          - 0
-          - 0
-          - 0
-        Rotation:
-          - 0
-          - 0
-          - 0
-        Scale:
-          - 1
-          - 1
-          - 1
-    ChildComponent:
-      - 3
-      - 4
-      - 0
-  - Entity: 4
-    IDComponent:
-      ID: 950b6eb457446395
-      MarkToDelete: false
-    TagComponent:
-      Tag: Bot_1_1
-    TransformComponent:
-      Transform:
-        Position:
-          - -29.9004326
-          - 42.2470093
-          - 7.97214127
-        Rotation:
-          - -8.6585608e-08
-          - 1.01294625
-          - -6.04797421e-08
-        Scale:
-          - 1.00000191
-          - 1
-          - 1.00000143
-    ParentComponent:
-      Parent: 5
-    MeshComponent:
-      MeshName: mesh_bot
-    MaterialComponent:
-      Material:
-        MaterialName: Material.001
-        ShaderName: default
-        AlbedoColor:
-          - 0.800000012
-          - 0.800000012
-          - 0.800000012
-        NormalStrength: 1
-        MetallicValue: 0
-        RoughnessValue: 0.699999988
-        AoValue: 1
-  - Entity: 3
-    IDComponent:
-      ID: 3b437e0d42a7c2a1
-      MarkToDelete: false
-    TagComponent:
-      Tag: Bot_1
-    TransformComponent:
-      Transform:
-        Position:
-          - -12.5382748
-          - 42.2470093
-          - -2.26248264
-        Rotation:
-          - -3.1415925
-          - 0.00978098437
-          - -3.14159274
-        Scale:
-          - 1.00001419
-          - 1
-          - 1.00001419
-    ParentComponent:
-      Parent: 5
-    MeshComponent:
-      MeshName: mesh_bot
-    MaterialComponent:
-      Material:
-        MaterialName: Material.001
-        ShaderName: default
-        AlbedoColor:
-          - 0.800000012
-          - 0.800000012
-          - 0.800000012
-        NormalStrength: 1
-        MetallicValue: 0
-        RoughnessValue: 0.699999988
-        AoValue: 1
-  - Entity: 2
-    IDComponent:
-      ID: fb1be669153e4c5e
-      MarkToDelete: false
-    TagComponent:
-      Tag: Blocker_wall_2
-    TransformComponent:
-      Transform:
-        Position:
-          - -22
-          - 21
+          - -2.94541264
           - 0
         Rotation:
           - 0
           - -0
           - 0
         Scale:
-          - 1
-          - 1
-          - 1
-    ParentComponent:
-      Parent: 6
+          - 1682.7948
+          - 1682.7948
+          - 1682.7948
     MeshComponent:
-      MeshName: Mesh.061
+      MeshName: Plane
     MaterialComponent:
       Material:
-        MaterialName: Wall3.010
+        MaterialName: ""
         ShaderName: default
         AlbedoColor:
-          - 1
-          - 1
-          - 1
+          - 0.458571523
+          - 0.833159566
+          - 0.235439256
         NormalStrength: 1
         MetallicValue: 0
         RoughnessValue: 0.699999988
         AoValue: 1
-  - Entity: 1048577
+  - Entity: 6
+    IDComponent:
+      ID: 195791d9609c0f1f
+      MarkToDelete: false
+    TagComponent:
+      Tag: Bot
+    TransformComponent:
+      Transform:
+        Position:
+          - 4.20507431
+          - 21
+          - 6.82970524
+        Rotation:
+          - -3.1415925
+          - 1.01891005
+          - -3.1415925
+        Scale:
+          - 1.00000095
+          - 1
+          - 1.00000095
+    ParentComponent:
+      Parent: 1
+    MeshComponent:
+      MeshName: mesh_bot
+    MaterialComponent:
+      Material:
+        MaterialName: Material.001
+        ShaderName: default
+        AlbedoColor:
+          - 0.800000012
+          - 0.800000012
+          - 0.800000012
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 5
     IDComponent:
       ID: 9b1b232cfbeb28c2
       MarkToDelete: false
@@ -199,7 +125,7 @@ Entities:
           - 1
           - 1
     ParentComponent:
-      Parent: 6
+      Parent: 0
     MeshComponent:
       MeshName: Mesh.061
     MaterialComponent:
@@ -214,28 +140,64 @@ Entities:
         MetallicValue: 0
         RoughnessValue: 0.699999988
         AoValue: 1
-  - Entity: 0
+  - Entity: 4
     IDComponent:
-      ID: 195791d9609c0f1f
+      ID: fb1be669153e4c5e
       MarkToDelete: false
     TagComponent:
-      Tag: Bot
+      Tag: Blocker_wall_2
     TransformComponent:
       Transform:
         Position:
-          - 4.20507431
+          - -22
           - 21
-          - 6.82970524
+          - 0
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 0
+    MeshComponent:
+      MeshName: Mesh.061
+    MaterialComponent:
+      Material:
+        MaterialName: Wall3.010
+        ShaderName: default
+        AlbedoColor:
+          - 1
+          - 1
+          - 1
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 3
+    IDComponent:
+      ID: 3b437e0d42a7c2a1
+      MarkToDelete: false
+    TagComponent:
+      Tag: Bot_1
+    TransformComponent:
+      Transform:
+        Position:
+          - -12.5382748
+          - 42.2470093
+          - -2.26248264
         Rotation:
           - -3.1415925
-          - 1.01891017
-          - -3.1415925
+          - 0.00978098251
+          - 3.1415925
         Scale:
-          - 1.0000006
+          - 1.0000149
           - 1
-          - 1.0000006
+          - 1.0000149
     ParentComponent:
-      Parent: 5
+      Parent: 1
     MeshComponent:
       MeshName: mesh_bot
     MaterialComponent:
@@ -250,3 +212,86 @@ Entities:
         MetallicValue: 0
         RoughnessValue: 0.699999988
         AoValue: 1
+  - Entity: 2
+    IDComponent:
+      ID: 950b6eb457446395
+      MarkToDelete: false
+    TagComponent:
+      Tag: Bot_1_1
+    TransformComponent:
+      Transform:
+        Position:
+          - -29.9004326
+          - 42.2470093
+          - 7.97214127
+        Rotation:
+          - -8.6585608e-08
+          - 1.01294625
+          - -6.04797421e-08
+        Scale:
+          - 1.00000191
+          - 1
+          - 1.00000143
+    ParentComponent:
+      Parent: 1
+    MeshComponent:
+      MeshName: mesh_bot
+    MaterialComponent:
+      Material:
+        MaterialName: Material.001
+        ShaderName: default
+        AlbedoColor:
+          - 0.800000012
+          - 0.800000012
+          - 0.800000012
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+  - Entity: 1
+    IDComponent:
+      ID: a6fa0a92dacb0710
+      MarkToDelete: false
+    TagComponent:
+      Tag: Bots
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 0
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ChildComponent:
+      - 2
+      - 3
+      - 6
+  - Entity: 0
+    IDComponent:
+      ID: 7f789d1ed9bd7f4a
+      MarkToDelete: false
+    TagComponent:
+      Tag: Nivel
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 0
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ChildComponent:
+      - 4
+      - 5

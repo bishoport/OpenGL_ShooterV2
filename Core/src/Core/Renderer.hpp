@@ -46,7 +46,7 @@ namespace libCore {
         bool hdrEnabled = false;
         float hdrExposure = 1.0f;
 
-
+        bool renderInPause = false;
 
         static Renderer& getInstance() {
             static Renderer instance;
@@ -56,6 +56,7 @@ namespace libCore {
 
 
         void initialize() {
+
             //--SKYBOX
             std::vector<const char*> faces {
                 "assets/Skybox/right.jpg",
@@ -65,14 +66,13 @@ namespace libCore {
                     "assets/Skybox/front.jpg",
                     "assets/Skybox/back.jpg"
             };
-
             dynamicSkybox = CreateScope<DynamicSkybox>(faces);
             //-------------------------------------------------------
 
 
             //--IBL
             ibl = CreateScope<IBL>();
-            ibl->prepareIBL(1080, 720,dynamicIBL);
+            ibl->prepareIBL(640, 480,dynamicIBL);
             //-------------------------------------------------------
 
 
@@ -103,9 +103,10 @@ namespace libCore {
 
 
 
-        void RenderViewport(const Ref<Viewport>& viewport, const Timestep& m_deltaTime) { //, const std::vector<Ref<libCore::Model>>& modelsInScene
-
-            if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_P)) 
+        void RenderViewport(const Ref<Viewport>& viewport, const Timestep& m_deltaTime) 
+        { 
+            if (renderInPause == true) return;
+            /*if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_P)) 
             {
                 m_wireframe = !m_wireframe;
             }
@@ -113,7 +114,7 @@ namespace libCore {
             if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_M))
             {
                 enableMultisample = !enableMultisample;
-            }
+            }*/
             
             if (enableMultisample)
             {

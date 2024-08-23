@@ -1,6 +1,7 @@
 #include "AssetsManager.h"
 #include "TextureManager.h"
 #include "ModelLoader.h"
+#include "ThumbnailGenerator.h"
 
 namespace libCore
 {
@@ -63,6 +64,7 @@ namespace libCore
 		{
 			std::string key = importModelData.filePath + importModelData.fileName;
 			loadedModels[key] = model;
+			ThumbnailGenerator::GenerateThumbnail(model);
 		}
 		else 
 		{
