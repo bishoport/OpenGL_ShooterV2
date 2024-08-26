@@ -843,7 +843,6 @@ namespace libCore
     }
     //-------------------------------------------------------------------------------
 
-
     //--MATERIAL PANEL
     void GuiLayer::DrawMaterialsPanel() {
         ImGui::Begin("Materials In Scene");
@@ -932,7 +931,6 @@ namespace libCore
         ImGui::End();
     }
     //-----------------------------------------------------------------------------------------------------
-
 
     //--GLOBAL TEXTURES PANEL
     void GuiLayer::DrawTexturesPanel() {
@@ -1099,7 +1097,6 @@ namespace libCore
         ImGui::End();
     }
     //-----------------------------------------------------------------------------------------------------
-
 
 
     //--GLOBAL LIGHT´s PANEL (ESTO CAMBIARÁ)

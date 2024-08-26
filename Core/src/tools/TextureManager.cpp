@@ -35,18 +35,18 @@ namespace libCore
         // Cargamos la textura si no existe en la biblioteca:
         if (!fs::exists(imagePathFS))
         {
-            std::cout << "Texture not found at initial path. Searching in subfolders..." << std::endl;
+            //std::cout << "Texture not found at initial path. Searching in subfolders..." << std::endl;
             fs::path foundPath = findTextureInSubfolders(directoryPath, fileName);
 
             if (foundPath.empty())
             {
-                std::cerr << "Texture not found in any subfolder." << std::endl;
+                std::cerr << "Texture "<< foundPath << " not found in any subfolder." << std::endl;
                 return nullptr;
             }
 
             imagePathFS = foundPath;
             textureKey = imagePathFS.string();
-            std::cout << "Texture found at: " << imagePathFS << std::endl;
+           // std::cout << "Texture found at: " << imagePathFS << std::endl;
         }
 
         std::cout << "Loading Texture->" << imagePathFS << std::endl;
@@ -75,7 +75,7 @@ namespace libCore
 
             if (data)
             {
-                std::cout << "Cubemap TExture Loaded " << faces[i] << std::endl;
+                //std::cout << "Cubemap TExture Loaded " << faces[i] << std::endl;
                 glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
                 stbi_image_free(data);
             }
@@ -115,7 +115,7 @@ namespace libCore
 
             stbi_image_free(data);
 
-            std::cout << "Image HDR loaded successfully" << std::endl;
+            //std::cout << "Image HDR loaded successfully" << std::endl;
         }
         else
         {

@@ -9,7 +9,7 @@
 
 void libCore::ThumbnailGenerator::GenerateThumbnail(Ref<Model> model, int width, int height)
 {
-    std::cout << "Starting Thumbnail Generation..." << std::endl;
+    //std::cout << "Starting Thumbnail Generation..." << std::endl;
 
     EngineOpenGL::GetInstance().pauseRenderer(true);
 
@@ -45,7 +45,7 @@ void libCore::ThumbnailGenerator::GenerateThumbnail(Ref<Model> model, int width,
         return;
     }
 
-    std::cout << "Framebuffer configured successfully." << std::endl;
+   // std::cout << "Framebuffer configured successfully." << std::endl;
 
     // Configurar el viewport
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
@@ -53,7 +53,7 @@ void libCore::ThumbnailGenerator::GenerateThumbnail(Ref<Model> model, int width,
     glClearColor(0.3f, 0.2f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    std::cout << "Viewport configured and buffers cleared." << std::endl;
+   // std::cout << "Viewport configured and buffers cleared." << std::endl;
 
     // Crear y configurar el shader
     auto shader = libCore::ShaderManager::Get("snapshot");
@@ -70,7 +70,7 @@ void libCore::ThumbnailGenerator::GenerateThumbnail(Ref<Model> model, int width,
 
     EngineOpenGL::GetInstance().pauseRenderer(false);
 
-    std::cout << "Thumbnail generation completed." << std::endl;
+    //std::cout << "Thumbnail generation completed." << std::endl;
 }
 
 void libCore::ThumbnailGenerator::CaptureScreenshot(const std::string& filePath, int width, int height)
@@ -84,7 +84,7 @@ void libCore::ThumbnailGenerator::CaptureScreenshot(const std::string& filePath,
 
     delete[] pixels;
 
-    std::cout << "Screenshot saved to: " << filePath << std::endl;
+    //std::cout << "Screenshot saved to: " << filePath << std::endl;
 }
 
 void libCore::ThumbnailGenerator::RenderModelRecursively(Ref<Model> model, Shader* shader, int width, int height, const std::filesystem::path& thumbnailDir)
@@ -105,7 +105,7 @@ void libCore::ThumbnailGenerator::RenderModelRecursively(Ref<Model> model, Shade
         // Limpiar buffers antes de cada renderizado
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        std::cout << "Rendering mesh: " << mesh->meshName << std::endl;
+        //std::cout << "Rendering mesh: " << mesh->meshName << std::endl;
 
         // Calcular el centro y el radio del AABB
         glm::vec3 aabbCenter = (mesh->aabb->minBounds + mesh->aabb->maxBounds) / 2.0f;
@@ -157,7 +157,7 @@ void libCore::ThumbnailGenerator::RenderMesh(Ref<Mesh> mesh, Shader* shader, con
     // Desvincular el VAO después de dibujar
     glBindVertexArray(0);
 
-    std::cout << "Mesh rendered: " << mesh->meshName << std::endl;
+    //std::cout << "Mesh rendered: " << mesh->meshName << std::endl;
 }
 
 

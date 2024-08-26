@@ -41,13 +41,15 @@ namespace libCore
 		if (severity == GL_DEBUG_SEVERITY_HIGH) {
 			std::cerr << "GL HIGH SEVERITY: " << message << std::endl;
 		}
-		else if (severity == GL_DEBUG_SEVERITY_MEDIUM) {
-			std::cerr << "GL MEDIUM SEVERITY: " << message << std::endl;
+		else if (severity == GL_DEBUG_SEVERITY_MEDIUM) 
+		{
+			//std::cerr << "GL MEDIUM SEVERITY: " << message << std::endl;
 		}
 		else if (severity == GL_DEBUG_SEVERITY_LOW) {
-			std::cerr << "GL LOW SEVERITY: " << message << std::endl;
+			//std::cerr << "GL LOW SEVERITY: " << message << std::endl;
 		}
-		else if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) {
+		else if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) 
+		{
 			std::cout << "GL NOTIFICATION: " << message << std::endl;
 		}
 	}

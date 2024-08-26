@@ -263,7 +263,7 @@ namespace libCore
             //--ALBEDO
             if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS) {
                 std::string completePathTexture = texturePath.C_Str();
-                std::cout << "Loading Texture: " << completePathTexture << std::endl;
+               // std::cout << "Loading Texture: " << completePathTexture << std::endl;
 
                 std::string directoryPath = fs::path(importOptions.filePath).parent_path().string();
                 std::string fileName = fs::path(completePathTexture).filename().string();
@@ -287,7 +287,7 @@ namespace libCore
             //--NORMAL
             if (mat->GetTexture(aiTextureType_NORMALS, 0, &texturePath) == AI_SUCCESS) {
                 std::string completePathTexture = texturePath.C_Str();
-                std::cout << "Loading Normal Map: " << completePathTexture << std::endl;
+                //std::cout << "Loading Normal Map: " << completePathTexture << std::endl;
 
                 std::string directoryPath = fs::path(importOptions.filePath).parent_path().string();
                 std::string fileName = fs::path(completePathTexture).filename().string();
@@ -312,7 +312,7 @@ namespace libCore
             //--METALLIC
             if (mat->GetTexture(aiTextureType_METALNESS, 0, &texturePath) == AI_SUCCESS) {
                 std::string completePathTexture = texturePath.C_Str();
-                std::cout << "Loading Metallic Map: " << completePathTexture << std::endl;
+               // std::cout << "Loading Metallic Map: " << completePathTexture << std::endl;
 
                 std::string directoryPath = fs::path(importOptions.filePath).parent_path().string();
                 std::string fileName = fs::path(completePathTexture).filename().string();
@@ -336,7 +336,7 @@ namespace libCore
             //--ROUGHNESS
             if (mat->GetTexture(aiTextureType_SHININESS, 0, &texturePath) == AI_SUCCESS) {
                 std::string completePathTexture = texturePath.C_Str();
-                std::cout << "Loading Roughness Map: " << completePathTexture << std::endl;
+                //std::cout << "Loading Roughness Map: " << completePathTexture << std::endl;
 
                 std::string directoryPath = fs::path(importOptions.filePath).parent_path().string();
                 std::string fileName = fs::path(completePathTexture).filename().string();
