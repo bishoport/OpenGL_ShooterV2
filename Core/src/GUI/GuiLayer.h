@@ -55,6 +55,8 @@ namespace libCore
         void DrawMaterialsPanel();
         void DrawTexturesPanel();
 
+        void DrawEditorCameraPanel();
+
         void DrawModelHierarchy(const Ref<libCore::Model>& model);
         void DrawMeshWithThumbnail(const Ref<Mesh>& mesh, const std::string& modelPath);
 

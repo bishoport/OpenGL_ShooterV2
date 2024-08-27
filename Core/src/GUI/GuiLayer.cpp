@@ -188,6 +188,7 @@ namespace libCore
             DrawTexturesPanel();
             DrawModelsPanel();
             DrawLogPanel();
+            DrawEditorCameraPanel();
             //RenderCheckerMatrix(); //Panel para el editor de roofs
 
             Renderer::getInstance().ShowControlsGUI();
@@ -1393,6 +1394,55 @@ namespace libCore
     }
     //-----------------------------------------------------------------------------------------------------
  
+    //--EDITOR CAMERA PANEL
+    void GuiLayer::DrawEditorCameraPanel()
+    {
+        ImGui::Begin("Camera Controls");
+
+        // Obtén una referencia a la cámara del editor
+        auto& editorCamera = ViewportManager::GetInstance().viewports[0]->editorCamera;
+
+        // Mostrar y permitir editar la posición de la cámara
+        ImGui::Text("Position");
+        ImGui::DragFloat3("##Position", glm::value_ptr(editorCamera->Position), 0.1f);
+
+        // Mostrar y permitir editar la orientación en ángulos de Euler (Yaw, Pitch, Roll)
+        ImGui::Text("Euler Angles");
+        ImGui::DragFloat("Yaw", &editorCamera->yaw, 0.1f, -180.0f, 180.0f);
+        ImGui::DragFloat("Pitch", &editorCamera->pitch, 0.1f, -89.0f, 89.0f);
+
+        // Mostrar y permitir editar el cuaternión de orientación
+        ImGui::Text("Orientation Quaternion");
+        ImGui::DragFloat4("##OrientationQuat", glm::value_ptr(editorCamera->OrientationQuat), 0.1f);
+
+        // Mostrar y permitir editar la dirección "Up" de la cámara
+        ImGui::Text("Up");
+        ImGui::DragFloat3("##Up", glm::value_ptr(editorCamera->Up), 0.1f);
+
+        // Mostrar y permitir editar el FOV de la cámara
+        ImGui::Text("Field of View");
+        ImGui::SliderFloat("##FOV", &editorCamera->FOVdeg, 1.0f, 120.0f);
+
+        // Mostrar y permitir editar los planos cercano y lejano
+        ImGui::Text("Near Plane");
+        ImGui::DragFloat("##NearPlane", &editorCamera->nearPlane, 0.01f, 0.01f, 10.0f);
+
+        ImGui::Text("Far Plane");
+        ImGui::DragFloat("##FarPlane", &editorCamera->farPlane, 1.0f, 10.0f, 10000.0f);
+
+        // Mostrar y permitir editar la velocidad de la cámara
+        ImGui::Text("Speed");
+        ImGui::DragFloat("##Speed", &editorCamera->speed, 0.01f, 0.0f, 10.0f);
+
+        // Mostrar y permitir editar la sensibilidad de la cámara
+        ImGui::Text("Sensitivity");
+        ImGui::DragFloat("##Sensitivity", &editorCamera->sensitivity, 1.0f, 0.0f, 1000.0f);
+
+        ImGui::End();
+    }
+
+    //-----------------------------------------------------------------------------------------------------
+
 
     //Especial para el editor de Roofs
     void GuiLayer::RenderCheckerMatrix() {
