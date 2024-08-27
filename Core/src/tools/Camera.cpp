@@ -12,6 +12,9 @@ namespace libCore
 
     void Camera::updateMatrix()
     {
+        // Limitar el pitch para evitar el Gimbal Lock
+        pitch = glm::clamp(pitch, -89.0f, 89.0f);
+
         // Actualizar la orientación usando los ángulos de Euler en yaw y pitch
         glm::vec3 front;
         front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
@@ -20,7 +23,7 @@ namespace libCore
         Orientation = glm::normalize(front);
 
         // Actualizar el cuaternión
-        OrientationQuat = glm::quat(glm::vec3(pitch, yaw, 0.0f));
+        OrientationQuat = glm::quat(glm::vec3(glm::radians(pitch), glm::radians(yaw), 0.0f));
 
         this->view = glm::lookAt(Position, Position + Orientation, Up);
 
@@ -41,7 +44,7 @@ namespace libCore
     void Camera::UpdateOrientationFromEuler()
     {
         // Convertir la orientación de Euler a un cuaternión
-        this->OrientationQuat = glm::quat(glm::vec3(pitch, yaw, 0.0f));
+        this->OrientationQuat = glm::quat(glm::vec3(glm::radians(pitch), glm::radians(yaw), 0.0f));
     }
 
     void Camera::UpdateOrientationFromQuaternion()
@@ -52,7 +55,6 @@ namespace libCore
         this->yaw = glm::degrees(euler.y);
     }
 
-
     void libCore::Camera::LookAt(const glm::vec3& targetPosition)
     {
         // Calcula la dirección hacia el objetivo
@@ -61,6 +63,9 @@ namespace libCore
         // Calcula el nuevo pitch y yaw
         pitch = glm::degrees(asin(direction.y)); // Pitch: inclinación hacia arriba o abajo
         yaw = glm::degrees(atan2(direction.z, direction.x)); // Yaw: rotación alrededor del eje Y
+
+        // Limitar el pitch para evitar el Gimbal Lock
+        pitch = glm::clamp(pitch, -89.0f, 89.0f);
 
         // Ajustar la orientación usando los nuevos valores de pitch y yaw
         updateMatrix();

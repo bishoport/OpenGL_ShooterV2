@@ -1460,7 +1460,7 @@ namespace libCore
             return glm::length(extents) / 2.0f;  // Mitad de la diagonal del AABB
         };
 
-        float cameraDistance = 50.0f; // Valor por defecto
+        float cameraDistance = 150.0f; // Valor por defecto
 
         // Vista Superior (Top View)
         if (ImGui::Button("Top View"))
