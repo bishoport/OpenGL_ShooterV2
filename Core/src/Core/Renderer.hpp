@@ -106,16 +106,8 @@ namespace libCore {
         void RenderViewport(const Ref<Viewport>& viewport, const Timestep& m_deltaTime) 
         { 
             if (renderInPause == true) return;
-            /*if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_P)) 
-            {
-                m_wireframe = !m_wireframe;
-            }
 
-            if (InputManager::Instance().IsKeyJustPressed(GLFW_KEY_M))
-            {
-                enableMultisample = !enableMultisample;
-            }*/
-            
+
             if (enableMultisample)
             {
                 glEnable(GL_MULTISAMPLE);
@@ -402,19 +394,45 @@ namespace libCore {
             //DEBUG AABB
             EntityManager::GetInstance().DrawABBGameObjectMeshComponent("debug");
             //------------------------------------------------------------------------------------------
+
             
-            // PASADA DE TEXTOS
-            glEnable(GL_BLEND);
+            //GRID
+            glEnable(GL_BLEND);//Empieza zona alpha
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            // Asegúrate de que la cámara esté viendo el grid correctamente
+            libCore::ShaderManager::Get("grid")->use();
+            libCore::ShaderManager::Get("grid")->setMat4("view", viewport->camera->view);
+            libCore::ShaderManager::Get("grid")->setMat4("projection", viewport->camera->projection);
+
+            // Opcionalmente, podrías setear la matriz del modelo
+            glm::mat4 modelMatrix = glm::mat4(1.0f);
+            libCore::ShaderManager::Get("grid")->setMat4("model", modelMatrix);
+
+            // Opcionalmente, deshabilita el depth test para asegurarte de que se renderice en la parte superior
+            glDisable(GL_DEPTH_TEST);
+
+            // Renderiza el grid
+            renderGrid();
+
+            // Habilita nuevamente el depth test para el resto de la escena
+            glEnable(GL_DEPTH_TEST);
+            //------------------------------------------------------------------------------------------
+ 
+
+            // PASADA DE TEXTOS
             glm::mat4 model = glm::mat4(1.0f);
             libCore::ShaderManager::Get("text")->use();
             libCore::ShaderManager::Get("text")->setMat4("projection", viewport->camera->projection);
             libCore::ShaderManager::Get("text")->setMat4("model", model);
             libCore::ShaderManager::Get("text")->setMat4("view", viewport->camera->view);
+
             //--> Render Textos AQUI!!!
-            glDisable(GL_BLEND);
-            glBlendFunc(GL_ONE, GL_ZERO);
+            glDisable(GL_BLEND); 
+            glBlendFunc(GL_ONE, GL_ZERO);//Acaba zona alpha
             //------------------------------------------------------------------------------------------
+
+
+
 
             // Desligar el FBO forward
             viewport->framebuffer_forward->unbindFBO();
@@ -526,6 +544,29 @@ namespace libCore {
             ImGui::SliderFloat("Star Brightness Max", &dynamicSkybox->starBrightnessMax, 0.0f, 1.0f, "%.4f");
             ImGui::DragFloat2("Star Coord Scale", glm::value_ptr(dynamicSkybox->starCoordScale), 0.1f, 0.0f, 200.0f, "%.4f");
             
+
+
+
+            //GRID
+            ImGui::Dummy(ImVec2(0.0f, 10.0f));
+            ImGui::Separator();
+            ImGui::Text("Grid Settings");
+
+            // Control para el tamaño del grid (número de celdas)
+            ImGui::SliderInt("Grid Size", &gridSize, 1, 100);
+
+            // Control para el color del grid
+            ImGui::ColorEdit3("Grid Color", glm::value_ptr(gridColor));
+
+            // Control para la transparencia del grid
+            ImGui::SliderFloat("Grid Transparency", &gridTransparency, 0.0f, 1.0f, "%.2f");
+
+            // Control para el tamaño de la celda del grid
+            ImGui::SliderFloat("Grid Cell Size", &gridCellSize, 0.1f, 10.0f, "%.2f");
+
+            // Control para el grosor de las líneas del grid
+            ImGui::SliderFloat("Grid Line Thickness", &gridCellLineSize, 0.1f, 5.0f, "%.2f");
+
             ImGui::End();
         }
 
@@ -539,6 +580,14 @@ namespace libCore {
         GLuint noiseTexture;
         const unsigned int NR_LIGHTS = 1;
         GLuint quadVAO, quadVBO;
+
+        //GLuint gridVAO = 0;
+        //GLuint gridVBO = 0;
+        int gridSize = 10;
+        glm::vec3 gridColor =  glm::vec3(0.1f, 0.1f, 0.1f);
+        float gridTransparency = 1.0f;
+        float gridCellSize = 1.0f;
+        float gridCellLineSize = 1.0f;
 
         void setupQuad() {
             float quadVertices[] = {
@@ -568,6 +617,83 @@ namespace libCore {
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glBindVertexArray(0);
         }
+
+        void renderGrid()
+        {
+            static GLuint gridVAO = 0;
+            static GLuint gridVBO = 0;
+
+            // Si hay cambios en el tamaño del grid o el tamaño de las celdas, recrear el grid
+            static int lastGridSize = gridSize;
+            static float lastGridCellSize = gridCellSize;
+
+            if (gridVAO == 0 || gridSize != lastGridSize || gridCellSize != lastGridCellSize)
+            {
+                lastGridSize = gridSize;
+                lastGridCellSize = gridCellSize;
+
+                // Generar las líneas para el grid
+                std::vector<float> vertices;
+
+                for (int i = -gridSize; i <= gridSize; ++i)
+                {
+                    float position = i * gridCellSize;
+
+                    // Líneas en la dirección X (horizontales)
+                    vertices.push_back(-gridSize * gridCellSize);
+                    vertices.push_back(0.0f);
+                    vertices.push_back(position);
+
+                    vertices.push_back(gridSize * gridCellSize);
+                    vertices.push_back(0.0f);
+                    vertices.push_back(position);
+
+                    // Líneas en la dirección Z (verticales)
+                    vertices.push_back(position);
+                    vertices.push_back(0.0f);
+                    vertices.push_back(-gridSize * gridCellSize);
+
+                    vertices.push_back(position);
+                    vertices.push_back(0.0f);
+                    vertices.push_back(gridSize * gridCellSize);
+                }
+
+                if (gridVAO == 0)
+                {
+                    glGenVertexArrays(1, &gridVAO);
+                    glGenBuffers(1, &gridVBO);
+                }
+
+                glBindVertexArray(gridVAO);
+
+                glBindBuffer(GL_ARRAY_BUFFER, gridVBO);
+                glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
+
+                // Posiciones de vértices
+                glEnableVertexAttribArray(0);
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+                glBindVertexArray(0);
+            }
+
+            // Configurar las propiedades del shader antes de renderizar
+            glLineWidth(gridCellLineSize);
+            libCore::ShaderManager::Get("grid")->use();
+            libCore::ShaderManager::Get("grid")->setVec3("gridColor", gridColor);
+            libCore::ShaderManager::Get("grid")->setFloat("gridTransparency", gridTransparency);
+
+            // Renderizar el grid
+            glBindVertexArray(gridVAO);
+            glDrawArrays(GL_LINES, 0, (gridSize * 2 + 1) * 4); // Cantidad de vértices en el grid
+            glBindVertexArray(0);
+        }
+
+
+
+
+
+
+
 
         float ourLerp(float a, float b, float f) {
             return a + f * (b - a);

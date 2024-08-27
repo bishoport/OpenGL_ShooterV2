@@ -48,5 +48,7 @@
     <None Include="assets\shaders\IBL\capture_enviroment.frag" />
     <None Include="assets\shaders\snapshot.vert" />
     <None Include="assets\shaders\snapshot.frag" />
+    <None Include="assets\shaders\grid.vert" />
+    <None Include="assets\shaders\grid.frag" />
   </ItemGroup>
 </Project>

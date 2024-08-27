@@ -147,6 +147,8 @@
     <None Include="assets\shaders\deferred\lightingPass.vert" />
     <None Include="assets\shaders\deferred\geometryPass.frag" />
     <None Include="assets\shaders\deferred\geometryPass.vert" />
+    <None Include="assets\shaders\grid.frag" />
+    <None Include="assets\shaders\grid.vert" />
     <None Include="assets\shaders\IBL\capture_enviroment.frag" />
     <None Include="assets\shaders\IBL\capture_enviroment.vert" />
     <None Include="assets\shaders\snapshot.frag" />
