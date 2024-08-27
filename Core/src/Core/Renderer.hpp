@@ -45,15 +45,12 @@ namespace libCore {
         //HDR
         bool hdrEnabled = false;
         float hdrExposure = 1.0f;
-
         bool renderInPause = false;
 
         static Renderer& getInstance() {
             static Renderer instance;
             return instance;
         }
-
-
 
         void initialize() 
         {
@@ -94,17 +91,13 @@ namespace libCore {
             mLTC.mat2 = loadLUTTexture();
             //-------------------------------------------------------
         }
-        
-
 
         void PushDebugGroup(const std::string& name) {
             glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, name.c_str());
         }
-
         void PopDebugGroup() {
             glPopDebugGroup();
         }
-
 
 
         void RenderViewport(const Ref<Viewport>& viewport, const Timestep& m_deltaTime) 
@@ -493,7 +486,6 @@ namespace libCore {
             //------------------------------------------------------------------------------------------
             //------------------------------------------------------------------------------------------
         }
-
         void ShowViewportInQuad(Ref<Viewport> viewport) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             libCore::ShaderManager::Get("colorQuadFBO")->use();
@@ -501,8 +493,6 @@ namespace libCore {
             libCore::ShaderManager::Get("colorQuadFBO")->setInt("screenTexture", 0);
             renderQuad();
         }
-
-
 
 
         void ShowControlsGUI() {
@@ -584,8 +574,6 @@ namespace libCore {
 
             ImGui::End();
         }
-
-
         void ShowAxisControlGUI()
         {
             ImGui::Begin("Axis Controls");
@@ -612,21 +600,9 @@ namespace libCore {
         std::vector<glm::vec3> ssaoKernel;
         GLuint noiseTexture;
         const unsigned int NR_LIGHTS = 1;
-        GLuint quadVAO, quadVBO;
-
-        //WORLD GRID
-        //GLuint gridVAO = 0;
-        //GLuint gridVBO = 0;
-        int gridSize = 10;
-        glm::vec3 gridColor =  glm::vec3(0.1f, 0.1f, 0.1f);
-        float gridTransparency = 1.0f;
-        float gridCellSize = 1.0f;
-        float gridCellLineSize = 1.0f;
-
- 
-
 
         //--QUAD
+        GLuint quadVAO, quadVBO;
         void setupQuad() {
             float quadVertices[] = {
                 // positions  // texCoords
@@ -657,6 +633,11 @@ namespace libCore {
         //--------------------------------------------------------------------------
 
         //--GRID
+        int gridSize = 10;
+        glm::vec3 gridColor = glm::vec3(0.1f, 0.1f, 0.1f);
+        float gridTransparency = 1.0f;
+        float gridCellSize = 1.0f;
+        float gridCellLineSize = 1.0f;
         void renderGrid()
         {
             static GLuint gridVAO = 0;

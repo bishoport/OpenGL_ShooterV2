@@ -130,24 +130,22 @@ namespace libCore
 		//-----------------------------
 
 		// -- SHADERS
-		//libCore::ShaderManager shaderManager;
 		std::string shadersDirectory = "assets/shaders/";
-		//shaderManager.setShaderDataLoad("basic",        shadersDirectory + "basic.vert",    shadersDirectory + "basic.frag");
 		ShaderManager::setShaderDataLoad("colorQuadFBO", shadersDirectory + "quad_fbo.vert", shadersDirectory + "color_quad_fbo.frag");
 		
 		//-DEBUG & TEXT
-		ShaderManager::setShaderDataLoad("debug", shadersDirectory + "debug.vert", shadersDirectory + "debug.frag");
+		ShaderManager::setShaderDataLoad("debug",    shadersDirectory + "debug.vert",    shadersDirectory + "debug.frag");
 		ShaderManager::setShaderDataLoad("snapshot", shadersDirectory + "snapshot.vert", shadersDirectory + "snapshot.frag");
-		ShaderManager::setShaderDataLoad("text",  shadersDirectory + "text.vert",  shadersDirectory + "text.frag");
-		ShaderManager::setShaderDataLoad("grid",  shadersDirectory + "grid.vert",  shadersDirectory + "grid.frag");
-		ShaderManager::setShaderDataLoad("axes",  shadersDirectory + "axes.vert",  shadersDirectory + "axes.frag");
+		ShaderManager::setShaderDataLoad("text",     shadersDirectory + "text.vert",     shadersDirectory + "text.frag");
+		ShaderManager::setShaderDataLoad("grid",     shadersDirectory + "grid.vert",     shadersDirectory + "grid.frag");
+		ShaderManager::setShaderDataLoad("axes",     shadersDirectory + "axes.vert",     shadersDirectory + "axes.frag");
 
 		//-SSAO
 		ShaderManager::setShaderDataLoad("ssao",     shadersDirectory + "ssao.vert", shadersDirectory + "ssao.frag");
 		ShaderManager::setShaderDataLoad("ssaoBlur", shadersDirectory + "ssao.vert", shadersDirectory + "ssao_blur.frag");
 
 		//-SKYBOX
-		ShaderManager::setShaderDataLoad("dynamicSkybox", shadersDirectory + "skybox/dynamicSkybox.vs", shadersDirectory + "skybox/dynamicSkybox.fs");
+		ShaderManager::setShaderDataLoad("dynamicSkybox", shadersDirectory + "skybox/dynamicSkybox.vs",   shadersDirectory + "skybox/dynamicSkybox.fs");
 
 		//-G_Buffer
 		ShaderManager::setShaderDataLoad("geometryPass", shadersDirectory + "deferred/geometryPass.vert", shadersDirectory + "deferred/geometryPass.frag");
@@ -199,6 +197,8 @@ namespace libCore
 		// -- RENDERER
 		Renderer::getInstance().initialize();
 		//---------------------------------------------------------------------------
+
+		
 
 		// -- MOUSE PICKER
 		//MousePicker::getInstance().initialize(window);

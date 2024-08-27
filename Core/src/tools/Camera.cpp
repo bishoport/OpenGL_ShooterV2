@@ -41,6 +41,65 @@ namespace libCore
         this->cameraMatrix = projection * view;
     }
 
+    void Camera::SetPosition(const glm::vec3& position)
+    {
+        Position = position;
+        updateMatrix();
+    }
+
+    void Camera::SetYaw(float newYaw)
+    {
+        yaw = newYaw;
+        updateMatrix();
+    }
+
+    void Camera::SetPitch(float newPitch)
+    {
+        pitch = newPitch;
+        updateMatrix();
+    }
+
+    void Camera::SetOrientationQuat(const glm::quat& orientationQuat)
+    {
+        OrientationQuat = orientationQuat;
+        UpdateOrientationFromQuaternion();
+        updateMatrix();
+    }
+
+    void Camera::SetUpVector(const glm::vec3& up)
+    {
+        Up = up;
+        updateMatrix();
+    }
+
+    void Camera::SetFOV(float fov)
+    {
+        FOVdeg = fov;
+        updateMatrix();
+    }
+
+    void Camera::SetNearPlane(float newNearPlane)
+    {
+        nearPlane = newNearPlane;
+        updateMatrix();
+    }
+
+    void Camera::SetFarPlane(float newFarPlane)
+    {
+        farPlane = newFarPlane;
+        updateMatrix();
+    }
+
+    void Camera::SetSpeed(float newSpeed)
+    {
+        speed = newSpeed;
+    }
+
+    void Camera::SetSensitivity(float newSensitivity)
+    {
+        sensitivity = newSensitivity;
+    }
+
     void Camera::UpdateOrientationFromEuler()
     {
         // Convertir la orientación de Euler a un cuaternión
@@ -55,7 +114,7 @@ namespace libCore
         this->yaw = glm::degrees(euler.y);
     }
 
-    void libCore::Camera::LookAt(const glm::vec3& targetPosition)
+    void Camera::LookAt(const glm::vec3& targetPosition)
     {
         // Calcula la dirección hacia el objetivo
         glm::vec3 direction = glm::normalize(targetPosition - Position);

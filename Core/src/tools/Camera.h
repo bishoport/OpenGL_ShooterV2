@@ -36,7 +36,7 @@ namespace libCore
         float nearPlane = 0.1f;
         float farPlane = 1000.0f;
 
-        bool isOrthographic = false; // Nuevo: Controla si la cámara está en modo ortográfico
+        bool isOrthographic = false; // Controla si la cámara está en modo ortográfico
 
         Camera(int width, int height, glm::vec3 position);
 
@@ -48,5 +48,17 @@ namespace libCore
 
         // Nueva función para que la cámara mire a un punto específico
         void LookAt(const glm::vec3& targetPosition);
+
+        // Setters para actualizar propiedades desde fuera
+        void SetPosition(const glm::vec3& position);
+        void SetYaw(float yaw);
+        void SetPitch(float pitch);
+        void SetOrientationQuat(const glm::quat& orientationQuat);
+        void SetUpVector(const glm::vec3& up);
+        void SetFOV(float fov);
+        void SetNearPlane(float nearPlane);
+        void SetFarPlane(float farPlane);
+        void SetSpeed(float speed);
+        void SetSensitivity(float sensitivity);
     };
 }

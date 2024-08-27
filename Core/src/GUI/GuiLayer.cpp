@@ -1405,39 +1405,79 @@ namespace libCore
 
         // Mostrar y permitir editar la posición de la cámara
         ImGui::Text("Position");
-        ImGui::DragFloat3("##Position", glm::value_ptr(editorCamera->Position), 0.1f);
+        glm::vec3 position = editorCamera->Position;
+        if (ImGui::DragFloat3("##Position", glm::value_ptr(position), 0.1f))
+        {
+            editorCamera->SetPosition(position);
+        }
 
-        // Mostrar y permitir editar la orientación en ángulos de Euler (Yaw, Pitch, Roll)
+        // Mostrar y permitir editar la orientación en ángulos de Euler (Yaw, Pitch)
         ImGui::Text("Euler Angles");
-        ImGui::DragFloat("Yaw", &editorCamera->yaw, 0.1f, -180.0f, 180.0f);
-        ImGui::DragFloat("Pitch", &editorCamera->pitch, 0.1f, -89.0f, 89.0f);
+        float yaw = editorCamera->yaw;
+        float pitch = editorCamera->pitch;
+        if (ImGui::DragFloat("Yaw", &yaw, 0.1f, -180.0f, 180.0f))
+        {
+            editorCamera->SetYaw(yaw);
+        }
+        if (ImGui::DragFloat("Pitch", &pitch, 0.1f, -89.0f, 89.0f))
+        {
+            editorCamera->SetPitch(pitch);
+        }
 
         // Mostrar y permitir editar el cuaternión de orientación
         ImGui::Text("Orientation Quaternion");
-        ImGui::DragFloat4("##OrientationQuat", glm::value_ptr(editorCamera->OrientationQuat), 0.1f);
+        glm::quat orientationQuat = editorCamera->OrientationQuat;
+        if (ImGui::DragFloat4("##OrientationQuat", glm::value_ptr(orientationQuat), 0.1f))
+        {
+            editorCamera->SetOrientationQuat(orientationQuat);
+        }
 
         // Mostrar y permitir editar la dirección "Up" de la cámara
         ImGui::Text("Up");
-        ImGui::DragFloat3("##Up", glm::value_ptr(editorCamera->Up), 0.1f);
+        glm::vec3 up = editorCamera->Up;
+        if (ImGui::DragFloat3("##Up", glm::value_ptr(up), 0.1f))
+        {
+            editorCamera->SetUpVector(up);
+        }
 
         // Mostrar y permitir editar el FOV de la cámara
         ImGui::Text("Field of View");
-        ImGui::SliderFloat("##FOV", &editorCamera->FOVdeg, 1.0f, 120.0f);
+        float fov = editorCamera->FOVdeg;
+        if (ImGui::SliderFloat("##FOV", &fov, 1.0f, 120.0f))
+        {
+            editorCamera->SetFOV(fov);
+        }
 
         // Mostrar y permitir editar los planos cercano y lejano
         ImGui::Text("Near Plane");
-        ImGui::DragFloat("##NearPlane", &editorCamera->nearPlane, 0.01f, 0.01f, 10.0f);
+        float nearPlane = editorCamera->nearPlane;
+        if (ImGui::DragFloat("##NearPlane", &nearPlane, 0.01f, 0.01f, 10.0f))
+        {
+            editorCamera->SetNearPlane(nearPlane);
+        }
 
         ImGui::Text("Far Plane");
-        ImGui::DragFloat("##FarPlane", &editorCamera->farPlane, 1.0f, 10.0f, 10000.0f);
+        float farPlane = editorCamera->farPlane;
+        if (ImGui::DragFloat("##FarPlane", &farPlane, 1.0f, 10.0f, 10000.0f))
+        {
+            editorCamera->SetFarPlane(farPlane);
+        }
 
         // Mostrar y permitir editar la velocidad de la cámara
         ImGui::Text("Speed");
-        ImGui::DragFloat("##Speed", &editorCamera->speed, 0.01f, 0.0f, 10.0f);
+        float speed = editorCamera->speed;
+        if (ImGui::DragFloat("##Speed", &speed, 0.01f, 0.0f, 10.0f))
+        {
+            editorCamera->SetSpeed(speed);
+        }
 
         // Mostrar y permitir editar la sensibilidad de la cámara
         ImGui::Text("Sensitivity");
-        ImGui::DragFloat("##Sensitivity", &editorCamera->sensitivity, 1.0f, 0.0f, 1000.0f);
+        float sensitivity = editorCamera->sensitivity;
+        if (ImGui::DragFloat("##Sensitivity", &sensitivity, 1.0f, 0.0f, 1000.0f))
+        {
+            editorCamera->SetSensitivity(sensitivity);
+        }
 
         // Botón para cambiar entre ortográfico y perspectiva
         if (ImGui::Button(editorCamera->isOrthographic ? "Switch to Perspective" : "Switch to Orthographic"))
@@ -1449,11 +1489,9 @@ namespace libCore
         entt::entity selectedEntity = EntityManager::GetInstance().currentSelectedEntityInScene;
 
 
-
-
         // Botones para posiciones predefinidas
         ImGui::Text("Predefined Views");
-
+        
         // Función auxiliar para calcular el radio del AABB
         auto CalculateAABBRadius = [](const AABBComponent& aabbComponent) {
             glm::vec3 extents = aabbComponent.aabb->worldMaxBounds - aabbComponent.aabb->worldMinBounds;
@@ -1606,12 +1644,8 @@ namespace libCore
                 editorCamera->LookAt(glm::vec3(0.0f, 0.0f, 0.0f));
             }
         }
-
-
         ImGui::End();
     }
-
-
     //-----------------------------------------------------------------------------------------------------
 
 

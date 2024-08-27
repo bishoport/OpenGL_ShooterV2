@@ -32,6 +32,9 @@ namespace libCore
             viewport->editorCamera = CreateRef<libCore::EditorCamera>(viewport->viewportSize.x, viewport->viewportSize.y, cameraPosition);
 
             viewport->camera = viewport->editorCamera;
+
+            viewport->camera->SetPosition(glm::vec3(-20.0f, 8.0f, -20.0f));
+            viewport->camera->LookAt(glm::vec3(0.0f, 0.0f, 0.0f));
             //----------------------------------------------------------
            
 
