@@ -58,6 +58,7 @@ namespace libCore {
         void initialize() 
         {
             setupAxes();
+            setupSphere();
 
             //--SKYBOX
             std::vector<const char*> faces {
@@ -777,15 +778,12 @@ namespace libCore {
             // Configura las matrices de vista, proyección y modelo
             glm::mat4 model = glm::mat4(1.0f);
 
-            // Aplica la escala y el offset en la matriz de modelo
+            // Aplica la escala y el offset en la matriz de modelo para las líneas de los ejes
             model = glm::translate(model, viewport->camera->Position + axisOffset + viewport->camera->Orientation);
             model = glm::scale(model, glm::vec3(axisSize));
 
             libCore::ShaderManager::Get("axes")->setMat4("view", viewport->camera->view);
             libCore::ShaderManager::Get("axes")->setMat4("projection", viewport->camera->projection);
-
-
-
             libCore::ShaderManager::Get("axes")->setMat4("model", model);
 
             // Renderizar el eje X (rojo)
@@ -799,6 +797,61 @@ namespace libCore {
             // Renderizar el eje Z (azul)
             libCore::ShaderManager::Get("axes")->setVec3("axisColor", axisZColor);
             glDrawArrays(GL_LINES, 4, 2);
+
+            glBindVertexArray(0);
+
+            // Ahora renderizamos las bolitas en los extremos
+            glBindVertexArray(sphereVAO);
+            glPointSize(10.0f); // Si estás usando GL_POINTS
+
+            glm::mat4 sphereModel;
+
+            // Eje X (rojo)
+            libCore::ShaderManager::Get("axes")->setVec3("axisColor", axisXColor);
+            sphereModel = glm::mat4(1.0f); // Partimos de una matriz identidad para las esferas
+            sphereModel = glm::translate(sphereModel, viewport->camera->Position + axisOffset + viewport->camera->Orientation + glm::vec3(1.0f, 0.0f, 0.0f) * axisSize); // Mover al extremo del eje X
+            libCore::ShaderManager::Get("axes")->setMat4("model", sphereModel);
+            glDrawArrays(GL_POINTS, 0, 1);
+
+            // Eje Y (verde)
+            libCore::ShaderManager::Get("axes")->setVec3("axisColor", axisYColor);
+            sphereModel = glm::mat4(1.0f); // Partimos de una matriz identidad para las esferas
+            sphereModel = glm::translate(sphereModel, viewport->camera->Position + axisOffset + viewport->camera->Orientation + glm::vec3(0.0f, 1.0f, 0.0f) * axisSize); // Mover al extremo del eje Y
+            libCore::ShaderManager::Get("axes")->setMat4("model", sphereModel);
+            glDrawArrays(GL_POINTS, 0, 1);
+
+            // Eje Z (azul)
+            libCore::ShaderManager::Get("axes")->setVec3("axisColor", axisZColor);
+            sphereModel = glm::mat4(1.0f); // Partimos de una matriz identidad para las esferas
+            sphereModel = glm::translate(sphereModel, viewport->camera->Position + axisOffset + viewport->camera->Orientation + glm::vec3(0.0f, 0.0f, 1.0f) * axisSize); // Mover al extremo del eje Z
+            libCore::ShaderManager::Get("axes")->setMat4("model", sphereModel);
+            glDrawArrays(GL_POINTS, 0, 1);
+
+            glBindVertexArray(0);
+        }
+
+
+        //Balls
+        GLuint sphereVAO, sphereVBO;
+        void setupSphere()
+        {
+            // Vertices para una esfera muy simple (puedes generar una esfera más compleja si lo prefieres)
+            float sphereVertices[] = {
+                // X, Y, Z
+                0.0f, 0.0f, 0.0f, // Centro, usado como base para GL_POINTS o una esfera simple
+                // Podrías agregar más vértices aquí para una esfera completa si lo prefieres
+            };
+
+            glGenVertexArrays(1, &sphereVAO);
+            glGenBuffers(1, &sphereVBO);
+
+            glBindVertexArray(sphereVAO);
+
+            glBindBuffer(GL_ARRAY_BUFFER, sphereVBO);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(sphereVertices), sphereVertices, GL_STATIC_DRAW);
+
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
             glBindVertexArray(0);
         }
