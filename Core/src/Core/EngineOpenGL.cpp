@@ -140,6 +140,7 @@ namespace libCore
 		ShaderManager::setShaderDataLoad("snapshot", shadersDirectory + "snapshot.vert", shadersDirectory + "snapshot.frag");
 		ShaderManager::setShaderDataLoad("text",  shadersDirectory + "text.vert",  shadersDirectory + "text.frag");
 		ShaderManager::setShaderDataLoad("grid",  shadersDirectory + "grid.vert",  shadersDirectory + "grid.frag");
+		ShaderManager::setShaderDataLoad("axes",  shadersDirectory + "axes.vert",  shadersDirectory + "axes.frag");
 
 		//-SSAO
 		ShaderManager::setShaderDataLoad("ssao",     shadersDirectory + "ssao.vert", shadersDirectory + "ssao.frag");

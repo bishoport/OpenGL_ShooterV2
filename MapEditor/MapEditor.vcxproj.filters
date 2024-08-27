@@ -50,5 +50,7 @@
     <None Include="assets\shaders\snapshot.frag" />
     <None Include="assets\shaders\grid.vert" />
     <None Include="assets\shaders\grid.frag" />
+    <None Include="assets\shaders\axes.vert" />
+    <None Include="assets\shaders\axes.frag" />
   </ItemGroup>
 </Project>

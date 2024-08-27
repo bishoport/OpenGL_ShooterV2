@@ -192,6 +192,7 @@ namespace libCore
             //RenderCheckerMatrix(); //Panel para el editor de roofs
 
             Renderer::getInstance().ShowControlsGUI();
+            Renderer::getInstance().ShowAxisControlGUI();
             ViewportManager::GetInstance().DrawPanelGUI();
             //--------------------------------------------------------
 
@@ -1438,8 +1439,61 @@ namespace libCore
         ImGui::Text("Sensitivity");
         ImGui::DragFloat("##Sensitivity", &editorCamera->sensitivity, 1.0f, 0.0f, 1000.0f);
 
+        // Botón para cambiar entre ortográfico y perspectiva
+        if (ImGui::Button(editorCamera->isOrthographic ? "Switch to Perspective" : "Switch to Orthographic"))
+        {
+            editorCamera->isOrthographic = !editorCamera->isOrthographic;
+            editorCamera->updateMatrix(); // Actualizar la matriz de la cámara inmediatamente
+        }
+
+        // Botones para posiciones predefinidas
+        ImGui::Text("Predefined Views");
+        if (ImGui::Button("Top View"))
+        {
+            editorCamera->Position = glm::vec3(0.0f, 10.0f, 0.0f);
+            editorCamera->pitch = -90.0f;
+            editorCamera->yaw = 0.0f;
+            editorCamera->updateMatrix();
+        }
+        if (ImGui::Button("Bottom View"))
+        {
+            editorCamera->Position = glm::vec3(0.0f, -10.0f, 0.0f);
+            editorCamera->pitch = 90.0f;
+            editorCamera->yaw = 0.0f;
+            editorCamera->updateMatrix();
+        }
+        if (ImGui::Button("Left View"))
+        {
+            editorCamera->Position = glm::vec3(-10.0f, 0.0f, 0.0f);
+            editorCamera->pitch = 0.0f;
+            editorCamera->yaw = 90.0f;
+            editorCamera->updateMatrix();
+        }
+        if (ImGui::Button("Right View"))
+        {
+            editorCamera->Position = glm::vec3(10.0f, 0.0f, 0.0f);
+            editorCamera->pitch = 0.0f;
+            editorCamera->yaw = -90.0f;
+            editorCamera->updateMatrix();
+        }
+        if (ImGui::Button("Front View"))
+        {
+            editorCamera->Position = glm::vec3(0.0f, 0.0f, 10.0f);
+            editorCamera->pitch = 0.0f;
+            editorCamera->yaw = 180.0f;
+            editorCamera->updateMatrix();
+        }
+        if (ImGui::Button("Back View"))
+        {
+            editorCamera->Position = glm::vec3(0.0f, 0.0f, -10.0f);
+            editorCamera->pitch = 0.0f;
+            editorCamera->yaw = 0.0f;
+            editorCamera->updateMatrix();
+        }
+
         ImGui::End();
     }
+
 
     //-----------------------------------------------------------------------------------------------------
 

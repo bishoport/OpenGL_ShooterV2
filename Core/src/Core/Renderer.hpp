@@ -55,7 +55,9 @@ namespace libCore {
 
 
 
-        void initialize() {
+        void initialize() 
+        {
+            setupAxes();
 
             //--SKYBOX
             std::vector<const char*> faces {
@@ -75,6 +77,7 @@ namespace libCore {
             ibl->prepareIBL(640, 480,dynamicIBL);
             //-------------------------------------------------------
 
+            
 
             //--SSAO
             setupQuad();// Configuración del quad para SSAO
@@ -395,7 +398,8 @@ namespace libCore {
             EntityManager::GetInstance().DrawABBGameObjectMeshComponent("debug");
             //------------------------------------------------------------------------------------------
 
-            
+
+
             //GRID
             glEnable(GL_BLEND);//Empieza zona alpha
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -411,13 +415,23 @@ namespace libCore {
             // Opcionalmente, deshabilita el depth test para asegurarte de que se renderice en la parte superior
             glDisable(GL_DEPTH_TEST);
 
+            // Renderizar los ejes en el origen
+            renderAxes(viewport);
+
             // Renderiza el grid
             renderGrid();
+            
+            
+
+            
+
 
             // Habilita nuevamente el depth test para el resto de la escena
             glEnable(GL_DEPTH_TEST);
             //------------------------------------------------------------------------------------------
  
+            
+            
 
             // PASADA DE TEXTOS
             glm::mat4 model = glm::mat4(1.0f);
@@ -571,6 +585,20 @@ namespace libCore {
         }
 
 
+        void ShowAxisControlGUI()
+        {
+            ImGui::Begin("Axis Controls");
+
+            ImGui::ColorEdit3("X Axis Color", glm::value_ptr(axisXColor));
+            ImGui::ColorEdit3("Y Axis Color", glm::value_ptr(axisYColor));
+            ImGui::ColorEdit3("Z Axis Color", glm::value_ptr(axisZColor));
+
+            ImGui::SliderFloat("Axis Size", &axisSize, 0.01f, 0.5f); // Ajusta el tamaño de los ejes
+
+            ImGui::SliderFloat2("Axis Position", glm::value_ptr(axisPosition), 0.0f, 1.0f); // Ajusta la posición en pantalla
+
+            ImGui::End();
+        }
 
 
     private:
@@ -581,6 +609,7 @@ namespace libCore {
         const unsigned int NR_LIGHTS = 1;
         GLuint quadVAO, quadVBO;
 
+        //WORLD GRID
         //GLuint gridVAO = 0;
         //GLuint gridVBO = 0;
         int gridSize = 10;
@@ -589,6 +618,17 @@ namespace libCore {
         float gridCellSize = 1.0f;
         float gridCellLineSize = 1.0f;
 
+        //WORLD AXIS
+        glm::vec3 axisXColor = glm::vec3(1.0f, 0.0f, 0.0f);
+        glm::vec3 axisYColor = glm::vec3(0.0f, 1.0f, 0.0f);
+        glm::vec3 axisZColor = glm::vec3(0.0f, 0.0f, 1.0f);
+        float axisSize = 0.1f; // Tamaño relativo de los ejes
+        glm::vec2 axisPosition = glm::vec2(0.1f, 0.9f); // Posición relativa de los ejes (esquina superior izquierda)
+        GLuint axesVAO;
+        GLuint axesVBO;
+
+
+        //--QUAD
         void setupQuad() {
             float quadVertices[] = {
                 // positions  // texCoords
@@ -611,13 +651,14 @@ namespace libCore {
             glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
             glBindVertexArray(0);
         }
-
         void renderQuad() {
             glBindVertexArray(quadVAO);
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glBindVertexArray(0);
         }
+        //--------------------------------------------------------------------------
 
+        //--GRID
         void renderGrid()
         {
             static GLuint gridVAO = 0;
@@ -687,18 +728,93 @@ namespace libCore {
             glDrawArrays(GL_LINES, 0, (gridSize * 2 + 1) * 4); // Cantidad de vértices en el grid
             glBindVertexArray(0);
         }
+        //--------------------------------------------------------------------------
+        
+        //--WORLD_AXIS
+        void setupAxes()
+        {
+            // Definir los vértices de las líneas de los ejes X, Y, Z
+            float axesVertices[] = {
+                // Eje X (rojo)
+                0.0f, 0.0f, 0.0f,
+                1.0f, 0.0f, 0.0f,
+
+                // Eje Y (verde)
+                0.0f, 0.0f, 0.0f,
+                0.0f, 1.0f, 0.0f,
+
+                // Eje Z (azul)
+                0.0f, 0.0f, 0.0f,
+                0.0f, 0.0f, 1.0f,
+            };
+
+            glGenVertexArrays(1, &axesVAO);
+            glGenBuffers(1, &axesVBO);
+
+            glBindVertexArray(axesVAO);
+
+            glBindBuffer(GL_ARRAY_BUFFER, axesVBO);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(axesVertices), axesVertices, GL_STATIC_DRAW);
+
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+            glBindVertexArray(0);
+        }
+        //void renderAxes()
+        //{
+        //    glBindVertexArray(axesVAO);
+
+        //    glLineWidth(gridCellLineSize);
+
+        //    // Eje X (rojo)
+        //    libCore::ShaderManager::Get("axes")->use();
+        //    libCore::ShaderManager::Get("axes")->setVec3("axisColor", glm::vec3(1.0f, 0.0f, 0.0f)); // Rojo para X
+        //    glDrawArrays(GL_LINES, 0, 2);
+
+        //    // Eje Y (verde)
+        //    libCore::ShaderManager::Get("axes")->setVec3("axisColor", glm::vec3(0.0f, 1.0f, 0.0f)); // Verde para Y
+        //    glDrawArrays(GL_LINES, 2, 2);
+
+        //    // Eje Z (azul)
+        //    libCore::ShaderManager::Get("axes")->setVec3("axisColor", glm::vec3(0.0f, 0.0f, 1.0f)); // Azul para Z
+        //    glDrawArrays(GL_LINES, 4, 2);
+
+        //    glBindVertexArray(0);
+        //}
+        void renderAxes(const Ref<Viewport>& viewport)
+        {
+            glBindVertexArray(axesVAO);
+
+            glLineWidth(2.0f); // Asegúrate de que la línea sea lo suficientemente gruesa para ser visible
+
+            libCore::ShaderManager::Get("axes")->use();
+            libCore::ShaderManager::Get("axes")->setMat4("view", viewport->camera->view);
+            libCore::ShaderManager::Get("axes")->setMat4("projection", viewport->camera->projection);
+
+            // Eje X (rojo)
+            libCore::ShaderManager::Get("axes")->setVec3("axisColor", glm::vec3(1.0f, 0.0f, 0.0f)); // Rojo
+            glDrawArrays(GL_LINES, 0, 2);
+
+            // Eje Y (verde)
+            libCore::ShaderManager::Get("axes")->setVec3("axisColor", glm::vec3(0.0f, 1.0f, 0.0f)); // Verde
+            glDrawArrays(GL_LINES, 2, 2);
+
+            // Eje Z (azul)
+            libCore::ShaderManager::Get("axes")->setVec3("axisColor", glm::vec3(0.0f, 0.0f, 1.0f)); // Azul
+            glDrawArrays(GL_LINES, 4, 2);
+
+            glBindVertexArray(0);
+        }
 
 
-
-
-
+        //--------------------------------------------------------------------------
 
 
 
         float ourLerp(float a, float b, float f) {
             return a + f * (b - a);
         }
-
         std::uniform_real_distribution<GLfloat> randomFloats{0.0f, 1.0f}; // Genera floats aleatorios entre 0.0 y 1.0
         std::default_random_engine generator;
 

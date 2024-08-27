@@ -36,6 +36,8 @@ namespace libCore
         float nearPlane = 0.1f;
         float farPlane = 1000.0f;
 
+        bool isOrthographic = false; // Nuevo: Controla si la cámara está en modo ortográfico
+
         Camera(int width, int height, glm::vec3 position);
 
         void updateMatrix();

@@ -23,7 +23,18 @@ namespace libCore
         OrientationQuat = glm::quat(glm::vec3(pitch, yaw, 0.0f));
 
         this->view = glm::lookAt(Position, Position + Orientation, Up);
-        this->projection = glm::perspective(glm::radians(FOVdeg), (float)width / height, nearPlane, farPlane);
+
+        // Seleccionar la matriz de proyección en función del modo
+        if (isOrthographic)
+        {
+            float orthoSize = 10.0f; // Tamaño de la cámara ortográfica (ajustable)
+            this->projection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, nearPlane, farPlane);
+        }
+        else
+        {
+            this->projection = glm::perspective(glm::radians(FOVdeg), (float)width / height, nearPlane, farPlane);
+        }
+
         this->cameraMatrix = projection * view;
     }
 
