@@ -593,12 +593,16 @@ namespace libCore {
             ImGui::ColorEdit3("Y Axis Color", glm::value_ptr(axisYColor));
             ImGui::ColorEdit3("Z Axis Color", glm::value_ptr(axisZColor));
 
-            ImGui::SliderFloat("Axis Size", &axisSize, 0.01f, 0.5f); // Ajusta el tamaño de los ejes
+            ImGui::SliderFloat("Axis Size", &axisSize, 0.01f, 1.0f); // Ajusta el tamaño de los ejes
 
-            ImGui::SliderFloat2("Axis Position", glm::value_ptr(axisPosition), 0.0f, 1.0f); // Ajusta la posición en pantalla
+            //ImGui::SliderFloat3("Axis Offset", glm::value_ptr(axisOffset), -10.0f, 10.0f); // Ajusta el offset
+            ImGui::SliderFloat3("Axis Offset", glm::value_ptr(axisOffset), -5.0f, 5.0f); // Ajusta la posición en relación a la cámara
+
 
             ImGui::End();
         }
+
+
 
 
     private:
@@ -618,14 +622,7 @@ namespace libCore {
         float gridCellSize = 1.0f;
         float gridCellLineSize = 1.0f;
 
-        //WORLD AXIS
-        glm::vec3 axisXColor = glm::vec3(1.0f, 0.0f, 0.0f);
-        glm::vec3 axisYColor = glm::vec3(0.0f, 1.0f, 0.0f);
-        glm::vec3 axisZColor = glm::vec3(0.0f, 0.0f, 1.0f);
-        float axisSize = 0.1f; // Tamaño relativo de los ejes
-        glm::vec2 axisPosition = glm::vec2(0.1f, 0.9f); // Posición relativa de los ejes (esquina superior izquierda)
-        GLuint axesVAO;
-        GLuint axesVBO;
+ 
 
 
         //--QUAD
@@ -731,6 +728,14 @@ namespace libCore {
         //--------------------------------------------------------------------------
         
         //--WORLD_AXIS
+        glm::vec3 axisXColor = glm::vec3(1.0f, 0.0f, 0.0f);
+        glm::vec3 axisYColor = glm::vec3(0.0f, 1.0f, 0.0f);
+        glm::vec3 axisZColor = glm::vec3(0.0f, 0.0f, 1.0f);
+        float axisSize = 0.1f; // Tamaño de las líneas del eje
+        glm::vec3 axisOffset = glm::vec3(0.0f, 0.0f, 0.0f); // Offset para posicionar los ejes respecto a la cámara
+        GLuint axesVAO;
+        GLuint axesVBO;
+
         void setupAxes()
         {
             // Definir los vértices de las líneas de los ejes X, Y, Z
@@ -761,53 +766,42 @@ namespace libCore {
 
             glBindVertexArray(0);
         }
-        //void renderAxes()
-        //{
-        //    glBindVertexArray(axesVAO);
-
-        //    glLineWidth(gridCellLineSize);
-
-        //    // Eje X (rojo)
-        //    libCore::ShaderManager::Get("axes")->use();
-        //    libCore::ShaderManager::Get("axes")->setVec3("axisColor", glm::vec3(1.0f, 0.0f, 0.0f)); // Rojo para X
-        //    glDrawArrays(GL_LINES, 0, 2);
-
-        //    // Eje Y (verde)
-        //    libCore::ShaderManager::Get("axes")->setVec3("axisColor", glm::vec3(0.0f, 1.0f, 0.0f)); // Verde para Y
-        //    glDrawArrays(GL_LINES, 2, 2);
-
-        //    // Eje Z (azul)
-        //    libCore::ShaderManager::Get("axes")->setVec3("axisColor", glm::vec3(0.0f, 0.0f, 1.0f)); // Azul para Z
-        //    glDrawArrays(GL_LINES, 4, 2);
-
-        //    glBindVertexArray(0);
-        //}
         void renderAxes(const Ref<Viewport>& viewport)
         {
             glBindVertexArray(axesVAO);
+            glLineWidth(2.0f); // Grosor de las líneas
 
-            glLineWidth(2.0f); // Asegúrate de que la línea sea lo suficientemente gruesa para ser visible
-
+            // Usa el shader para los ejes
             libCore::ShaderManager::Get("axes")->use();
+
+            // Configura las matrices de vista, proyección y modelo
+            glm::mat4 model = glm::mat4(1.0f);
+
+            // Aplica la escala y el offset en la matriz de modelo
+            model = glm::translate(model, viewport->camera->Position + axisOffset + viewport->camera->Orientation);
+            model = glm::scale(model, glm::vec3(axisSize));
+
             libCore::ShaderManager::Get("axes")->setMat4("view", viewport->camera->view);
             libCore::ShaderManager::Get("axes")->setMat4("projection", viewport->camera->projection);
 
-            // Eje X (rojo)
-            libCore::ShaderManager::Get("axes")->setVec3("axisColor", glm::vec3(1.0f, 0.0f, 0.0f)); // Rojo
+
+
+            libCore::ShaderManager::Get("axes")->setMat4("model", model);
+
+            // Renderizar el eje X (rojo)
+            libCore::ShaderManager::Get("axes")->setVec3("axisColor", axisXColor);
             glDrawArrays(GL_LINES, 0, 2);
 
-            // Eje Y (verde)
-            libCore::ShaderManager::Get("axes")->setVec3("axisColor", glm::vec3(0.0f, 1.0f, 0.0f)); // Verde
+            // Renderizar el eje Y (verde)
+            libCore::ShaderManager::Get("axes")->setVec3("axisColor", axisYColor);
             glDrawArrays(GL_LINES, 2, 2);
 
-            // Eje Z (azul)
-            libCore::ShaderManager::Get("axes")->setVec3("axisColor", glm::vec3(0.0f, 0.0f, 1.0f)); // Azul
+            // Renderizar el eje Z (azul)
+            libCore::ShaderManager::Get("axes")->setVec3("axisColor", axisZColor);
             glDrawArrays(GL_LINES, 4, 2);
 
             glBindVertexArray(0);
         }
-
-
         //--------------------------------------------------------------------------
 
 
