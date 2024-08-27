@@ -51,4 +51,18 @@ namespace libCore
         this->pitch = glm::degrees(euler.x);
         this->yaw = glm::degrees(euler.y);
     }
+
+
+    void libCore::Camera::LookAt(const glm::vec3& targetPosition)
+    {
+        // Calcula la dirección hacia el objetivo
+        glm::vec3 direction = glm::normalize(targetPosition - Position);
+
+        // Calcula el nuevo pitch y yaw
+        pitch = glm::degrees(asin(direction.y)); // Pitch: inclinación hacia arriba o abajo
+        yaw = glm::degrees(atan2(direction.z, direction.x)); // Yaw: rotación alrededor del eje Y
+
+        // Ajustar la orientación usando los nuevos valores de pitch y yaw
+        updateMatrix();
+    }
 }

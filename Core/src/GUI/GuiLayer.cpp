@@ -1446,50 +1446,167 @@ namespace libCore
             editorCamera->updateMatrix(); // Actualizar la matriz de la cámara inmediatamente
         }
 
+        entt::entity selectedEntity = EntityManager::GetInstance().currentSelectedEntityInScene;
+
+
+
+
         // Botones para posiciones predefinidas
         ImGui::Text("Predefined Views");
+
+        // Función auxiliar para calcular el radio del AABB
+        auto CalculateAABBRadius = [](const AABBComponent& aabbComponent) {
+            glm::vec3 extents = aabbComponent.aabb->worldMaxBounds - aabbComponent.aabb->worldMinBounds;
+            return glm::length(extents) / 2.0f;  // Mitad de la diagonal del AABB
+        };
+
+        float cameraDistance = 50.0f; // Valor por defecto
+
+        // Vista Superior (Top View)
         if (ImGui::Button("Top View"))
         {
-            editorCamera->Position = glm::vec3(0.0f, 10.0f, 0.0f);
-            editorCamera->pitch = -90.0f;
-            editorCamera->yaw = 0.0f;
-            editorCamera->updateMatrix();
+            if (selectedEntity != entt::null && EntityManager::GetInstance().m_registry->valid(selectedEntity))
+            {
+                if (EntityManager::GetInstance().HasComponent<TransformComponent>(selectedEntity)) {
+
+                    auto& transformComponent = EntityManager::GetInstance().GetComponent<TransformComponent>(selectedEntity);
+
+                    if (EntityManager::GetInstance().HasComponent<AABBComponent>(selectedEntity)) {
+                        auto& aabbComponent = EntityManager::GetInstance().GetComponent<AABBComponent>(selectedEntity);
+                        cameraDistance = CalculateAABBRadius(aabbComponent) * 2.0f;  // Ajustamos la distancia de la cámara
+                    }
+
+                    editorCamera->Position = transformComponent.transform->position + glm::vec3(0.0f, cameraDistance, 0.0f);
+                    editorCamera->LookAt(transformComponent.transform->position);
+                }
+                else
+                {
+                    editorCamera->Position = glm::vec3(0.0f, 150.0f, 0.0f);
+                    editorCamera->LookAt(glm::vec3(0.0f, 0.0f, 0.0f));
+                }
+            }
+            else
+            {
+                editorCamera->Position = glm::vec3(0.0f, 150.0f, 0.0f);
+                editorCamera->LookAt(glm::vec3(0.0f, 0.0f, 0.0f));
+            }
         }
+
+        // Vista Inferior (Bottom View)
         if (ImGui::Button("Bottom View"))
         {
-            editorCamera->Position = glm::vec3(0.0f, -10.0f, 0.0f);
-            editorCamera->pitch = 90.0f;
-            editorCamera->yaw = 0.0f;
-            editorCamera->updateMatrix();
+            if (selectedEntity != entt::null && EntityManager::GetInstance().m_registry->valid(selectedEntity))
+            {
+                auto& transformComponent = EntityManager::GetInstance().GetComponent<TransformComponent>(selectedEntity);
+
+
+                if (EntityManager::GetInstance().HasComponent<AABBComponent>(selectedEntity)) {
+                    auto& aabbComponent = EntityManager::GetInstance().GetComponent<AABBComponent>(selectedEntity);
+                    cameraDistance = CalculateAABBRadius(aabbComponent) * 2.0f;  // Ajustamos la distancia de la cámara
+                }
+
+                editorCamera->Position = transformComponent.transform->position + glm::vec3(0.0f, -cameraDistance, 0.0f);
+                editorCamera->LookAt(transformComponent.transform->position);
+            }
+            else
+            {
+                editorCamera->Position = glm::vec3(0.0f, -150.0f, 0.0f);
+                editorCamera->LookAt(glm::vec3(0.0f, 0.0f, 0.0f));
+            }
         }
+
+        // Vista Izquierda (Left View)
         if (ImGui::Button("Left View"))
         {
-            editorCamera->Position = glm::vec3(-10.0f, 0.0f, 0.0f);
-            editorCamera->pitch = 0.0f;
-            editorCamera->yaw = 90.0f;
-            editorCamera->updateMatrix();
+            if (selectedEntity != entt::null && EntityManager::GetInstance().m_registry->valid(selectedEntity))
+            {
+                auto& transformComponent = EntityManager::GetInstance().GetComponent<TransformComponent>(selectedEntity);
+
+
+                if (EntityManager::GetInstance().HasComponent<AABBComponent>(selectedEntity)) {
+                    auto& aabbComponent = EntityManager::GetInstance().GetComponent<AABBComponent>(selectedEntity);
+                    cameraDistance = CalculateAABBRadius(aabbComponent) * 2.0f;  // Ajustamos la distancia de la cámara
+                }
+
+                editorCamera->Position = transformComponent.transform->position + glm::vec3(-cameraDistance, 0.0f, 0.0f);
+                editorCamera->LookAt(transformComponent.transform->position);
+            }
+            else
+            {
+                editorCamera->Position = glm::vec3(-150.0f, 0.0f, 0.0f);
+                editorCamera->LookAt(glm::vec3(0.0f, 0.0f, 0.0f));
+            }
         }
+
+        // Vista Derecha (Right View)
         if (ImGui::Button("Right View"))
         {
-            editorCamera->Position = glm::vec3(10.0f, 0.0f, 0.0f);
-            editorCamera->pitch = 0.0f;
-            editorCamera->yaw = -90.0f;
-            editorCamera->updateMatrix();
+            if (selectedEntity != entt::null && EntityManager::GetInstance().m_registry->valid(selectedEntity))
+            {
+                auto& transformComponent = EntityManager::GetInstance().GetComponent<TransformComponent>(selectedEntity);
+
+
+                if (EntityManager::GetInstance().HasComponent<AABBComponent>(selectedEntity)) {
+                    auto& aabbComponent = EntityManager::GetInstance().GetComponent<AABBComponent>(selectedEntity);
+                    cameraDistance = CalculateAABBRadius(aabbComponent) * 2.0f;  // Ajustamos la distancia de la cámara
+                }
+
+                editorCamera->Position = transformComponent.transform->position + glm::vec3(cameraDistance, 0.0f, 0.0f);
+                editorCamera->LookAt(transformComponent.transform->position);
+            }
+            else
+            {
+                editorCamera->Position = glm::vec3(150.0f, 0.0f, 0.0f);
+                editorCamera->LookAt(glm::vec3(0.0f, 0.0f, 0.0f));
+            }
         }
+
+        // Vista Frontal (Front View)
         if (ImGui::Button("Front View"))
         {
-            editorCamera->Position = glm::vec3(0.0f, 0.0f, 10.0f);
-            editorCamera->pitch = 0.0f;
-            editorCamera->yaw = 180.0f;
-            editorCamera->updateMatrix();
+            if (selectedEntity != entt::null && EntityManager::GetInstance().m_registry->valid(selectedEntity))
+            {
+                auto& transformComponent = EntityManager::GetInstance().GetComponent<TransformComponent>(selectedEntity);
+
+
+                if (EntityManager::GetInstance().HasComponent<AABBComponent>(selectedEntity)) {
+                    auto& aabbComponent = EntityManager::GetInstance().GetComponent<AABBComponent>(selectedEntity);
+                    cameraDistance = CalculateAABBRadius(aabbComponent) * 2.0f;  // Ajustamos la distancia de la cámara
+                }
+
+                editorCamera->Position = transformComponent.transform->position + glm::vec3(0.0f, 0.0f, cameraDistance);
+                editorCamera->LookAt(transformComponent.transform->position);
+            }
+            else
+            {
+                editorCamera->Position = glm::vec3(0.0f, 0.0f, 150.0f);
+                editorCamera->LookAt(glm::vec3(0.0f, 0.0f, 0.0f));
+            }
         }
+
+        // Vista Trasera (Back View)
         if (ImGui::Button("Back View"))
         {
-            editorCamera->Position = glm::vec3(0.0f, 0.0f, -10.0f);
-            editorCamera->pitch = 0.0f;
-            editorCamera->yaw = 0.0f;
-            editorCamera->updateMatrix();
+            if (selectedEntity != entt::null && EntityManager::GetInstance().m_registry->valid(selectedEntity))
+            {
+                auto& transformComponent = EntityManager::GetInstance().GetComponent<TransformComponent>(selectedEntity);
+                
+
+                if (EntityManager::GetInstance().HasComponent<AABBComponent>(selectedEntity)) {
+                    auto& aabbComponent = EntityManager::GetInstance().GetComponent<AABBComponent>(selectedEntity);
+                    cameraDistance = CalculateAABBRadius(aabbComponent) * 2.0f;  // Ajustamos la distancia de la cámara
+                }
+
+                editorCamera->Position = transformComponent.transform->position + glm::vec3(0.0f, 0.0f, -cameraDistance);
+                editorCamera->LookAt(transformComponent.transform->position);
+            }
+            else
+            {
+                editorCamera->Position = glm::vec3(0.0f, 0.0f, -150.0f);
+                editorCamera->LookAt(glm::vec3(0.0f, 0.0f, 0.0f));
+            }
         }
+
 
         ImGui::End();
     }

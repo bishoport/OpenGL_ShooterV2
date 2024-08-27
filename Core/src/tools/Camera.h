@@ -45,5 +45,8 @@ namespace libCore
 
         void UpdateOrientationFromEuler();
         void UpdateOrientationFromQuaternion();
+
+        // Nueva función para que la cámara mire a un punto específico
+        void LookAt(const glm::vec3& targetPosition);
     };
 }
