@@ -139,6 +139,7 @@ namespace libCore
 		ShaderManager::setShaderDataLoad("text",     shadersDirectory + "text.vert",     shadersDirectory + "text.frag");
 		ShaderManager::setShaderDataLoad("grid",     shadersDirectory + "grid.vert",     shadersDirectory + "grid.frag");
 		ShaderManager::setShaderDataLoad("axes",     shadersDirectory + "axes.vert",     shadersDirectory + "axes.frag");
+		ShaderManager::setShaderDataLoad("frustum",  shadersDirectory + "frustum.vert",  shadersDirectory + "frustum.frag");
 
 		//-SSAO
 		ShaderManager::setShaderDataLoad("ssao",     shadersDirectory + "ssao.vert", shadersDirectory + "ssao.frag");
@@ -332,6 +333,10 @@ namespace libCore
 	// -------------------------------------------------
 	// -------------------------------------------------
 
+	bool libCore::EngineOpenGL::CheckAABBInFrustum(const glm::vec3& min, const glm::vec3& max)
+	{
+		return ViewportManager::GetInstance().viewports[0]->camera->IsBoxInFrustum(min, max);
+	}
 
 
 	void EngineOpenGL::pauseRenderer(bool inPause)

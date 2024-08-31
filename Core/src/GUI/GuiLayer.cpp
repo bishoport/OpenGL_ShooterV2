@@ -698,6 +698,7 @@ namespace libCore
                     auto& meshComponent = EntityManager::GetInstance().GetComponent<MeshComponent>(selectedEntity);
                     ImGui::Text("Mesh Name: %s", meshComponent.mesh->meshName.c_str());
                     ImGui::Text("Instance: %s", meshComponent.isInstance ? "Yes" : "No");
+                    ImGui::Checkbox("Renderable", &meshComponent.renderable);
                     if (meshComponent.isInstance) {
                         ImGui::Text("Original Model: %s", meshComponent.originalModel->name.c_str());
                     }

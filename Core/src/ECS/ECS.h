@@ -79,6 +79,8 @@ namespace libCore
 
     struct MeshComponent
     {
+        bool renderable = true; //<- no está serializada, hay que agregarla
+
         Ref<Mesh> mesh = CreateRef<Mesh>();
         std::vector<glm::mat4> instanceMatrices;
         Ref<Model> originalModel = nullptr; // Referencia al modelo original

@@ -52,5 +52,7 @@
     <None Include="assets\shaders\grid.frag" />
     <None Include="assets\shaders\axes.vert" />
     <None Include="assets\shaders\axes.frag" />
+    <None Include="assets\shaders\frustum.vert" />
+    <None Include="assets\shaders\frustum.frag" />
   </ItemGroup>
 </Project>

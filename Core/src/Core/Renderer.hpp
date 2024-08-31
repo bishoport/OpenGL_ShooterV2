@@ -32,7 +32,7 @@ namespace libCore {
         float iblIntensity = 0.0f;
         
         //SSAO
-        bool ssaoEnabled = true; // Variable para activar/desactivar SSAO
+        bool  ssaoEnabled = true; // Variable para activar/desactivar SSAO
         float ssaoRadius =2.0f;
         float ssaoBias = 0.5f;
         float ssaoIntensity = 1.8f;
@@ -46,6 +46,8 @@ namespace libCore {
         bool hdrEnabled = false;
         float hdrExposure = 1.0f;
         bool renderInPause = false;
+
+        
 
         static Renderer& getInstance() {
             static Renderer instance;
@@ -90,16 +92,21 @@ namespace libCore {
             mLTC.mat1 = loadMTexture();
             mLTC.mat2 = loadLUTTexture();
             //-------------------------------------------------------
+
+            
         }
 
+
+        //--DEBUG
         void PushDebugGroup(const std::string& name) {
             glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, name.c_str());
         }
         void PopDebugGroup() {
             glPopDebugGroup();
         }
+        //--------------------------------------------------------------------------
 
-
+        //--RENDERER
         void RenderViewport(const Ref<Viewport>& viewport, const Timestep& m_deltaTime) 
         { 
             if (renderInPause == true) return;
@@ -121,7 +128,8 @@ namespace libCore {
             // Actualizar la cámara
             viewport->camera->Inputs(m_deltaTime);
             viewport->camera->updateMatrix();
-
+            EntityManager::GetInstance().CheckAABBinFrustum();
+ 
             glEnable(GL_DEPTH_TEST); // Habilitar el test de profundidad
 
 
@@ -412,6 +420,10 @@ namespace libCore {
             // Renderizar los ejes en el origen
             renderAxes(viewport);
 
+            //Render camera Frustrum
+            //viewport->camera->RenderFrustum();
+            //viewport->gameCamera->RenderFrustum();
+
             // Renderiza el grid
             renderGrid();
             
@@ -493,8 +505,9 @@ namespace libCore {
             libCore::ShaderManager::Get("colorQuadFBO")->setInt("screenTexture", 0);
             renderQuad();
         }
+        //--------------------------------------------------------------------------
 
-
+        //--GUI CONTROLS
         void ShowControlsGUI() {
             // Global Ilumination Controls
             ImGui::Begin("Ilumination Controls");
@@ -590,16 +603,12 @@ namespace libCore {
 
             ImGui::End();
         }
-
+        //--------------------------------------------------------------------------
 
 
 
     private:
         Renderer() {} // Constructor privado
-
-        std::vector<glm::vec3> ssaoKernel;
-        GLuint noiseTexture;
-        const unsigned int NR_LIGHTS = 1;
 
         //--QUAD
         GLuint quadVAO, quadVBO;
@@ -631,6 +640,7 @@ namespace libCore {
             glBindVertexArray(0);
         }
         //--------------------------------------------------------------------------
+
 
         //--GRID
         int gridSize = 10;
@@ -709,6 +719,7 @@ namespace libCore {
         }
         //--------------------------------------------------------------------------
         
+
         //--WORLD_AXIS
         glm::vec3 axisXColor = glm::vec3(1.0f, 0.0f, 0.0f);
         glm::vec3 axisYColor = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -717,7 +728,6 @@ namespace libCore {
         glm::vec3 axisOffset = glm::vec3(0.0f, 0.0f, 0.0f); // Offset para posicionar los ejes respecto a la cámara
         GLuint axesVAO;
         GLuint axesVBO;
-
         void setupAxes()
         {
             // Definir los vértices de las líneas de los ejes X, Y, Z
@@ -810,9 +820,6 @@ namespace libCore {
 
             glBindVertexArray(0);
         }
-
-
-        //Balls
         GLuint sphereVAO, sphereVBO;
         void setupSphere()
         {
@@ -839,13 +846,14 @@ namespace libCore {
         //--------------------------------------------------------------------------
 
 
-
+        //--SSAO       
+        std::uniform_real_distribution<GLfloat> randomFloats{0.0f, 1.0f}; // Genera floats aleatorios entre 0.0 y 1.0
+        std::default_random_engine generator;
+        std::vector<glm::vec3> ssaoKernel;
+        GLuint noiseTexture;
         float ourLerp(float a, float b, float f) {
             return a + f * (b - a);
         }
-        std::uniform_real_distribution<GLfloat> randomFloats{0.0f, 1.0f}; // Genera floats aleatorios entre 0.0 y 1.0
-        std::default_random_engine generator;
-
         std::vector<glm::vec3> generateSSAOKernel() {
             std::vector<glm::vec3> ssaoKernel;
             for (unsigned int i = 0; i < 64; ++i) {
@@ -861,8 +869,6 @@ namespace libCore {
             }
             return ssaoKernel;
         }
-
-        // Generar la textura de ruido SSAO
         GLuint generateSSAONoiseTexture() {
             std::vector<glm::vec3> ssaoNoise;
             for (unsigned int i = 0; i < 16; i++) {
@@ -880,16 +886,15 @@ namespace libCore {
 
             return noiseTexture;
         }
+        //--------------------------------------------------------------------------
+        
 
-
-        //LTC´s
+        //--LTC´s
         struct LTC_matrices {
             GLuint mat1;
             GLuint mat2;
         };
-
         LTC_matrices mLTC;
-
         GLuint loadMTexture()
         {
             GLuint texture = 0;
@@ -906,7 +911,6 @@ namespace libCore {
             glBindTexture(GL_TEXTURE_2D, 0);
             return texture;
         }
-
         GLuint loadLUTTexture()
         {
             GLuint texture = 0;
@@ -923,5 +927,9 @@ namespace libCore {
             glBindTexture(GL_TEXTURE_2D, 0);
             return texture;
         }
+        //--------------------------------------------------------------------------
+
+
+        
     };
 }

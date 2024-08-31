@@ -9,6 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include <array>
 
 namespace libCore
 {
@@ -60,5 +61,46 @@ namespace libCore
         void SetFarPlane(float farPlane);
         void SetSpeed(float speed);
         void SetSensitivity(float sensitivity);
+
+        // Frustum related methods
+        void UpdateFrustum();
+        bool IsBoxInFrustum(const glm::vec3& min, const glm::vec3& max) const;
+        void RenderFrustum();
+
+    private:
+        struct Plane
+        {
+            glm::vec3 normal;
+            float distance;
+
+            Plane() = default;
+            Plane(const glm::vec3& normal, float distance)
+                : normal(normal), distance(distance) {}
+
+            float GetDistanceToPoint(const glm::vec3& point) const
+            {
+                return glm::dot(normal, point) + distance;
+            }
+        };
+
+        enum Planes
+        {
+            Near = 0,
+            Far,
+            Left,
+            Right,
+            Top,
+            Bottom,
+            Count
+        };
+
+        std::array<Plane, Planes::Count> planes;
+
+        void ExtractPlanes(const glm::mat4& viewProjectionMatrix);
+
+        // OpenGL Buffers
+        GLuint frustumVAO, frustumVBO;
+        void setupFrustumBuffers();
+        void renderFrustumLines(const std::vector<glm::vec3>& vertices, const glm::mat4& modelMatrix);
     };
 }

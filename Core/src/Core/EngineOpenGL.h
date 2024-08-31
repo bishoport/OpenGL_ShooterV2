@@ -35,6 +35,7 @@ namespace libCore
 
         //VIEWPORTS, UPDATE & RENDER
         void pauseRenderer(bool inPause);
+        bool CheckAABBInFrustum(const glm::vec3& min, const glm::vec3& max);
         void UpdateBeforeRender();
         void CreateViewport(std::string name, glm::vec3 cameraPosition, CAMERA_CONTROLLERS controller);
         void RenderViewports();
