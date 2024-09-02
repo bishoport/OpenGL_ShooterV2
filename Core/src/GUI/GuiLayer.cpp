@@ -306,6 +306,16 @@ namespace libCore
                 }
                 ImGui::EndMenu();
             }
+
+
+            if (ImGui::BeginMenu("Scripts"))
+            {
+                if (ImGui::MenuItem("Load DLL"))
+                {
+                    EntityManager::GetInstance().LoadScriptsFromDLL();
+                }
+                ImGui::EndMenu();
+            }
             ImGui::EndMainMenuBar();
         }
     }
@@ -828,7 +838,9 @@ namespace libCore
                             ImGui::EndCombo();
                         }
 
-                        if (ImGui::Button("Assign") && !selectedScript.empty()) {
+
+                        if (ImGui::Button("Assign") && !selectedScript.empty()) 
+                        {
                             scriptComponent.instance = ScriptFactory::GetInstance().CreateScript(selectedScript);
                             scriptComponent.instance->SetEntity(selectedEntity, EntityManager::GetInstance().m_registry);
                             //scriptComponent.OnAssign(); // Inicializar el script

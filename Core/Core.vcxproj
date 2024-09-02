@@ -45,6 +45,7 @@
     <ClInclude Include="src\Core\Viewport.hpp" />
     <ClInclude Include="src\Core\ViewportManager.hpp" />
     <ClInclude Include="src\ECS\ECS.h" />
+    <ClInclude Include="src\ECS\Script.h" />
     <ClInclude Include="src\ECS\Scripts\CameraControllerFPS.h" />
     <ClInclude Include="src\ECS\SerializatorManager.h" />
     <ClInclude Include="src\GUI\GuiLayer.h" />

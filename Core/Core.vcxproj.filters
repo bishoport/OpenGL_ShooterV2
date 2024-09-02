@@ -324,6 +324,9 @@
     <ClInclude Include="src\tools\ThumbnailGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\ECS\Script.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\input\InputManager.cpp">

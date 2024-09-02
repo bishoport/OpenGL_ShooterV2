@@ -128,13 +128,9 @@ namespace libCore {
             // Actualizar la cámara
             viewport->camera->Inputs(m_deltaTime);
             viewport->camera->updateMatrix();
-            EntityManager::GetInstance().CheckAABBinFrustum();
+            //EntityManager::GetInstance().CheckAABBinFrustum();
  
             glEnable(GL_DEPTH_TEST); // Habilitar el test de profundidad
-
-
-
-
 
             //--------------------------------------------------------------------------------
             //-----------------------DIRECTIONAL LIGHT SHADOW PASS----------------------------

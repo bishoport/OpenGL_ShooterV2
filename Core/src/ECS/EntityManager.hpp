@@ -15,6 +15,8 @@
 #include "../tools/AssetsManager.h"
 #include "Scripts/CameraControllerFPS.h"
 
+#include <windows.h> // Para manejar DLLs en Windows
+
 namespace libCore
 {
     class EntityManager {
@@ -25,6 +27,59 @@ namespace libCore
         entt::entity currentSelectedEntityInScene = entt::null;
         //------------------------------------------------------------------------------------
         //------------------------------------------------------------------------------------
+
+
+        //--CARGADOR DLL SCRIPTS
+        std::wstring GetExecutablePath()
+        {
+            wchar_t buffer[MAX_PATH];
+            GetModuleFileNameW(NULL, buffer, MAX_PATH);
+            std::wstring::size_type pos = std::wstring(buffer).find_last_of(L"\\/");
+            return std::wstring(buffer).substr(0, pos);
+        }
+        std::string wstring_to_string(const std::wstring& wstr)
+        {
+            std::string str(wstr.begin(), wstr.end());
+            return str;
+        }
+
+        void LoadScriptsFromDLL()
+        {
+            // Obtén la ruta del directorio actual de compilación
+            std::wstring buildDir = GetExecutablePath();
+
+            // Combina la ruta con el nombre de la DLL
+            std::wstring dllPath = buildDir + L"\\TestScript.dll";
+
+            // Cargar la DLL
+            HMODULE scriptDll = LoadLibraryW(dllPath.c_str());
+            if (scriptDll)
+            {
+                // Registro de scripts, etc.
+                typedef void (*RegisterScriptsFunc)(ScriptFactory&);
+                RegisterScriptsFunc registerScripts = (RegisterScriptsFunc)GetProcAddress(scriptDll, "RegisterScripts");
+
+                if (registerScripts)
+                {
+                    registerScripts(ScriptFactory::GetInstance());
+                }
+                else
+                {
+                    std::cerr << "No se pudo encontrar la función RegisterScripts en la DLL." << std::endl;
+                }
+
+                // Libera la DLL cuando termines
+                // scriptComponent.instance.reset();  // Destruir la instancia del script
+                //FreeLibrary(scriptDll);
+            }
+            else
+            {
+                std::cerr << "No se pudo cargar la DLL: " << wstring_to_string(dllPath) << std::endl;
+            }
+        }
+        //------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------
+
 
 
         //--CREADOR DE ENTITIES
@@ -154,7 +209,6 @@ namespace libCore
                 UpdateAccumulatedTransforms(newEntity);
             }
         }
-
         entt::entity DuplicateEntityRecursively(entt::entity entity, entt::entity parentEntity) {
             if (!m_registry->valid(entity)) {
                 return entt::null;
@@ -239,74 +293,6 @@ namespace libCore
 
             return newEntity;
         }
-
-
-
-
-        //entt::entity DuplicateEntityRecursively(entt::entity entity, entt::entity parentEntity) {
-        //    if (!m_registry->valid(entity)) {
-        //        return entt::null;
-        //    }
-
-        //    // Obtener el nombre original
-        //    std::string originalTag = GetComponent<TagComponent>(entity).Tag;
-        //    std::string newTag = originalTag;
-
-        //    // Buscar si ya existen clones y agregar un sufijo único
-        //    int cloneIndex = 1;
-        //    while (IsTagUsed(newTag + "_" + std::to_string(cloneIndex))) {
-        //        cloneIndex++;
-        //    }
-        //    newTag = originalTag + "_" + std::to_string(cloneIndex);
-
-        //    // Crear una nueva entidad con el nombre modificado
-        //    entt::entity newEntity = CreateEmptyGameObject(newTag);
-
-        //    // Copiar componentes
-        //    if (HasComponent<TransformComponent>(entity)) {
-        //        auto& srcTransform = GetComponent<TransformComponent>(entity);
-        //        auto& dstTransform = GetComponent<TransformComponent>(newEntity);
-
-        //        dstTransform.transform->setMatrix(srcTransform.transform->getMatrix());
-        //    }
-
-        //    if (HasComponent<MeshComponent>(entity)) {
-        //        auto& srcMesh = GetComponent<MeshComponent>(entity);
-        //        auto& dstMesh = AddComponent<MeshComponent>(newEntity, srcMesh.mesh, srcMesh.originalModel, srcMesh.isInstance);
-
-        //        // Agregar la matriz de instancia al nuevo MeshComponent
-        //        glm::mat4 instanceMatrix = glm::translate(glm::mat4(1.0f), GetComponent<TransformComponent>(newEntity).transform->position);
-        //        dstMesh.instanceMatrices.push_back(instanceMatrix);
-        //    }
-
-        //    if (HasComponent<MaterialComponent>(entity)) {
-        //        auto& srcMaterial = GetComponent<MaterialComponent>(entity);
-        //        AddComponent<MaterialComponent>(newEntity, srcMaterial.material);
-        //    }
-
-        //    if (HasComponent<AABBComponent>(entity)) {
-        //        auto& srcAABB = GetComponent<AABBComponent>(entity);
-        //        auto& dstAABB = AddComponent<AABBComponent>(newEntity);
-        //        auto& srcMesh = GetComponent<MeshComponent>(entity);
-        //        dstAABB.aabb->CalculateAABB(srcMesh.mesh->vertices);
-        //    }
-
-        //    // Añadir el hijo al padre usando AddChild
-        //    if (parentEntity != entt::null) {
-        //        AddChild(parentEntity, newEntity);
-        //    }
-
-        //    // Manejar los hijos
-        //    if (HasComponent<ChildComponent>(entity)) {
-        //        auto& srcChild = GetComponent<ChildComponent>(entity);
-        //        for (auto& child : srcChild.children) {
-        //            DuplicateEntityRecursively(child, newEntity);
-        //        }
-        //    }
-
-        //    return newEntity;
-        //}
-
         bool IsTagUsed(const std::string& tag) {
             auto view = m_registry->view<TagComponent>();
             for (auto entity : view) {
@@ -317,8 +303,6 @@ namespace libCore
             }
             return false;
         }
-
-
         void UpdateAccumulatedTransforms(entt::entity entity, const glm::mat4& parentTransform = glm::mat4(1.0f)) {
             if (!m_registry->valid(entity)) {
                 return;
@@ -579,6 +563,29 @@ namespace libCore
 
         //--COMPONENTS HANDLERS
         template<typename T>
+        bool ValidateEntityComponent(entt::entity entity, Ref<entt::registry> registry) {
+            if (!registry->valid(entity)) {
+                std::cerr << "La entidad no es válida." << std::endl;
+                return false;
+            }
+
+            if (!registry->has<T>(entity)) {
+                std::cerr << "La entidad no tiene el componente requerido." << std::endl;
+                return false;
+            }
+
+            auto& component = registry->get<T>(entity);
+            if (!component) {
+                std::cerr << "El componente está en un estado inválido (nullptr o no inicializado)." << std::endl;
+                return false;
+            }
+
+            std::cout << "La entidad y el componente son válidos." << std::endl;
+            return true;
+        }
+
+
+        template<typename T>
         T& GetComponent(entt::entity entity) {
             return m_registry->get<T>(entity);
         }
@@ -625,7 +632,7 @@ namespace libCore
         //-Registra otros scripts aquí
         void RegisterScripts()
         {
-            ScriptFactory::GetInstance().RegisterScript<MyScript>("MyScript");
+            //ScriptFactory::GetInstance().RegisterScript<MyScript>("MyScript");
             ScriptFactory::GetInstance().RegisterScript<CameraControllerFPS>("CameraControllerFPS");
         }
 

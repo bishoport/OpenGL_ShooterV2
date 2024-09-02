@@ -11,7 +11,7 @@ namespace libCore
         }
 
         void Update(float deltaTime) override {
-            if (m_Registry && HasComponent<TransformComponent>()) {
+            if (m_Registry &&  HasComponent<TransformComponent>()) {
                 auto& transform = GetComponent<TransformComponent>().transform;
                 if (InputManager::Instance().IsKeyPressed(GLFW_KEY_M))
                 {
