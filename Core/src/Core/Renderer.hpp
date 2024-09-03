@@ -11,7 +11,7 @@
 #include <glm/glm.hpp>
 #include "Itc_matrix_floats.hpp"
 #include "../tools/LUTGenerator.hpp"
-#include "../ECS/EntityManager.hpp"
+#include "../ECS/EntityManager.h"
 
 namespace libCore {
 

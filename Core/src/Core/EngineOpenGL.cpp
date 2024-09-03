@@ -6,7 +6,7 @@
 #include "../tools/RoofGenerator.hpp"
 #include "../tools/LightsManager.hpp"
 #include "../tools/SkyBox.hpp"
-#include "../ECS/EntityManager.hpp"
+#include "../ECS/EntityManager.h"
 #include "../tools/AssetsManager.h"
 #include "../tools/FreeTypeManager.h"
 

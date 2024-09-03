@@ -44,12 +44,16 @@
     <ClInclude Include="src\Core\VBO.h" />
     <ClInclude Include="src\Core\Viewport.hpp" />
     <ClInclude Include="src\Core\ViewportManager.hpp" />
+    <ClInclude Include="src\ECS\Components.h" />
     <ClInclude Include="src\ECS\ECS.h" />
+    <ClInclude Include="src\ECS\EntityManager.h" />
     <ClInclude Include="src\ECS\Script.h" />
+    <ClInclude Include="src\ECS\ScriptComponent.h" />
+    <ClInclude Include="src\ECS\ScriptFactory.h" />
     <ClInclude Include="src\ECS\Scripts\CameraControllerFPS.h" />
     <ClInclude Include="src\ECS\SerializatorManager.h" />
     <ClInclude Include="src\GUI\GuiLayer.h" />
-    <ClInclude Include="src\ECS\EntityManager.hpp" />
+    <ClInclude Include="src\ECS\EntityManager.old" />
     <ClInclude Include="src\ECS\Scene.h" />
     <ClInclude Include="src\ECS\Scripts\MyScript.h" />
     <ClInclude Include="src\GUI\AssetsPanel.h" />
@@ -135,6 +139,9 @@
     <ClCompile Include="src\Core\UUID.cpp" />
     <ClCompile Include="src\Core\VAO.cpp" />
     <ClCompile Include="src\Core\VBO.cpp" />
+    <ClCompile Include="src\ECS\EntityManager.cpp" />
+    <ClCompile Include="src\ECS\Script.cpp" />
+    <ClCompile Include="src\ECS\ScriptFactory.cpp" />
     <ClCompile Include="src\GUI\GuiLayer.cpp" />
     <ClCompile Include="src\ECS\Scene.cpp" />
     <ClCompile Include="src\GUI\AssetsPanel.cpp" />
@@ -185,6 +192,11 @@
     <ClCompile Include="vendor\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="vendor\imgui\imgui_tables.cpp" />
     <ClCompile Include="vendor\imgui\imgui_widgets.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\ECS\EntityManager.inl" />
+    <None Include="src\ECS\Script.inl" />
+    <None Include="src\ECS\ScriptFactory.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -276,7 +288,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;MY_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>

@@ -16,9 +16,9 @@ namespace libCore
 
         void Init() override
         {
-            transform = GetComponent<TransformComponent>().transform;
-            cameraComponent = GetComponent<CameraComponent>();
-            floorLimit = transform->position.y;
+            //transform = GetComponent<TransformComponent>().transform;
+            //cameraComponent = GetComponent<CameraComponent>();
+            //floorLimit = transform->position.y;
         }
 
         void Update(float deltaTime) override {

@@ -1,63 +1,50 @@
-//#pragma once
-//#include "EntityManager.hpp"
-//#include "../Core/Transform.h"
-//#include "../Core/Material.h"
-//#include "../Core/Mesh.h"
-//#include "../Core/Model.h"
-//#include "../Core/Light.hpp"
-//#include <entt.hpp>
-//
-//
-//namespace libCore
-//{
-//
-//    class Script {
-//
-//    public:
-//        virtual ~Script() = default;
-//
-//        // Métodos del ciclo de vida
-//        virtual void Init() {}
-//        virtual void Update(float deltaTime) {}
-//
-//        // Métodos para establecer la entidad y el registro
-//        void SetEntity(entt::entity entity, Ref<entt::registry> registry) {
-//            m_Entity = entity;
-//            m_Registry = registry;
-//        }
-//
-//        //// Métodos para gestionar componentes
-//        template<typename T>
-//        T& GetComponent() {
-//            return EntityManager::GetInstance().GetComponent<T>(m_Entity);
-//        }
-//
-//        template<typename T>
-//        bool HasComponent() {
-//            return EntityManager::GetInstance().HasComponent<T>(m_Entity);
-//        }
-//
-//        template<typename T, typename... Args>
-//        T& AddComponent(Args&&... args) {
-//            return EntityManager::GetInstance().AddComponent<T>(m_Entity, std::forward<Args>(args)...);
-//        }
-//        //template<typename T>
-//        //T& GetComponent() {
-//        //    return m_Registry->get<T>(m_Entity);
-//        //}
-//
-//        //template<typename T>
-//        //bool HasComponent() {
-//        //    return m_Registry->has<T>(m_Entity);
-//        //}
-//
-//        //template<typename T, typename... Args>
-//        //T& AddComponent(Args&&... args) {
-//        //    return m_Registry->emplace<T>(m_Entity, std::forward<Args>(args)...);
-//        //}
-//
-//    protected:
-//        entt::entity m_Entity;
-//        Ref<entt::registry> m_Registry;
-//    };
-//}
+#pragma once
+
+#include "../LibCoreHeaders.h"
+#include <entt.hpp>
+#include <memory>
+#include <string>
+
+
+#ifdef MY_DLL_EXPORTS
+#define MY_DLL_API __declspec(dllexport)
+#else
+#define MY_DLL_API __declspec(dllimport)
+#endif
+
+#pragma warning(disable: 4251)
+
+
+
+namespace libCore
+{
+    class EntityManager;
+
+    class MY_DLL_API  Script {
+
+    public:
+        Script();  // Declaración del constructor
+        ~Script();  // Declaración del destructor
+
+        // Métodos del ciclo de vida
+        virtual void Init() {}
+        virtual void Update(float deltaTime) {}
+
+        // Métodos para establecer el UUID y el registro
+        void SetEntity(const std::string& uuid);
+
+        template<typename T>
+        T& GetComponent();
+
+        template<typename T>
+        bool HasComponent();
+
+    //protected:
+        std::string m_UUID;
+        entt::entity m_Entity = entt::null;
+        //Ref<entt::registry> m_Registry = nullptr;
+        entt::registry* m_Registry = nullptr;
+    };
+}
+
+#include "Script.inl"

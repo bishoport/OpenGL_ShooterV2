@@ -4,7 +4,8 @@
 #include <fstream>
 #include <functional>
 #include "../tools/ModelLoader.h"
-#include "../ECS/EntityManager.hpp"
+#include "../tools/AssetsManager.h"
+#include "../ECS/EntityManager.h"
 
 
 namespace libCore {

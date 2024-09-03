@@ -1,5 +1,5 @@
 #include "Scene.h"
-#include "EntityManager.hpp"
+#include "EntityManager.h"
 #include <fstream>
 #include "../Core/Transform.h"
 #include "../Core/Material.h"

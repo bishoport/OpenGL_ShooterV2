@@ -5,10 +5,11 @@
 #include <imgui_internal.h>
 
 #include "../tools/LightsManager.hpp"
-#include "../ECS/EntityManager.hpp"
+#include "../ECS/EntityManager.h"
 #include "../Core/ViewportManager.hpp"
 #include "../Core/Renderer.hpp"
 
+#include "../tools/AssetsManager.h"
 
 namespace libCore
 {
@@ -314,6 +315,14 @@ namespace libCore
                 {
                     EntityManager::GetInstance().LoadScriptsFromDLL();
                 }
+
+                if (ImGui::MenuItem("CHECK ENTITIES"))
+                {
+                    EntityManager::GetInstance().DebugPrintAllEntitiesWithUUIDs();
+                }
+
+                
+
                 ImGui::EndMenu();
             }
             ImGui::EndMainMenuBar();
@@ -841,10 +850,19 @@ namespace libCore
 
                         if (ImGui::Button("Assign") && !selectedScript.empty()) 
                         {
-                            scriptComponent.instance = ScriptFactory::GetInstance().CreateScript(selectedScript);
-                            scriptComponent.instance->SetEntity(selectedEntity, EntityManager::GetInstance().m_registry);
-                            //scriptComponent.OnAssign(); // Inicializar el script
-                            selectedScript.clear(); // Limpiar la selección después de asignar el script
+                            if (selectedEntity != entt::null)
+                            {
+                                scriptComponent.instance = ScriptFactory::GetInstance().CreateScript(selectedScript);
+                                scriptComponent.instance->SetEntity(EntityManager::GetInstance().GetComponent<IDComponent>(selectedEntity).ID.ToString());
+                                //scriptComponent.instance->SetEntity(selectedEntity, EntityManager::GetInstance().m_registry);
+                                //scriptComponent.OnAssign(); // Inicializar el script
+                                selectedScript.clear(); // Limpiar la selección después de asignar el script
+                            }
+                            else
+                            {
+                                std::cout << "la entidad seleccioanda es nula" << std::endl;
+                            }
+                            
                         }
                     }
                 }
