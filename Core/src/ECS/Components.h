@@ -128,65 +128,67 @@ namespace libCore
 
 
 
-
-
-
-
-        glm::vec3 SafeGetPosition() const {
-            if (transform) {
-                return transform->GetPosition();
-            }
-            else {
-                throw std::runtime_error("Invalid TransformComponent: transform is nullptr.");
-            }
-        }
-
-        void SafeSetPosition(const glm::vec3& pos) {
-            if (transform) {
-                transform->SetPosition(pos);
-            }
-            else {
-                throw std::runtime_error("Invalid TransformComponent: transform is nullptr.");
-            }
-        }
-
-        glm::quat SafeGetRotation() const {
-            if (transform) {
-                return transform->GetRotation();
-            }
-            else {
-                throw std::runtime_error("Invalid TransformComponent: transform is nullptr.");
-            }
-        }
-
-        void SafeSetRotation(const glm::quat& rot) {
-            if (transform) {
-                transform->SetRotation(rot);
-            }
-            else {
-                throw std::runtime_error("Invalid TransformComponent: transform is nullptr.");
-            }
-        }
-
-        glm::vec3 SafeGetScale() const {
-            if (transform) {
-                return transform->GetScale();
-            }
-            else {
-                throw std::runtime_error("Invalid TransformComponent: transform is nullptr.");
-            }
-        }
-
-        void SafeSetScale(const glm::vec3& scale) {
-            if (transform) {
-                transform->SetScale(scale);
-            }
-            else {
-                throw std::runtime_error("Invalid TransformComponent: transform is nullptr.");
-            }
-        }
     };
 
+
+
+
+
+
+
+    //glm::vec3 SafeGetPosition() const {
+    //    if (transform) {
+    //        return transform->GetPosition();
+    //    }
+    //    else {
+    //        throw std::runtime_error("Invalid TransformComponent: transform is nullptr.");
+    //    }
+    //}
+
+    //void SafeSetPosition(const glm::vec3& pos) {
+    //    if (transform) {
+    //        transform->SetPosition(pos);
+    //    }
+    //    else {
+    //        throw std::runtime_error("Invalid TransformComponent: transform is nullptr.");
+    //    }
+    //}
+
+    //glm::quat SafeGetRotation() const {
+    //    if (transform) {
+    //        return transform->GetRotation();
+    //    }
+    //    else {
+    //        throw std::runtime_error("Invalid TransformComponent: transform is nullptr.");
+    //    }
+    //}
+
+    //void SafeSetRotation(const glm::quat& rot) {
+    //    if (transform) {
+    //        transform->SetRotation(rot);
+    //    }
+    //    else {
+    //        throw std::runtime_error("Invalid TransformComponent: transform is nullptr.");
+    //    }
+    //}
+
+    //glm::vec3 SafeGetScale() const {
+    //    if (transform) {
+    //        return transform->GetScale();
+    //    }
+    //    else {
+    //        throw std::runtime_error("Invalid TransformComponent: transform is nullptr.");
+    //    }
+    //}
+
+    //void SafeSetScale(const glm::vec3& scale) {
+    //    if (transform) {
+    //        transform->SetScale(scale);
+    //    }
+    //    else {
+    //        throw std::runtime_error("Invalid TransformComponent: transform is nullptr.");
+    //    }
+    //}
 
     //struct TransformComponent {
     //    Ref<Transform> transform = CreateRef<Transform>();

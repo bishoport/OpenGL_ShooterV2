@@ -4,34 +4,24 @@ local transform = nil
 
 function Init()
     print("Lua Init function called")
-    -- Obtener y mostrar el transform inicial
+    -- Obtener el transform desde el script
     transform = script:getTransform()
     if transform then
-        local position = transform:getPosition()
+        local position = script:getPosition()
+        position.y = position.y + 1
+        script:setPosition(position)
         print("Initial Position: ", position.x, position.y, position.z)
-    end
-end
-
-function Update(deltaTime)
-    -- Verificar si el transform fue almacenado
-    if transform then
-        local position = transform:getPosition()
-        --print("Current Position before update: ", position.x, position.y, position.z)
-        
-        -- Actualizar la posición y verificar el nuevo valor
-        position.y = position.y + (deltaTime)
-        transform:setPosition(position)
-
-        -- Imprimir la nueva posición
-        local newPosition = transform:getPosition()
-        --print("Updated Position: ", newPosition.x, newPosition.y, newPosition.z)
     else
         print("Transform not found")
     end
 end
 
-
-
-
-
-
+function Update(deltaTime)
+    if transform then
+        local position = script:getPosition()
+        position.y = position.y + 0.001
+        script:setPosition(position)
+    else
+        print("Transform not found in Update")
+    end
+end

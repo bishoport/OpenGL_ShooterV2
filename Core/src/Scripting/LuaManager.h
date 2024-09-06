@@ -1,12 +1,12 @@
 #pragma once
 #include "../LibCoreHeaders.h"
 #include <lua/lua.hpp>
-#include <LuaBridge/LuaBridge.h>
-
 #include <unordered_map>
 #include <string>
 #include <memory>
 #include <vector>
+
+#include "../ECS/ScriptComponent.h"
 
 namespace libCore
 {
@@ -23,44 +23,21 @@ namespace libCore
         void LoadLuaFile(const std::string& scriptName, const std::string& path);
 
         // Obtener un estado Lua por nombre de script
-        lua_State* GetLuaState(const std::string& scriptName) const
-        {
-            auto it = scripts.find(scriptName);
-            if (it != scripts.end()) {
-                if (!it->second) {
-                    std::cerr << "Lua state for script " << scriptName << " is null!" << std::endl;
-                }
-                return it->second.get();
-            }
-            std::cerr << "Lua state not found for script: " << scriptName << std::endl;
-            return nullptr; // Retorna nullptr si no se encuentra
-        }
+        lua_State* GetLuaState(const std::string& scriptName) const;
 
         // Función para verificar si un script está cargado
-        bool IsScriptLoaded(const std::string& scriptName) const {
-            return scripts.find(scriptName) != scripts.end();
-        }
+        bool IsScriptLoaded(const std::string& scriptName) const;
 
         // Método para obtener una lista de los nombres de los scripts cargados
-        std::vector<std::string> GetLoadedScripts() const 
-        {
-            std::vector<std::string> scriptNames;
-            for (const auto& pair : scripts) {
-                scriptNames.push_back(pair.first);
-            }
-            return scriptNames;
-        }
+        std::vector<std::string> GetLoadedScripts() const;
 
         // Función para registrar clases y funciones de C++ en Lua
-        void RegisterClasses(lua_State* L);
+        void RegisterClasses(lua_State* L, ScriptComponent* scriptComponent);
 
         void printLuaStack(lua_State* L);
 
     private:
-        LuaManager() {
-            // Constructor privado
-        }
-
+        LuaManager() {}
         ~LuaManager() {}
 
         // Definición personalizada para liberar los lua_State en el map
@@ -74,4 +51,3 @@ namespace libCore
         std::unordered_map<std::string, std::unique_ptr<lua_State, LuaStateDeleter>> scripts;
     };
 }
-
