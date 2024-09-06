@@ -10,6 +10,7 @@
 #include "../Core/Renderer.hpp"
 
 #include "../tools/AssetsManager.h"
+#include "../Scripting/LuaManager.h"
 
 namespace libCore
 {
@@ -248,7 +249,6 @@ namespace libCore
     //--TOP MAIN MENU & TOOLBAR
     void GuiLayer::renderMainMenuBar() 
     {
-
         // Barra de menu principal
         if (ImGui::BeginMainMenuBar())
         {
@@ -307,22 +307,12 @@ namespace libCore
                 }
                 ImGui::EndMenu();
             }
-
-
-            if (ImGui::BeginMenu("Scripts"))
+            if (ImGui::BeginMenu("Entities"))
             {
-                if (ImGui::MenuItem("Load DLL"))
-                {
-                    EntityManager::GetInstance().LoadScriptsFromDLL();
-                }
-
                 if (ImGui::MenuItem("CHECK ENTITIES"))
                 {
                     EntityManager::GetInstance().DebugPrintAllEntitiesWithUUIDs();
                 }
-
-                
-
                 ImGui::EndMenu();
             }
             ImGui::EndMainMenuBar();
@@ -710,7 +700,6 @@ namespace libCore
                     ImGui::DragFloat("##ScaleZ", &transform->scale.z, 0.01f, 0.0f, FLT_MAX, "Z: %.2f");
                 }
             }
-
             //--MESH_COMPONENT
             if (EntityManager::GetInstance().HasComponent<MeshComponent>(selectedEntity)) {
                 if (ImGui::CollapsingHeader("Mesh")) {
@@ -820,21 +809,33 @@ namespace libCore
             }
             //--SCRIPT_COMPONENT
             if (EntityManager::GetInstance().HasComponent<ScriptComponent>(selectedEntity)) {
+                
                 auto& scriptComponent = EntityManager::GetInstance().GetComponent<ScriptComponent>(selectedEntity);
-                if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen)) {
-                    ImGui::Text("Script Instance: %s", scriptComponent.instance ? typeid(*scriptComponent.instance).name() : "None");
-                    // Aquí puedes agregar más controles para interactuar con el script, si es necesario
 
-                    // Si instance es nullptr, muestra la opción para asignar un script
-                    if (!scriptComponent.instance) {
-                        const auto& creators = ScriptFactory::GetInstance().GetCreators();
+                if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen)) {
+                   
+                    // Si ya tiene un script asignado, mostrar el nombre del script y el botón para eliminarlo
+                    if (scriptComponent.HasLuaScript()) 
+                    {
+                        ImGui::Text("Assigned Script: %s", scriptComponent.GetLuaScriptName().c_str());
+
+                        // Botón para eliminar el script asignado
+                        if (ImGui::Button("Remove Script")) {
+                            // Elimina el script del ScriptComponent
+                            scriptComponent.RemoveLuaScript();
+                        }
+                    }
+                    else {
+                        // Si no tiene un script asignado, mostrar el combo box para asignar uno
+                        const auto loadedScripts = LuaManager::GetInstance().GetLoadedScripts();
                         static std::string selectedScript;
                         std::vector<std::string> scriptNames;
-                        for (const auto& pair : creators) {
-                            scriptNames.push_back(pair.first);
+
+                        for (const auto& scriptName : loadedScripts) {
+                            scriptNames.push_back(scriptName);
                         }
 
-                        if (ImGui::BeginCombo("Assign Script", selectedScript.c_str())) {
+                        if (ImGui::BeginCombo("Scripts", selectedScript.c_str())) {
                             for (const auto& scriptName : scriptNames) {
                                 bool isSelected = (selectedScript == scriptName);
                                 if (ImGui::Selectable(scriptName.c_str(), isSelected)) {
@@ -847,26 +848,66 @@ namespace libCore
                             ImGui::EndCombo();
                         }
 
-
-                        if (ImGui::Button("Assign") && !selectedScript.empty()) 
-                        {
-                            if (selectedEntity != entt::null)
-                            {
-                                scriptComponent.instance = ScriptFactory::GetInstance().CreateScript(selectedScript);
-                                scriptComponent.instance->SetEntity(EntityManager::GetInstance().GetComponent<IDComponent>(selectedEntity).ID.ToString());
-                                //scriptComponent.instance->SetEntity(selectedEntity, EntityManager::GetInstance().m_registry);
-                                //scriptComponent.OnAssign(); // Inicializar el script
-                                selectedScript.clear(); // Limpiar la selección después de asignar el script
-                            }
-                            else
-                            {
-                                std::cout << "la entidad seleccioanda es nula" << std::endl;
-                            }
-                            
+                        // Botón para asignar el script seleccionado
+                        if (ImGui::Button("Assign Script")) {
+                            // Asigna el script seleccionado al ScriptComponent
+                            scriptComponent.SetLuaScript(selectedScript);
+                            selectedScript.clear();  // Limpia la selección después de asignar
                         }
                     }
                 }
             }
+
+
+
+            //if (EntityManager::GetInstance().HasComponent<ScriptComponent>(selectedEntity)) {
+            //    auto& scriptComponent = EntityManager::GetInstance().GetComponent<ScriptComponent>(selectedEntity);
+            //    if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen)) {
+            //        ImGui::Text("Script Instance: %s", scriptComponent.instance ? typeid(*scriptComponent.instance).name() : "None");
+            //        // Aquí puedes agregar más controles para interactuar con el script, si es necesario
+
+            //        // Si instance es nullptr, muestra la opción para asignar un script
+            //        if (!scriptComponent.instance) {
+            //            const auto& creators = ScriptFactory::GetInstance().GetCreators();
+            //            static std::string selectedScript;
+            //            std::vector<std::string> scriptNames;
+            //            for (const auto& pair : creators) {
+            //                scriptNames.push_back(pair.first);
+            //            }
+
+            //            if (ImGui::BeginCombo("Assign Script", selectedScript.c_str())) {
+            //                for (const auto& scriptName : scriptNames) {
+            //                    bool isSelected = (selectedScript == scriptName);
+            //                    if (ImGui::Selectable(scriptName.c_str(), isSelected)) {
+            //                        selectedScript = scriptName;
+            //                    }
+            //                    if (isSelected) {
+            //                        ImGui::SetItemDefaultFocus();
+            //                    }
+            //                }
+            //                ImGui::EndCombo();
+            //            }
+
+
+            //            if (ImGui::Button("Assign") && !selectedScript.empty()) 
+            //            {
+            //                if (selectedEntity != entt::null)
+            //                {
+            //                    scriptComponent.instance = ScriptFactory::GetInstance().CreateScript(selectedScript);
+            //                    scriptComponent.instance->SetEntity(EntityManager::GetInstance().GetComponent<IDComponent>(selectedEntity).ID.ToString());
+            //                    //scriptComponent.instance->SetEntity(selectedEntity, EntityManager::GetInstance().m_registry);
+            //                    //scriptComponent.OnAssign(); // Inicializar el script
+            //                    selectedScript.clear(); // Limpiar la selección después de asignar el script
+            //                }
+            //                else
+            //                {
+            //                    std::cout << "la entidad seleccioanda es nula" << std::endl;
+            //                }
+            //                
+            //            }
+            //        }
+            //    }
+            //}
         }
         else {
             ImGui::Text("No entity selected.");
@@ -1367,11 +1408,12 @@ namespace libCore
             else if (selectedComponent == "ScriptComponent") {
                 entityManager.AddComponent<ScriptComponent>(entity);
             }
-            selectedComponent.clear(); // Limpiar la selección después de agregar el componente
+             selectedComponent.clear(); // Limpiar la selección después de agregar el componente
         }
     }
     //-----------------------------------------------------------------------------------------------------
 
+    //--CONSOLE LOG PANEL
     //--CONSOLE LOG PANEL
     void GuiLayer::DrawLogPanel() {
         static bool showInfo = true;
@@ -1380,6 +1422,21 @@ namespace libCore
 
         ImGui::Begin("Console Log");
 
+        // Obtener el deltaTime en milisegundos y segundos
+        float deltaTimeMs = EngineOpenGL::GetInstance().m_deltaTime.GetMilliseconds();
+        float deltaTimeSec = EngineOpenGL::GetInstance().m_deltaTime.GetSeconds();
+
+        // Calcular FPS
+        float fps = (deltaTimeSec > 0.0f) ? (1.0f / deltaTimeSec) : 0.0f;
+
+        // Mostrar deltaTime y FPS en tiempo real
+        ImGui::Text("Timestep Info");
+        ImGui::Separator();
+        ImGui::Text("Delta Time: %.3f ms (%.5f s)", deltaTimeMs, deltaTimeSec);
+        ImGui::Text("FPS: %.1f", fps);  // Mostrar FPS con un decimal
+        ImGui::Separator();
+
+        // Botones y controles de filtro
         if (ImGui::Button("Clear")) {
             ConsoleLog::GetInstance().ClearLogs();
         }
@@ -1393,6 +1450,7 @@ namespace libCore
 
         ImGui::Separator();
 
+        // Mostrar los logs
         ImGui::BeginChild("LogScrolling");
         const auto& logs = ConsoleLog::GetInstance().GetLogs();
         for (const auto& log : logs) {
@@ -1424,6 +1482,8 @@ namespace libCore
 
         ImGui::End();
     }
+
+
     //-----------------------------------------------------------------------------------------------------
  
     //--EDITOR CAMERA PANEL

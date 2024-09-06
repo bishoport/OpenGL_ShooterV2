@@ -3,12 +3,14 @@
 #include "../LibCoreHeaders.h"
 #include <entt.hpp>
 #include "Components.h"
-#include "Script.h"
-#include "ScriptFactory.h"
 #include "ScriptComponent.h"
+#include "../Timestep.h"
+
 #include <windows.h>
 #include <iostream>
 #include <memory>
+
+#
 
 namespace libCore
 {

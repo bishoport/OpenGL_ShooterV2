@@ -12,7 +12,8 @@ namespace libCore
 {
     class ScriptMoveTest : public Script {
     public:
-        void Init() override {
+        void Init() override 
+        {
             std::cout << "--------------------------INIT SCRIPT MOVETEST-----------------------" << std::endl;
 
             std::cout << "Inicializando script para la entidad: " << static_cast<uint32_t>(m_Entity) << std::endl;

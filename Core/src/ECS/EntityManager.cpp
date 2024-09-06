@@ -6,6 +6,7 @@
 
 #include "Scripts/CameraControllerFPS.h"
 #include "Scripts/MyScript.h"
+#include "../Scripting/LuaManager.h"
 
 
 
@@ -36,7 +37,9 @@ namespace libCore
         std::wstring buildDir = GetExecutablePath();
         std::wstring dllPath = buildDir + L"\\TestScript.dll";
 
-        HMODULE scriptDll = LoadLibraryW(dllPath.c_str());
+        LuaManager::GetInstance();
+
+        /*HMODULE scriptDll = LoadLibraryW(dllPath.c_str());
         if (scriptDll) {
             typedef void (*RegisterScriptsFunc)(ScriptFactory&);
             RegisterScriptsFunc registerScripts = (RegisterScriptsFunc)GetProcAddress(scriptDll, "RegisterScripts");
@@ -51,7 +54,7 @@ namespace libCore
         }
         else {
             std::cerr << "No se pudo cargar la DLL: " << wstring_to_string(dllPath) << std::endl;
-        }
+        }*/
     }
     //------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------
@@ -395,34 +398,24 @@ namespace libCore
     void EntityManager::RegisterScripts() 
     {
         //ScriptFactory::GetInstance().RegisterScript<CameraControllerFPS>("CameraControllerFPS");
-        ScriptFactory::GetInstance().RegisterScript<MyScript>("MyScript");
+        //ScriptFactory::GetInstance().RegisterScript<MyScript>("MyScript");
     }
-    void EntityManager::InitScripts() {
+    void EntityManager::InitScripts() 
+    {
         auto scriptView = m_registry->view<ScriptComponent>();
         
         for (auto entity : scriptView) {
             auto& scriptComponent = scriptView.get<ScriptComponent>(entity);
-            if (!scriptComponent.instance) {
-                std::cerr << "Error: Script instance is null for entity " << (uint32_t)entity << std::endl;
-                continue;
-            }
-            //auto& idComponent = GetComponent<IDComponent>(entity);
-            //scriptComponent.instance->SetEntity(idComponent.ID.ToString());
             scriptComponent.Init();
         }
     }
-    void EntityManager::UpdateScripts(Timestep deltaTime) {
-        //auto scriptView = m_registry->view<ScriptComponent>();
-        //for (auto entity : scriptView) {
-        //    auto& scriptComponent = scriptView.get<ScriptComponent>(entity);
-        //    if (scriptComponent.instance) {
-        //        scriptComponent.Update(deltaTime.GetMilliseconds());
-        //    }
-        //    else {
-        //        std::cerr << "Error: Script instance is null for entity " << (uint32_t)entity << std::endl;
-        //    }
-
-        //}
+    void EntityManager::UpdateScripts(Timestep deltaTime) 
+    {
+        auto scriptView = m_registry->view<ScriptComponent>();
+        for (auto entity : scriptView) {
+            auto& scriptComponent = scriptView.get<ScriptComponent>(entity);
+            scriptComponent.Update(deltaTime.GetMilliseconds());
+        }
     }
     //------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------
@@ -488,13 +481,22 @@ namespace libCore
     //--DRAW MESH Component (Son llamadas desde el Renderer cuando le toque)
     void EntityManager::DrawGameObjects(const std::string& shader)
     {
-        auto view = m_registry->view<TransformComponent, MeshComponent, MaterialComponent>();
+        auto view = m_registry->view<TransformComponent, MeshComponent, MaterialComponent,AABBComponent>();
         for (auto entity : view) {
             auto& transform = view.get<TransformComponent>(entity);
             auto& mesh = view.get<MeshComponent>(entity);
             auto& material = view.get<MaterialComponent>(entity);
+            auto& aabb = view.get<AABBComponent>(entity).aabb;
 
-            DrawOneGameObject(transform, mesh, material, shader);
+            if (EngineOpenGL::GetInstance().CheckAABBInFrustum(aabb->minBounds, aabb->maxBounds))
+            {
+                mesh.renderable = true;
+                DrawOneGameObject(transform, mesh, material, shader);
+            }
+            else
+            {
+                mesh.renderable = false;
+            }
         }
     }
     void EntityManager::DrawOneGameObject(TransformComponent& transformComponent, MeshComponent& meshComponent, MaterialComponent& materialComponent, const std::string& shader)

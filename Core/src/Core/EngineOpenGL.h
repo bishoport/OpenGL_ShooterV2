@@ -54,10 +54,11 @@ namespace libCore
         bool usingGizmo = false;
         int currentViewport = 0; //Editor Camera by default
         Scope<Scene> currentScene = nullptr;
+        Timestep m_deltaTime = 0.0f;
 
     private:
         GLFWwindow* window = nullptr;
-        Timestep m_deltaTime = 0.0f;
+        
 
         bool running = false;
 

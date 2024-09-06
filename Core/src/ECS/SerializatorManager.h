@@ -386,21 +386,21 @@ namespace libCore {
     //--ScriptComponent
     YAML::Node SerializeScriptComponent(const ScriptComponent& scriptComponent) {
         YAML::Node node;
-        if (scriptComponent.instance) {
-            node["ScriptName"] = typeid(*scriptComponent.instance).name(); // Or use a custom name if you have one
-        }
+        //if (scriptComponent.instance) {
+        //    node["ScriptName"] = typeid(*scriptComponent.instance).name(); // Or use a custom name if you have one
+        //}
         return node;
     }
 
     ScriptComponent DeserializeScriptComponent(const YAML::Node& node) {
         ScriptComponent scriptComponent;
-        if (node["ScriptName"]) {
+        /*if (node["ScriptName"]) {
             std::string scriptName = node["ScriptName"].as<std::string>();
             scriptComponent.instance = ScriptFactory::GetInstance().CreateScript(scriptName);
             if (scriptComponent.instance) {
                 scriptComponent.instance->Init();
             }
-        }
+        }*/
         return scriptComponent;
     }
 

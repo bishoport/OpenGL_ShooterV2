@@ -2,6 +2,7 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <iostream>
+#include "../Scripting/LuaManager.h"
 
 namespace libCore {
 
@@ -75,6 +76,10 @@ namespace libCore {
 			{
 				iconTexture = iconImage; // Asumiendo que imageTexture es la ID de tu textura para imágenes
 			}
+			else if (path.extension() == ".lua")
+			{
+				iconTexture = iconImage; // Asumiendo que imageTexture es la ID de tu textura para imágenes
+			}
 
 
 
@@ -99,6 +104,11 @@ namespace libCore {
 					// Aquí llamas a la función para deserializar la escena
 					std::string sceneName = path.stem().string(); // Obtén el nombre del archivo sin extensión
 					EngineOpenGL::GetInstance().currentScene->DeserializeScene(sceneName);
+				}
+				else if (path.extension() == ".lua")
+				{
+					std::string scriptName = path.stem().string();
+					LuaManager::GetInstance().LoadLuaFile(scriptName, path.string());
 				}
 				else
 				{

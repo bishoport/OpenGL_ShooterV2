@@ -328,10 +328,11 @@ namespace libCore
 		{
 			EntityManager::GetInstance().InitScripts();
 		}
-
 	}
 	// -------------------------------------------------
 	// -------------------------------------------------
+
+
 
 	bool libCore::EngineOpenGL::CheckAABBInFrustum(const glm::vec3& min, const glm::vec3& max)
 	{

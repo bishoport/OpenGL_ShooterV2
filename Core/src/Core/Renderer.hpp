@@ -77,7 +77,6 @@ namespace libCore {
             ibl->prepareIBL(640, 480,dynamicIBL);
             //-------------------------------------------------------
 
-            
 
             //--SSAO
             setupQuad();// Configuración del quad para SSAO
@@ -92,8 +91,6 @@ namespace libCore {
             mLTC.mat1 = loadMTexture();
             mLTC.mat2 = loadLUTTexture();
             //-------------------------------------------------------
-
-            
         }
 
 
@@ -105,6 +102,7 @@ namespace libCore {
             glPopDebugGroup();
         }
         //--------------------------------------------------------------------------
+
 
         //--RENDERER
         void RenderViewport(const Ref<Viewport>& viewport, const Timestep& m_deltaTime) 
@@ -128,7 +126,9 @@ namespace libCore {
             // Actualizar la cámara
             viewport->camera->Inputs(m_deltaTime);
             viewport->camera->updateMatrix();
-            //EntityManager::GetInstance().CheckAABBinFrustum();
+
+
+            
  
             glEnable(GL_DEPTH_TEST); // Habilitar el test de profundidad
 

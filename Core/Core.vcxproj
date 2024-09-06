@@ -62,6 +62,7 @@
     <ClInclude Include="src\input\MouseButtonCodes.h" />
     <ClInclude Include="src\LibCore.h" />
     <ClInclude Include="src\LibCoreHeaders.h" />
+    <ClInclude Include="src\Scripting\LuaManager.h" />
     <ClInclude Include="src\StraightSkeleton\CircularList.h" />
     <ClInclude Include="src\StraightSkeleton\CircularNode.h" />
     <ClInclude Include="src\StraightSkeleton\EChainType.h" />
@@ -141,11 +142,13 @@
     <ClCompile Include="src\Core\VBO.cpp" />
     <ClCompile Include="src\ECS\EntityManager.cpp" />
     <ClCompile Include="src\ECS\Script.cpp" />
+    <ClCompile Include="src\ECS\ScriptComponent.cpp" />
     <ClCompile Include="src\ECS\ScriptFactory.cpp" />
     <ClCompile Include="src\GUI\GuiLayer.cpp" />
     <ClCompile Include="src\ECS\Scene.cpp" />
     <ClCompile Include="src\GUI\AssetsPanel.cpp" />
     <ClCompile Include="src\input\InputManager.cpp" />
+    <ClCompile Include="src\Scripting\LuaManager.cpp" />
     <ClCompile Include="src\StraightSkeleton\CircularList.cpp" />
     <ClCompile Include="src\StraightSkeleton\CircularNode.cpp" />
     <ClCompile Include="src\StraightSkeleton\EChainType.cpp" />
@@ -302,7 +305,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;freetype.lib;assimp-vc143-mtd.lib;yaml-cppd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;freetype.lib;assimp-vc143-mtd.lib;yaml-cppd.lib;lua54.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
