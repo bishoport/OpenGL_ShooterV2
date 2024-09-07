@@ -1,27 +1,29 @@
-io.write("Cosa.LUA LOADED\n") 
-
-local transform = nil
+--io.write("Cosa.LUA LOADED\n")
 
 function Init()
     print("Lua Init function called")
-    -- Obtener el transform desde el script
-    transform = script:getTransform()
-    if transform then
-        local position = script:getPosition()
-        position.y = position.y + 1
-        script:setPosition(position)
-        print("Initial Position: ", position.x, position.y, position.z)
-    else
-        print("Transform not found")
-    end
+
+    -- Obtener y modificar el valor de simpleInt en Init
+    local currentValue = script:getSimpleInt()
+    print("Initial simpleInt value in Init: ", currentValue)
+    
+    -- Incrementar simpleInt por 10
+    script:setSimpleInt(currentValue + 10)
+    
+    local updatedValue = script:getSimpleInt()
+    print("Updated simpleInt value in Init: ", updatedValue)
 end
 
 function Update(deltaTime)
-    if transform then
-        local position = script:getPosition()
-        position.y = position.y + 0.001
-        script:setPosition(position)
-    else
-        print("Transform not found in Update")
-    end
+    print("Calling Lua Update function")
+
+    -- Leer el valor de simpleInt en cada frame
+    local currentValue = script:getSimpleInt()
+    print("Current simpleInt value in Update: ", currentValue)
+
+    -- Incrementar simpleInt en cada frame
+    script:setSimpleInt(currentValue + 1)
+    
+    local updatedValue = script:getSimpleInt()
+    print("Updated simpleInt value in Update: ", updatedValue)
 end
