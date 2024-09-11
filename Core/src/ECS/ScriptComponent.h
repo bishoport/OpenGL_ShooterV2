@@ -26,19 +26,22 @@ namespace libCore
         void Update(float deltaTime);
 
         //--API
-        std::tuple<float, float, float> GetPosition();   // Para obtener la posición del objeto
-        void SetPosition(float x, float y, float z);  // Para establecer la posición del objeto
+        //--TANSFORM
+        std::tuple<float, float, float> GetPosition();
+        void SetPosition(float x, float y, float z);
 
-        //--TEST FUNCTIONS
-        float GetSimpleFloat() const;
-        void SetSimpleFloat(float value);
+        std::tuple<float, float, float> GetRotation();  // Rotación en Euler
+        void SetRotation(float x, float y, float z);    // Establecer rotación en Euler
+
+        std::tuple<float, float, float> GetScale();
+        void SetScale(float x, float y, float z);
+        //--
+
 
     private:
         entt::entity entity;
         std::string luaScriptName;
         bool scriptAssigned = false;
 
-        // Variable de prueba para exponer a Lua
-        float simpleFloat = 25.0f;
     };
 }

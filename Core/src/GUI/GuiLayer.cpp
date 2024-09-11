@@ -815,17 +815,79 @@ namespace libCore
                 if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen)) {
                    
                     // Si ya tiene un script asignado, mostrar el nombre del script y el botón para eliminarlo
-                    if (scriptComponent.HasLuaScript()) 
+                    if (scriptComponent.HasLuaScript())
                     {
                         ImGui::Text("Assigned Script: %s", scriptComponent.GetLuaScriptName().c_str());
-                        ImGui::Text("Simple Int: %f", scriptComponent.GetSimpleFloat());
 
-                        //// Botón para eliminar el script asignado
-                        //if (ImGui::Button("Remove Script")) {
-                        //    // Elimina el script del ScriptComponent
-                        //    scriptComponent.RemoveLuaScript();
-                        //}
+                        sol::state& lua = LuaManager::GetInstance().GetLuaState(scriptComponent.GetLuaScriptName());
+
+                        // Asegurarse de que la tabla 'exposedVars' existe en el script Lua
+                        sol::table exposedVars = lua["exposedVars"];
+                        if (!exposedVars.valid()) {
+                            ImGui::Text("No exposed variables found");
+                            return;
+                        }
+
+                        // Iterar sobre los pares de la tabla exposedVars
+                        for (auto& kvp : exposedVars) {
+                            std::string varName = kvp.first.as<std::string>();  // Nombre de la variable
+                            sol::object varValue = kvp.second;                  // Valor de la variable
+
+                            // Soporte para tipo 'float'
+                            if (varValue.is<float>()) {
+                                float value = varValue.as<float>();
+                                if (ImGui::SliderFloat(varName.c_str(), &value, 0.0f, 10.0f)) { // Rango ajustable para floats
+                                    exposedVars[varName] = value;  // Actualizar el valor en Lua
+                                }
+                            }
+
+                            // Soporte para tipo 'int'
+                            else if (varValue.is<int>()) {
+                                int value = varValue.as<int>();
+                                if (ImGui::SliderInt(varName.c_str(), &value, 0, 100)) { // Rango ajustable para ints
+                                    exposedVars[varName] = value;  // Actualizar el valor en Lua
+                                }
+                            }
+
+                            // Soporte para tipo 'bool'
+                            else if (varValue.is<bool>()) {
+                                bool value = varValue.as<bool>();
+                                if (ImGui::Checkbox(varName.c_str(), &value)) {
+                                    exposedVars[varName] = value;  // Actualizar el valor en Lua
+                                }
+                            }
+
+                            // Soporte para tipo 'string'
+                            else if (varValue.is<std::string>()) {
+                                std::string value = varValue.as<std::string>();
+                                char buffer[256];
+                                strncpy(buffer, value.c_str(), sizeof(buffer));
+                                if (ImGui::InputText(varName.c_str(), buffer, sizeof(buffer))) {
+                                    exposedVars[varName] = std::string(buffer);  // Actualizar el valor en Lua
+                                }
+                            }
+
+                            // Soporte para tipo 'glm::vec3' representado como una tabla Lua
+                            else if (varValue.is<sol::table>()) {
+                                sol::table vectorTable = varValue.as<sol::table>();
+
+                                if (vectorTable.size() == 3) {  // Suponemos que es un glm::vec3 si tiene 3 elementos
+                                    float vec3[3];
+                                    vec3[0] = vectorTable[1].get<float>();  // X
+                                    vec3[1] = vectorTable[2].get<float>();  // Y
+                                    vec3[2] = vectorTable[3].get<float>();  // Z
+
+                                    if (ImGui::InputFloat3(varName.c_str(), vec3)) {
+                                        // Actualizar la tabla en Lua con los nuevos valores
+                                        vectorTable[1] = vec3[0];
+                                        vectorTable[2] = vec3[1];
+                                        vectorTable[3] = vec3[2];
+                                    }
+                                }
+                            }
+                        }
                     }
+
                     else {
                         // Si no tiene un script asignado, mostrar el combo box para asignar uno
                         const auto loadedScripts = LuaManager::GetInstance().GetLoadedScripts();
@@ -858,57 +920,6 @@ namespace libCore
                     }
                 }
             }
-
-
-
-            //if (EntityManager::GetInstance().HasComponent<ScriptComponent>(selectedEntity)) {
-            //    auto& scriptComponent = EntityManager::GetInstance().GetComponent<ScriptComponent>(selectedEntity);
-            //    if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen)) {
-            //        ImGui::Text("Script Instance: %s", scriptComponent.instance ? typeid(*scriptComponent.instance).name() : "None");
-            //        // Aquí puedes agregar más controles para interactuar con el script, si es necesario
-
-            //        // Si instance es nullptr, muestra la opción para asignar un script
-            //        if (!scriptComponent.instance) {
-            //            const auto& creators = ScriptFactory::GetInstance().GetCreators();
-            //            static std::string selectedScript;
-            //            std::vector<std::string> scriptNames;
-            //            for (const auto& pair : creators) {
-            //                scriptNames.push_back(pair.first);
-            //            }
-
-            //            if (ImGui::BeginCombo("Assign Script", selectedScript.c_str())) {
-            //                for (const auto& scriptName : scriptNames) {
-            //                    bool isSelected = (selectedScript == scriptName);
-            //                    if (ImGui::Selectable(scriptName.c_str(), isSelected)) {
-            //                        selectedScript = scriptName;
-            //                    }
-            //                    if (isSelected) {
-            //                        ImGui::SetItemDefaultFocus();
-            //                    }
-            //                }
-            //                ImGui::EndCombo();
-            //            }
-
-
-            //            if (ImGui::Button("Assign") && !selectedScript.empty()) 
-            //            {
-            //                if (selectedEntity != entt::null)
-            //                {
-            //                    scriptComponent.instance = ScriptFactory::GetInstance().CreateScript(selectedScript);
-            //                    scriptComponent.instance->SetEntity(EntityManager::GetInstance().GetComponent<IDComponent>(selectedEntity).ID.ToString());
-            //                    //scriptComponent.instance->SetEntity(selectedEntity, EntityManager::GetInstance().m_registry);
-            //                    //scriptComponent.OnAssign(); // Inicializar el script
-            //                    selectedScript.clear(); // Limpiar la selección después de asignar el script
-            //                }
-            //                else
-            //                {
-            //                    std::cout << "la entidad seleccioanda es nula" << std::endl;
-            //                }
-            //                
-            //            }
-            //        }
-            //    }
-            //}
         }
         else {
             ImGui::Text("No entity selected.");

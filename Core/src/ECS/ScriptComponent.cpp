@@ -1,27 +1,30 @@
 #include "ScriptComponent.h"
 #include "EntityManager.h"
 #include "../Scripting/LuaManager.h"
+#include <glm/gtc/quaternion.hpp>
 
 namespace libCore
 {
-    //--INICIALIZACION DEL COMPONENTE
     void ScriptComponent::SetLuaScript(const std::string& scriptName) {
         luaScriptName = scriptName;
 
-        // Obtener el estado Lua de LuaManager
         sol::state& lua = LuaManager::GetInstance().GetLuaState(luaScriptName);
 
-        // Registrar las clases y componentes C++ que se pueden usar desde Lua
         RegisterClasses();
         scriptAssigned = true;
     }
+
     void ScriptComponent::RegisterClasses() {
         sol::state& L = LuaManager::GetInstance().GetLuaState(luaScriptName);
 
         // Exponer ScriptComponent a Lua
         L.new_usertype<ScriptComponent>("ScriptComponent",
             "GetPosition", &ScriptComponent::GetPosition,
-            "SetPosition", &ScriptComponent::SetPosition
+            "SetPosition", &ScriptComponent::SetPosition,
+            "GetRotation", &ScriptComponent::GetRotation,
+            "SetRotation", &ScriptComponent::SetRotation,
+            "GetScale", &ScriptComponent::GetScale,
+            "SetScale", &ScriptComponent::SetScale
         );
 
         // Exponer el ScriptComponent global a Lua para su uso en scripts
@@ -31,53 +34,62 @@ namespace libCore
     //-------------------------------------------------------------------------------------------------------------------------
 
     //--API
-    std::tuple<float, float, float> ScriptComponent::GetPosition() 
-    {
+    std::tuple<float, float, float> ScriptComponent::GetPosition() {
         if (EntityManager::GetInstance().HasComponent<TransformComponent>(entity)) {
             glm::vec3 position = EntityManager::GetInstance().GetComponent<TransformComponent>(entity).GetPosition();
-            //std::cout << "Position from TransformComponent: (" << position.x << ", " << position.y << ", " << position.z << ")" << std::endl;
-
-            // Devolvemos los valores x, y, z como un std::tuple para que Lua los reciba correctamente
             return std::make_tuple(position.x, position.y, position.z);
         }
-        else {
-            std::cerr << "TransformComponent not found for entity." << std::endl;
-            // Devuelve una posición por defecto si no existe el componente
-            return std::make_tuple(0.0f, 0.0f, 0.0f);
-        }
+        return std::make_tuple(0.0f, 0.0f, 0.0f);
     }
 
-    // Función para establecer la posición usando tres floats
-    void ScriptComponent::SetPosition(float x, float y, float z) 
-    {
+    void ScriptComponent::SetPosition(float x, float y, float z) {
         if (EntityManager::GetInstance().HasComponent<TransformComponent>(entity)) {
             EntityManager::GetInstance().GetComponent<TransformComponent>(entity).SetPosition(glm::vec3(x, y, z));
         }
-        else 
-        {
-            std::cerr << "TransformComponent not found for entity." << std::endl;
+    }
+
+    std::tuple<float, float, float> ScriptComponent::GetRotation() {
+        if (EntityManager::GetInstance().HasComponent<TransformComponent>(entity)) {
+            glm::vec3 eulerAngles = EntityManager::GetInstance().GetComponent<TransformComponent>(entity).GetEulerAngles();
+            return std::make_tuple(eulerAngles.x, eulerAngles.y, eulerAngles.z);
+        }
+        return std::make_tuple(0.0f, 0.0f, 0.0f);
+    }
+
+    void ScriptComponent::SetRotation(float x, float y, float z) {
+        if (EntityManager::GetInstance().HasComponent<TransformComponent>(entity)) {
+            EntityManager::GetInstance().GetComponent<TransformComponent>(entity).SetRotationEuler(glm::vec3(x, y, z));
+        }
+    }
+
+    std::tuple<float, float, float> ScriptComponent::GetScale() {
+        if (EntityManager::GetInstance().HasComponent<TransformComponent>(entity)) {
+            glm::vec3 scale = EntityManager::GetInstance().GetComponent<TransformComponent>(entity).GetScale();
+            return std::make_tuple(scale.x, scale.y, scale.z);
+        }
+        return std::make_tuple(1.0f, 1.0f, 1.0f);  // Devolver escala por defecto si no tiene componente
+    }
+
+    void ScriptComponent::SetScale(float x, float y, float z) {
+        if (EntityManager::GetInstance().HasComponent<TransformComponent>(entity)) {
+            EntityManager::GetInstance().GetComponent<TransformComponent>(entity).SetScale(glm::vec3(x, y, z));
         }
     }
 
     //-------------------------------------------------------------------------------------------------------------------------
 
-    //--LIFE CYCLE
     void ScriptComponent::Init() {
         sol::state& lua = LuaManager::GetInstance().GetLuaState(luaScriptName);
         sol::function initFunc = lua["Init"];
         if (initFunc.valid()) {
             initFunc();
         }
-        else {
-            std::cerr << "Lua Init function not found" << std::endl;
-        }
     }
-    void ScriptComponent::Update(float deltaTime)
-    {
+
+    void ScriptComponent::Update(float deltaTime) {
         sol::state& lua = LuaManager::GetInstance().GetLuaState(luaScriptName);
         sol::function updateFunc = lua["Update"];
-        if (updateFunc.valid())
-        {
+        if (updateFunc.valid()) {
             updateFunc(deltaTime);
         }
         else {
@@ -87,7 +99,6 @@ namespace libCore
 
     //-------------------------------------------------------------------------------------------------------------------------
 
-    //--TEST FUNCTIONS
     float ScriptComponent::GetSimpleFloat() const {
         return simpleFloat;
     }

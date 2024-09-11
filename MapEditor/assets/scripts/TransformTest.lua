@@ -1,19 +1,28 @@
+-- Tabla especial para las variables expuestas a ImGui
+exposedVars = {
+    speed = 1.0,     -- Velocidad de desplazamiento
+    rotationSpeed = 30.0, -- Velocidad de rotación
+    scale = 1.0      -- Escala uniforme
+}
+
+
 function Init()
     print("Lua Init function called")
 end
 
 function Update(deltaTime)
-    -- Obtener la posición actual
+    -- Usar las variables expuestas
     local x, y, z = script:GetPosition()
+    y = y + (exposedVars.speed * deltaTime)  -- Desplazarse usando la velocidad desde ImGui
+    script:SetPosition(x, y, z)
 
-    -- Verificar si los valores son válidos antes de establecer la nueva posición
-    if x ~= nil and y ~= nil and z ~= nil then
-        -- Incrementar la posición en el eje Y
-        y = y + (1.0 * deltaTime)
+    -- Rotar el objeto usando rotationSpeed
+    local rx, ry, rz = script:GetRotation()
+    ry = ry + (exposedVars.rotationSpeed * deltaTime)
+    script:SetRotation(rx, ry, rz)
 
-        -- Establecer la nueva posición
-        script:SetPosition(x, y, z)
-    else
-        print("Error: One of the position values is nil!")
-    end
+    -- Escalar el objeto usando scale
+    local sx, sy, sz = exposedVars.scale, exposedVars.scale, exposedVars.scale
+    script:SetScale(sx, sy, sz)
 end
+
