@@ -818,7 +818,7 @@ namespace libCore
                     if (scriptComponent.HasLuaScript()) 
                     {
                         ImGui::Text("Assigned Script: %s", scriptComponent.GetLuaScriptName().c_str());
-                        ImGui::Text("Simple Int: %d", scriptComponent.GetSimpleInt());
+                        ImGui::Text("Simple Int: %f", scriptComponent.GetSimpleFloat());
 
                         //// Botón para eliminar el script asignado
                         //if (ImGui::Button("Remove Script")) {

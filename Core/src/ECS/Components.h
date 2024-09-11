@@ -125,9 +125,6 @@ namespace libCore
         glm::mat4 GetLocalModelMatrix() const {
             return transform->getLocalModelMatrix();
         }
-
-
-
     };
 
 

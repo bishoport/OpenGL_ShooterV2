@@ -414,7 +414,7 @@ namespace libCore
         auto scriptView = m_registry->view<ScriptComponent>();
         for (auto entity : scriptView) {
             auto& scriptComponent = scriptView.get<ScriptComponent>(entity);
-            scriptComponent.Update(deltaTime.GetMilliseconds());
+            scriptComponent.Update(deltaTime);
         }
     }
     //------------------------------------------------------------------------------------

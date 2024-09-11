@@ -12,7 +12,7 @@ namespace libCore
     class ScriptComponent {
     public:
         ScriptComponent() = default;
-        ScriptComponent(entt::entity entityRef) : entity(entityRef), simpleInt(0) {}
+        ScriptComponent(entt::entity entityRef) : entity(entityRef), simpleFloat(0) {}
 
         void SetLuaScript(const std::string& scriptName);
         bool HasLuaScript() const { return scriptAssigned; }
@@ -25,16 +25,20 @@ namespace libCore
         void Init();
         void Update(float deltaTime);
 
-        //--METHODS
-        TransformComponent& GetTransform();
+        //--API
+        std::tuple<float, float, float> GetPosition();   // Para obtener la posición del objeto
+        void SetPosition(float x, float y, float z);  // Para establecer la posición del objeto
 
-        int GetSimpleInt() const;
-        void SetSimpleInt(int value);
+        //--TEST FUNCTIONS
+        float GetSimpleFloat() const;
+        void SetSimpleFloat(float value);
 
     private:
         entt::entity entity;
         std::string luaScriptName;
         bool scriptAssigned = false;
-        int simpleInt = 25;  // Variable de prueba para exponer a Lua
+
+        // Variable de prueba para exponer a Lua
+        float simpleFloat = 25.0f;
     };
 }

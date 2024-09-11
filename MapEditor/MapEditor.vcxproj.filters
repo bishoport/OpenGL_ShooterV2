@@ -54,5 +54,6 @@
     <None Include="assets\shaders\axes.frag" />
     <None Include="assets\shaders\frustum.vert" />
     <None Include="assets\shaders\frustum.frag" />
+    <None Include="assets\scripts\TransformTest.lua" />
   </ItemGroup>
 </Project>

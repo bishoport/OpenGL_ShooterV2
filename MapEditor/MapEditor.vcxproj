@@ -138,6 +138,7 @@
     <ClInclude Include="src\MapEditor.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\scripts\TransformTest.lua" />
     <None Include="assets\shaders\axes.frag" />
     <None Include="assets\shaders\axes.vert" />
     <None Include="assets\shaders\combine.frag" />
