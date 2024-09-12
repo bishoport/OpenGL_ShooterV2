@@ -10,8 +10,6 @@
 #include <iostream>
 #include <memory>
 
-#
-
 namespace libCore
 {
     class EntityManager {

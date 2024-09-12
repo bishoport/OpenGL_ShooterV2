@@ -40,7 +40,7 @@ namespace libCore
         //--
 
         //--MESH INSTACE
-        void InstanceModel(std::string key);
+        //void InstanceModel(std::string key);
         //--
 
     private:

@@ -336,6 +336,9 @@
     <ClInclude Include="src\Scripting\LuaManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\ECS\EntityManagerBridge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\input\InputManager.cpp">
@@ -525,6 +528,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Scripting\LuaManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ECS\EntityManagerBridge.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

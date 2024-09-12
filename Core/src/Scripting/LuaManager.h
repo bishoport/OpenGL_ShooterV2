@@ -5,11 +5,10 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include "../ECS/EntityManagerBridge.h" // Incluir el bridge
 
-namespace libCore
-{
-    class LuaManager
-    {
+namespace libCore {
+    class LuaManager {
     public:
         // Singleton
         static LuaManager& GetInstance() {
@@ -22,6 +21,9 @@ namespace libCore
 
         // Obtener el estado Lua por nombre de script
         sol::state& GetLuaState(const std::string& scriptName) const;
+
+        // Registrar las funciones comunes (como EntityManagerBridge)
+        void RegisterCommonFunctions(sol::state& luaState);
 
         // Verificar si un script está cargado
         bool IsScriptLoaded(const std::string& scriptName) const;

@@ -25,9 +25,7 @@ namespace libCore
             "GetRotation",   &ScriptComponent::GetRotation,
             "SetRotation",   &ScriptComponent::SetRotation,
             "GetScale",      &ScriptComponent::GetScale,
-            "SetScale",      &ScriptComponent::SetScale,
-
-            "InstanceModel", &ScriptComponent::InstanceModel
+            "SetScale",      &ScriptComponent::SetScale
         );
 
         // Exponer el ScriptComponent global a Lua para su uso en scripts
@@ -79,10 +77,10 @@ namespace libCore
         }
     }
 
-    void ScriptComponent::InstanceModel(std::string key)
-    {
-        EntityManager::GetInstance().CreateGameObjectFromModel( AssetsManager::GetInstance().GetModel(key), entt::null);
-    }
+    //void ScriptComponent::InstanceModel(std::string key)
+    //{
+    //    EntityManager::GetInstance().CreateGameObjectFromModel( AssetsManager::GetInstance().GetModel(key), entt::null);
+    //}
 
     //-------------------------------------------------------------------------------------------------------------------------
 

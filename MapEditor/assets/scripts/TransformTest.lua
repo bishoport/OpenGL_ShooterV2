@@ -11,8 +11,8 @@ exposedVars = {
 function Init()
     print("Lua Init function called")
     print(exposedVars.selectedModel)
-
-    script:InstanceModel(exposedVars.selectedModel)
+    local modelEntity = EntityManager:CreateEntityFromModel("assets\\models\\Turbina\\turbina.fbx")
+    --script:InstanceModel(exposedVars.selectedModel)
 end
 
 function Update(deltaTime)

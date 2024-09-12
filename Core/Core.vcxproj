@@ -47,6 +47,7 @@
     <ClInclude Include="src\ECS\Components.h" />
     <ClInclude Include="src\ECS\ECS.h" />
     <ClInclude Include="src\ECS\EntityManager.h" />
+    <ClInclude Include="src\ECS\EntityManagerBridge.h" />
     <ClInclude Include="src\ECS\ScriptComponent.h" />
     <ClInclude Include="src\ECS\Scripts\CameraControllerFPS.h" />
     <ClInclude Include="src\ECS\SerializatorManager.h" />
@@ -139,6 +140,7 @@
     <ClCompile Include="src\Core\VAO.cpp" />
     <ClCompile Include="src\Core\VBO.cpp" />
     <ClCompile Include="src\ECS\EntityManager.cpp" />
+    <ClCompile Include="src\ECS\EntityManagerBridge.cpp" />
     <ClCompile Include="src\ECS\ScriptComponent.cpp" />
     <ClCompile Include="src\GUI\GuiLayer.cpp" />
     <ClCompile Include="src\ECS\Scene.cpp" />
