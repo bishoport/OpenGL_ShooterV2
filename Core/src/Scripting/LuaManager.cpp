@@ -3,6 +3,7 @@
 
 namespace libCore
 {
+
     void LuaManager::LoadLuaFile(const std::string& scriptName, const std::string& path)
     {
         auto luaState = std::make_unique<sol::state>();
@@ -26,7 +27,6 @@ namespace libCore
         }
         throw std::runtime_error("Lua state not found for script: " + scriptName);
     }
-
 
     bool LuaManager::IsScriptLoaded(const std::string& scriptName) const
     {

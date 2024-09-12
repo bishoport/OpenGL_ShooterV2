@@ -324,16 +324,10 @@
     <ClInclude Include="src\tools\ThumbnailGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\Script.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\ECS\EntityManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ECS\Components.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ECS\ScriptFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ECS\ScriptComponent.h">
@@ -527,12 +521,6 @@
     <ClCompile Include="src\ECS\EntityManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ECS\Script.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ECS\ScriptFactory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ECS\ScriptComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -542,12 +530,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="src\ECS\EntityManager.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="src\ECS\Script.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="src\ECS\ScriptFactory.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

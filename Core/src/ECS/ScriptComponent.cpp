@@ -2,6 +2,7 @@
 #include "EntityManager.h"
 #include "../Scripting/LuaManager.h"
 #include <glm/gtc/quaternion.hpp>
+#include "../tools/AssetsManager.h"
 
 namespace libCore
 {
@@ -19,12 +20,14 @@ namespace libCore
 
         // Exponer ScriptComponent a Lua
         L.new_usertype<ScriptComponent>("ScriptComponent",
-            "GetPosition", &ScriptComponent::GetPosition,
-            "SetPosition", &ScriptComponent::SetPosition,
-            "GetRotation", &ScriptComponent::GetRotation,
-            "SetRotation", &ScriptComponent::SetRotation,
-            "GetScale", &ScriptComponent::GetScale,
-            "SetScale", &ScriptComponent::SetScale
+            "GetPosition",   &ScriptComponent::GetPosition,
+            "SetPosition",   &ScriptComponent::SetPosition,
+            "GetRotation",   &ScriptComponent::GetRotation,
+            "SetRotation",   &ScriptComponent::SetRotation,
+            "GetScale",      &ScriptComponent::GetScale,
+            "SetScale",      &ScriptComponent::SetScale,
+
+            "InstanceModel", &ScriptComponent::InstanceModel
         );
 
         // Exponer el ScriptComponent global a Lua para su uso en scripts
@@ -76,6 +79,11 @@ namespace libCore
         }
     }
 
+    void ScriptComponent::InstanceModel(std::string key)
+    {
+        EntityManager::GetInstance().CreateGameObjectFromModel( AssetsManager::GetInstance().GetModel(key), entt::null);
+    }
+
     //-------------------------------------------------------------------------------------------------------------------------
 
     void ScriptComponent::Init() {
@@ -98,16 +106,4 @@ namespace libCore
     }
 
     //-------------------------------------------------------------------------------------------------------------------------
-
-    float ScriptComponent::GetSimpleFloat() const {
-        return simpleFloat;
-    }
-
-    void ScriptComponent::SetSimpleFloat(float value) {
-        simpleFloat = value;
-
-        if (EntityManager::GetInstance().HasComponent<TransformComponent>(entity)) {
-            EntityManager::GetInstance().GetComponent<TransformComponent>(entity).SetPosition(glm::vec3(0.0f, simpleFloat, 0.0f));
-        }
-    }
 }

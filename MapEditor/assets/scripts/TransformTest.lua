@@ -2,12 +2,17 @@
 exposedVars = {
     speed = 1.0,     -- Velocidad de desplazamiento
     rotationSpeed = 30.0, -- Velocidad de rotación
-    scale = 1.0      -- Escala uniforme
+    scale = 1.0,      -- Escala uniforme
+
+    selectedModel = ""  -- Variable para almacenar el nombre del modelo
 }
 
 
 function Init()
     print("Lua Init function called")
+    print(exposedVars.selectedModel)
+
+    script:InstanceModel(exposedVars.selectedModel)
 end
 
 function Update(deltaTime)

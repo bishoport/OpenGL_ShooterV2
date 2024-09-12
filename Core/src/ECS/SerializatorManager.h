@@ -14,8 +14,8 @@
 #include "ECS.h"
 
 // YAML Conversion Specializations
-
-namespace YAML {
+namespace YAML 
+{
 
     //--Vector3
     template<>
@@ -64,28 +64,6 @@ namespace YAML {
             return true;
         }
     };
-
-    ////--Transform
-    //template<>
-    //struct convert<libCore::Transform> {
-    //    static Node encode(const libCore::Transform& rhs) {
-    //        Node node;
-    //        node["Position"] = rhs.position;
-    //        node["Rotation"] = rhs.eulerAngles;
-    //        node["Scale"] = rhs.scale;
-    //        return node;
-    //    }
-
-    //    static bool decode(const Node& node, libCore::Transform& rhs) {
-    //        if (!node["Position"] || !node["Rotation"] || !node["Scale"]) {
-    //            return false;
-    //        }
-    //        rhs.position = node["Position"].as<glm::vec3>();
-    //        rhs.eulerAngles = node["Rotation"].as<glm::vec3>();
-    //        rhs.scale = node["Scale"].as<glm::vec3>();
-    //        return true;
-    //    }
-    //};
 
     //--Material
     template<>
@@ -200,9 +178,6 @@ namespace YAML {
             return true;
         }
     };
-
-
-    
 }
 
 
@@ -218,13 +193,6 @@ namespace libCore {
         return node;
     }
 
-    /*TransformComponent DeserializeTransformComponent(const YAML::Node& node) {
-        TransformComponent transformComponent;
-        transformComponent.transform = CreateRef<Transform>(node["Transform"].as<Transform>());
-        return transformComponent;
-    }*/
-
-
     TransformComponent DeserializeTransformComponent(const YAML::Node& node) {
         TransformComponent transformComponent;
         transformComponent.transform = CreateRef<Transform>(node["Transform"].as<Transform>());
@@ -239,7 +207,7 @@ namespace libCore {
         YAML::Node node;
         node["Material"] = *materialComponent.material;
 
-        /*if (materialComponent.material->albedoMap) {
+        if (materialComponent.material->albedoMap) {
             node["AlbedoMap"] = *materialComponent.material->albedoMap;
         }
         if (materialComponent.material->normalMap) {
@@ -253,7 +221,7 @@ namespace libCore {
         }
         if (materialComponent.material->aOMap) {
             node["AOMap"] = *materialComponent.material->aOMap;
-        }*/
+        }
 
         return node;
     }
@@ -263,26 +231,26 @@ namespace libCore {
         materialComponent.material = CreateRef<Material>();
         *materialComponent.material = node["Material"].as<Material>();
 
-        //if (node["AlbedoMap"]) {
-        //    materialComponent.material->albedoMap = CreateRef<Texture>();
-        //    *materialComponent.material->albedoMap = node["AlbedoMap"].as<Texture>();
-        //}
-        //if (node["NormalMap"]) {
-        //    materialComponent.material->normalMap = CreateRef<Texture>();
-        //    *materialComponent.material->normalMap = node["NormalMap"].as<Texture>();
-        //}
-        //if (node["MetallicMap"]) {
-        //    materialComponent.material->metallicMap = CreateRef<Texture>();
-        //    *materialComponent.material->metallicMap = node["MetallicMap"].as<Texture>();
-        //}
-        //if (node["RoughnessMap"]) {
-        //    materialComponent.material->roughnessMap = CreateRef<Texture>();
-        //    *materialComponent.material->roughnessMap = node["RoughnessMap"].as<Texture>();
-        //}
-        //if (node["AOMap"]) {
-        //    materialComponent.material->aOMap = CreateRef<Texture>();
-        //    *materialComponent.material->aOMap = node["AOMap"].as<Texture>();
-        //}
+        if (node["AlbedoMap"]) {
+            materialComponent.material->albedoMap = CreateRef<Texture>();
+            *materialComponent.material->albedoMap = node["AlbedoMap"].as<Texture>();
+        }
+        if (node["NormalMap"]) {
+            materialComponent.material->normalMap = CreateRef<Texture>();
+            *materialComponent.material->normalMap = node["NormalMap"].as<Texture>();
+        }
+        if (node["MetallicMap"]) {
+            materialComponent.material->metallicMap = CreateRef<Texture>();
+            *materialComponent.material->metallicMap = node["MetallicMap"].as<Texture>();
+        }
+        if (node["RoughnessMap"]) {
+            materialComponent.material->roughnessMap = CreateRef<Texture>();
+            *materialComponent.material->roughnessMap = node["RoughnessMap"].as<Texture>();
+        }
+        if (node["AOMap"]) {
+            materialComponent.material->aOMap = CreateRef<Texture>();
+            *materialComponent.material->aOMap = node["AOMap"].as<Texture>();
+        }
 
         return materialComponent;
     }
@@ -386,21 +354,14 @@ namespace libCore {
     //--ScriptComponent
     YAML::Node SerializeScriptComponent(const ScriptComponent& scriptComponent) {
         YAML::Node node;
-        //if (scriptComponent.instance) {
-        //    node["ScriptName"] = typeid(*scriptComponent.instance).name(); // Or use a custom name if you have one
-        //}
+        node["ScriptName"] = typeid(scriptComponent.GetLuaScriptName()).name(); // Or use a custom name if you have one
         return node;
     }
 
     ScriptComponent DeserializeScriptComponent(const YAML::Node& node) {
         ScriptComponent scriptComponent;
-        /*if (node["ScriptName"]) {
-            std::string scriptName = node["ScriptName"].as<std::string>();
-            scriptComponent.instance = ScriptFactory::GetInstance().CreateScript(scriptName);
-            if (scriptComponent.instance) {
-                scriptComponent.instance->Init();
-            }
-        }*/
+        std::string scriptName = node["ScriptName"].as<std::string>();
+        //scriptComponent.instance = ScriptFactory::GetInstance().CreateScript(scriptName);
         return scriptComponent;
     }
 

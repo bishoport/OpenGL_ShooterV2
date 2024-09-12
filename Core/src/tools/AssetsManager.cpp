@@ -64,13 +64,13 @@ namespace libCore
 		{
 			std::string key = importModelData.filePath + importModelData.fileName;
 			loadedModels[key] = model;
+			model->key_stored = key;
 			ThumbnailGenerator::GenerateThumbnail(model);
 		}
 		else 
 		{
 			std::cout << "Error Loading MODEL" << std::endl;
 		}
-		
 	}
 	void AssetsManager::LoadModelAssetAsync(ImportModelData importModelData)
 	{

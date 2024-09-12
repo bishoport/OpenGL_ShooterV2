@@ -47,9 +47,7 @@
     <ClInclude Include="src\ECS\Components.h" />
     <ClInclude Include="src\ECS\ECS.h" />
     <ClInclude Include="src\ECS\EntityManager.h" />
-    <ClInclude Include="src\ECS\Script.h" />
     <ClInclude Include="src\ECS\ScriptComponent.h" />
-    <ClInclude Include="src\ECS\ScriptFactory.h" />
     <ClInclude Include="src\ECS\Scripts\CameraControllerFPS.h" />
     <ClInclude Include="src\ECS\SerializatorManager.h" />
     <ClInclude Include="src\GUI\GuiLayer.h" />
@@ -141,9 +139,7 @@
     <ClCompile Include="src\Core\VAO.cpp" />
     <ClCompile Include="src\Core\VBO.cpp" />
     <ClCompile Include="src\ECS\EntityManager.cpp" />
-    <ClCompile Include="src\ECS\Script.cpp" />
     <ClCompile Include="src\ECS\ScriptComponent.cpp" />
-    <ClCompile Include="src\ECS\ScriptFactory.cpp" />
     <ClCompile Include="src\GUI\GuiLayer.cpp" />
     <ClCompile Include="src\ECS\Scene.cpp" />
     <ClCompile Include="src\GUI\AssetsPanel.cpp" />
@@ -198,8 +194,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="src\ECS\EntityManager.inl" />
-    <None Include="src\ECS\Script.inl" />
-    <None Include="src\ECS\ScriptFactory.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

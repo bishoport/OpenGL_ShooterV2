@@ -857,15 +857,36 @@ namespace libCore
                                 }
                             }
 
-                            // Soporte para tipo 'string'
-                            else if (varValue.is<std::string>()) {
+                            // Soporte para tipo 'string' (por ejemplo, selectedModel en Lua)
+                            else if (varName == "selectedModel" && varValue.is<std::string>()) {
                                 std::string value = varValue.as<std::string>();
                                 char buffer[256];
-                                strncpy(buffer, value.c_str(), sizeof(buffer));
+
+                                // Copiamos el valor actual al buffer
+                                strncpy_s(buffer, sizeof(buffer), value.c_str(), _TRUNCATE);
+
+                                // Mostrar el campo de texto para la entrada manual
                                 if (ImGui::InputText(varName.c_str(), buffer, sizeof(buffer))) {
-                                    exposedVars[varName] = std::string(buffer);  // Actualizar el valor en Lua
+                                    // Actualizar el valor en Lua si ha sido cambiado manualmente
+                                    exposedVars[varName] = std::string(buffer);
+                                }
+
+                                // Comprobar si hay un drop de un modelo en este campo
+                                if (ImGui::BeginDragDropTarget())
+                                {
+                                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("MODEL_PAYLOAD"))
+                                    {
+                                        const char* droppedModelName = (const char*)payload->Data;
+                                        strncpy_s(buffer, sizeof(buffer), droppedModelName, _TRUNCATE);  // Reemplazamos el valor con el nombre del modelo arrastrado
+                                        std::cout << "Model dropped: " << buffer << std::endl;
+                                        exposedVars[varName] = std::string(buffer);  // Actualizar el valor en Lua con el modelo arrastrado
+                                    }
+                                    ImGui::EndDragDropTarget();
                                 }
                             }
+
+
+
 
                             // Soporte para tipo 'glm::vec3' representado como una tabla Lua
                             else if (varValue.is<sol::table>()) {
@@ -1099,6 +1120,14 @@ namespace libCore
                     // Lógica de instanciación del modelo
                     EntityManager::GetInstance().CreateGameObjectFromModel(model, entt::null);
                 }
+                // Iniciar fuente de drag and drop para los modelos
+                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+                {
+                    // Enviar el nombre del modelo como payload
+                    ImGui::SetDragDropPayload("MODEL_PAYLOAD", model->key_stored.c_str(), model->key_stored.size() + 1);
+                    ImGui::Text("Dragging: %s", model->key_stored.c_str());
+                    ImGui::EndDragDropSource();
+                }
             }
 
             // Recorrer recursivamente los hijos del modelo
@@ -1148,10 +1177,8 @@ namespace libCore
         auto& assetsManager = libCore::AssetsManager::GetInstance();
         const auto& models = assetsManager.GetAllModels();
 
-        // Comenzar la ventana de ImGui
         ImGui::Begin("Models Panel");
 
-        // Mostrar el número de modelos cargados
         ImGui::Spacing();
         ImGui::Text("Model Count: %zu", models.size());
         ImGui::Spacing();
@@ -1171,7 +1198,17 @@ namespace libCore
                     EntityManager::GetInstance().CreateGameObjectFromModel(model, entt::null);
                 }
 
-                // Dibujar la jerarquía del modelo
+
+                // Iniciar fuente de drag and drop para los modelos
+                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+                {
+                    // Enviar el nombre del modelo como payload
+                    ImGui::SetDragDropPayload("MODEL_PAYLOAD", model->key_stored.c_str(), model->key_stored.size() + 1);
+                    ImGui::Text("Dragging: %s", model->key_stored.c_str());
+                    ImGui::EndDragDropSource();
+                }
+
+                // Dibujar la jerarquía del modelo (si corresponde)
                 DrawModelHierarchy(model);
             }
             else
@@ -1182,6 +1219,7 @@ namespace libCore
 
         ImGui::End();
     }
+
     //-----------------------------------------------------------------------------------------------------
 
 
@@ -1426,7 +1464,6 @@ namespace libCore
     //-----------------------------------------------------------------------------------------------------
 
     //--CONSOLE LOG PANEL
-    //--CONSOLE LOG PANEL
     void GuiLayer::DrawLogPanel() {
         static bool showInfo = true;
         static bool showWarning = true;
@@ -1494,10 +1531,9 @@ namespace libCore
 
         ImGui::End();
     }
-
-
     //-----------------------------------------------------------------------------------------------------
  
+
     //--EDITOR CAMERA PANEL
     void GuiLayer::DrawEditorCameraPanel()
     {
@@ -1750,6 +1786,8 @@ namespace libCore
         ImGui::End();
     }
     //-----------------------------------------------------------------------------------------------------
+
+
 
 
     //Especial para el editor de Roofs

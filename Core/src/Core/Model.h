@@ -22,6 +22,7 @@ namespace libCore
         ImportModelData importModelData;
         Ref<Transform> transform = CreateRef<Transform>();
         std::string name = "no_name_model";
+        std::string key_stored = "";
 
         //--MODEL DATA
         Ref<Model> modelParent = nullptr;

@@ -12,7 +12,7 @@ namespace libCore
     class ScriptComponent {
     public:
         ScriptComponent() = default;
-        ScriptComponent(entt::entity entityRef) : entity(entityRef), simpleFloat(0) {}
+        ScriptComponent(entt::entity entityRef) : entity(entityRef) {}
 
         void SetLuaScript(const std::string& scriptName);
         bool HasLuaScript() const { return scriptAssigned; }
@@ -24,6 +24,8 @@ namespace libCore
         //--LIFE CYCLE
         void Init();
         void Update(float deltaTime);
+
+
 
         //--API
         //--TANSFORM
@@ -37,11 +39,13 @@ namespace libCore
         void SetScale(float x, float y, float z);
         //--
 
+        //--MESH INSTACE
+        void InstanceModel(std::string key);
+        //--
 
     private:
         entt::entity entity;
         std::string luaScriptName;
         bool scriptAssigned = false;
-
     };
 }
