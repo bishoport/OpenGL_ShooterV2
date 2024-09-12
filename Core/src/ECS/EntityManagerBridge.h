@@ -1,9 +1,9 @@
 #pragma once
 
 #include "EntityManager.h"  // Incluir la clase original de EntityManager
+#include <tuple>
 
-namespace libCore
-{
+namespace libCore {
 
     class EntityManagerBridge {
     public:
@@ -23,8 +23,14 @@ namespace libCore
         // Destruir una entidad
         void DestroyEntity(entt::entity entity);
 
+        // Métodos para TransformComponent (posicion, rotación, escala)
+        std::tuple<float, float, float> GetPosition(entt::entity entity);
+        void SetPosition(entt::entity entity, float x, float y, float z);
+
+        std::tuple<float, float, float> GetRotation(entt::entity entity);  // Rotación en Euler
+        void SetRotation(entt::entity entity, float x, float y, float z);  // Establecer rotación en Euler
+
+        std::tuple<float, float, float> GetScale(entt::entity entity);
+        void SetScale(entt::entity entity, float x, float y, float z);
     };
-
-
-
 }

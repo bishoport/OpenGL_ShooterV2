@@ -433,11 +433,11 @@ namespace libCore
 			ViewportManager::GetInstance().viewports[currentViewport]->gameCamera->Position = transformComponent.transform->GetPosition();
 		}
 
-		if (engineState == EDITOR )
+		if (engineState == EDITOR || engineState == EDITOR_PLAY)
 		{
 			ViewportManager::GetInstance().viewports[currentViewport]->camera = ViewportManager::GetInstance().viewports[currentViewport]->editorCamera;
 		}
-		else if (engineState == PLAY || engineState == EDITOR_PLAY)
+		else if (engineState == PLAY )
 		{
 			ViewportManager::GetInstance().viewports[currentViewport]->camera = ViewportManager::GetInstance().viewports[currentViewport]->gameCamera;
 		}

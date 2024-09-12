@@ -20,7 +20,6 @@ namespace libCore {
         }
     }
 
-    // Registrar las funciones comunes (como las de EntityManagerBridge)
     void LuaManager::RegisterCommonFunctions(sol::state& luaState) {
         // Exponer `entt::entity` como un tipo simple en Lua
         luaState.new_usertype<entt::entity>("entity");
@@ -30,13 +29,22 @@ namespace libCore {
             "CreateEntity", &EntityManagerBridge::CreateEntity,
             "CreateEntityFromModel", &EntityManagerBridge::CreateEntityFromModel,
             "GetEntityName", &EntityManagerBridge::GetEntityName,
-            "DestroyEntity", &EntityManagerBridge::DestroyEntity
+            "DestroyEntity", &EntityManagerBridge::DestroyEntity,
+
+            // Métodos de TransformComponent
+            "GetPosition", &EntityManagerBridge::GetPosition,
+            "SetPosition", &EntityManagerBridge::SetPosition,
+            "GetRotation", &EntityManagerBridge::GetRotation,
+            "SetRotation", &EntityManagerBridge::SetRotation,
+            "GetScale", &EntityManagerBridge::GetScale,
+            "SetScale", &EntityManagerBridge::SetScale
         );
 
         // Crear una instancia global de `EntityManagerBridge`
         static EntityManagerBridge entityManagerBridge;
         luaState["EntityManager"] = &entityManagerBridge;
     }
+
 
     sol::state& LuaManager::GetLuaState(const std::string& scriptName) const {
         auto it = scripts.find(scriptName);

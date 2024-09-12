@@ -25,24 +25,6 @@ namespace libCore
         void Init();
         void Update(float deltaTime);
 
-
-
-        //--API
-        //--TANSFORM
-        std::tuple<float, float, float> GetPosition();
-        void SetPosition(float x, float y, float z);
-
-        std::tuple<float, float, float> GetRotation();  // Rotación en Euler
-        void SetRotation(float x, float y, float z);    // Establecer rotación en Euler
-
-        std::tuple<float, float, float> GetScale();
-        void SetScale(float x, float y, float z);
-        //--
-
-        //--MESH INSTACE
-        //void InstanceModel(std::string key);
-        //--
-
     private:
         entt::entity entity;
         std::string luaScriptName;

@@ -112,8 +112,6 @@ namespace libCore
         {
             ShowPopups(); // Llamada para renderizar todos los popups
 
-
-
             //--SELECT MODEL FROM RAY POPUP
             if (isSelectingObject == true && !popupJustClosed)
             {

@@ -7,11 +7,11 @@
 namespace libCore
 {
 
+    //--ENTITY MANAGER
     // Crear una nueva entidad vacía
     entt::entity EntityManagerBridge::CreateEntity(const std::string& name) {
         return EntityManager::GetInstance().CreateEmptyGameObject(name);
     }
-
     // Crear una entidad desde un modelo
     entt::entity EntityManagerBridge::CreateEntityFromModel(const std::string& modelName) {
         auto model = AssetsManager::GetInstance().GetModel(modelName);
@@ -21,7 +21,6 @@ namespace libCore
         }
         return EntityManager::GetInstance().CreateGameObjectFromModel(model, entt::null);
     }
-
     // Obtener el nombre de una entidad
     std::string EntityManagerBridge::GetEntityName(entt::entity entity) {
         if (EntityManager::GetInstance().HasComponent<TagComponent>(entity)) {
@@ -29,16 +28,63 @@ namespace libCore
         }
         return "Unnamed";
     }
-
     // Verificar si una entidad tiene un componente específico
     template<typename T>
     bool EntityManagerBridge::HasComponent(entt::entity entity) {
         return EntityManager::GetInstance().HasComponent<T>(entity);
     }
-
     // Destruir una entidad
     void EntityManagerBridge::DestroyEntity(entt::entity entity) {
         EntityManager::GetInstance().DestroyEntity(entity);
     }
+    //----------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------
 
+
+    //--TRANSFORM COMPONENT
+    std::tuple<float, float, float> EntityManagerBridge::GetPosition(entt::entity entity) {
+        if (EntityManager::GetInstance().HasComponent<TransformComponent>(entity)) {
+            auto& transform = EntityManager::GetInstance().GetComponent<TransformComponent>(entity);
+            return { transform.transform->position.x, transform.transform->position.y, transform.transform->position.z };
+        }
+        return { 0.0f, 0.0f, 0.0f };  // Valor por defecto si no tiene el componente
+    }
+
+    void EntityManagerBridge::SetPosition(entt::entity entity, float x, float y, float z) {
+        if (EntityManager::GetInstance().HasComponent<TransformComponent>(entity)) {
+            auto& transform = EntityManager::GetInstance().GetComponent<TransformComponent>(entity);
+            transform.transform->position = { x, y, z };
+        }
+    }
+
+    std::tuple<float, float, float> EntityManagerBridge::GetRotation(entt::entity entity) {
+        if (EntityManager::GetInstance().HasComponent<TransformComponent>(entity)) {
+            glm::vec3 eulerAngles = EntityManager::GetInstance().GetComponent<TransformComponent>(entity).GetEulerAngles();
+            return std::make_tuple(eulerAngles.x, eulerAngles.y, eulerAngles.z);
+        }
+        return std::make_tuple(0.0f, 0.0f, 0.0f);
+    }
+
+    void EntityManagerBridge::SetRotation(entt::entity entity, float x, float y, float z) {
+        if (EntityManager::GetInstance().HasComponent<TransformComponent>(entity)) {
+            EntityManager::GetInstance().GetComponent<TransformComponent>(entity).SetRotationEuler(glm::vec3(x, y, z));
+        }
+    }
+
+    std::tuple<float, float, float> EntityManagerBridge::GetScale(entt::entity entity) {
+        if (EntityManager::GetInstance().HasComponent<TransformComponent>(entity)) {
+            auto& transform = EntityManager::GetInstance().GetComponent<TransformComponent>(entity);
+            return { transform.transform->scale.x, transform.transform->scale.y, transform.transform->scale.z };
+        }
+        return { 1.0f, 1.0f, 1.0f };  // Escala por defecto si no tiene el componente
+    }
+
+    void EntityManagerBridge::SetScale(entt::entity entity, float x, float y, float z) {
+        if (EntityManager::GetInstance().HasComponent<TransformComponent>(entity)) {
+            auto& transform = EntityManager::GetInstance().GetComponent<TransformComponent>(entity);
+            transform.transform->scale = { x, y, z };
+        }
+    }
+    //----------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------
 }

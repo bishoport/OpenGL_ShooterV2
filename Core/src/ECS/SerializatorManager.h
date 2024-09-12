@@ -354,15 +354,20 @@ namespace libCore {
     //--ScriptComponent
     YAML::Node SerializeScriptComponent(const ScriptComponent& scriptComponent) {
         YAML::Node node;
-        node["ScriptName"] = typeid(scriptComponent.GetLuaScriptName()).name(); // Or use a custom name if you have one
+        node["ScriptName"] = scriptComponent.GetLuaScriptName();  // Serializar el nombre del script
         return node;
     }
 
+
     ScriptComponent DeserializeScriptComponent(const YAML::Node& node) {
         ScriptComponent scriptComponent;
+
+        // Recuperar el nombre del script y asignarlo al componente
         std::string scriptName = node["ScriptName"].as<std::string>();
-        //scriptComponent.instance = ScriptFactory::GetInstance().CreateScript(scriptName);
+        scriptComponent.SetLuaScript(scriptName);
+
         return scriptComponent;
     }
+
 
 }
