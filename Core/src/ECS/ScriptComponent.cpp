@@ -20,6 +20,10 @@ namespace libCore
     void ScriptComponent::Init() {
         for (const auto& scriptData : luaScriptsData) {
             sol::state& lua = LuaManager::GetInstance().GetLuaState(scriptData.name);
+
+            // Exponer la entidad a Lua
+            lua["entity"] = entity;  // O podrías mapear una interfaz si es necesario
+
             sol::function initFunc = lua["Init"];
             if (initFunc.valid()) {
                 initFunc();  // Ejecutar Init en cada script

@@ -16,13 +16,17 @@ namespace libCore
         ScriptComponent() = default;
         ScriptComponent(entt::entity entityRef) : entity(entityRef) {}
 
-        // Cargar múltiples scripts Lua usando ImportLUA_ScriptData
         void AddLuaScript(const ImportLUA_ScriptData& scriptData);
+
         bool HasLuaScripts() const { return !luaScriptsData.empty(); }
+
         const std::vector<ImportLUA_ScriptData>& GetLuaScriptsData() const { return luaScriptsData; }
+
         void RemoveLuaScript(const std::string& scriptName);
 
-        // Obtener los valores de exposedVars de un script específico
+
+        entt::entity GetEntity() const { return entity; }
+
         std::unordered_map<std::string, sol::object> GetExposedVars(const std::string& scriptName) const;
 
         // Establecer los valores de exposedVars de un script específico
