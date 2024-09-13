@@ -8,14 +8,6 @@ namespace libCore
 {
     void ScriptComponent::SetLuaScript(const ImportLUA_ScriptData& scriptData) {
         luaScriptData = scriptData;
-
-        // Verificar si el script ya está cargado antes de pedir a LuaManager que lo cargue
-        //if (!LuaManager::GetInstance().IsScriptLoaded(luaScriptData.name)) {
-        //    LuaManager::GetInstance().LoadLuaFile(luaScriptData.name, luaScriptData.filePath);
-        //}
-
-        // Obtener y almacenar la referencia al estado Lua cargado por LuaManager
-        //sol::state& luaState = LuaManager::GetInstance().GetLuaState(luaScriptData.name);
         scriptAssigned = true;
     }
     //-------------------------------------------------------------------------------------------------------------------------
@@ -40,4 +32,45 @@ namespace libCore
         }
     }
     //-------------------------------------------------------------------------------------------------------------------------
+
+    // Obtener los valores de exposedVars
+    std::unordered_map<std::string, sol::object> ScriptComponent::GetExposedVars() const {
+        sol::state& lua = LuaManager::GetInstance().GetLuaState(luaScriptData.name);
+        sol::table exposedVars = lua["exposedVars"];
+
+        std::unordered_map<std::string, sol::object> vars;
+
+        if (exposedVars.valid()) {
+            for (auto& pair : exposedVars) {
+                std::string varName = pair.first.as<std::string>();
+                sol::object varValue = pair.second;
+                vars[varName] = varValue;  // Guardar los valores actuales
+            }
+        }
+        return vars;
+    }
+
+    void ScriptComponent::SetExposedVars(const std::unordered_map<std::string, sol::object>& vars) {
+        sol::state& lua = LuaManager::GetInstance().GetLuaState(luaScriptData.name);
+        sol::table exposedVars = lua["exposedVars"];
+
+        if (exposedVars.valid()) {
+            for (const auto& [varName, varValue] : vars) {
+                // Asegurarse de que el valor correcto se asigna a la tabla
+                if (varValue.is<float>()) {
+                    exposedVars[varName] = varValue.as<float>();
+                }
+                else if (varValue.is<int>()) {
+                    exposedVars[varName] = varValue.as<int>();
+                }
+                else if (varValue.is<bool>()) {
+                    exposedVars[varName] = varValue.as<bool>();
+                }
+                else if (varValue.is<std::string>()) {
+                    exposedVars[varName] = varValue.as<std::string>();
+                }
+            }
+        }
+    }
+
 }

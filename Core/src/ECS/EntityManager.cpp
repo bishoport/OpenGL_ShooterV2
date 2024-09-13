@@ -298,6 +298,20 @@ namespace libCore
             dstAABB.aabb->CalculateAABB(srcMesh.mesh->vertices);
         }
 
+        //if (HasComponent<ScriptComponent>(entity)) {
+        //    auto& srcScript = GetComponent<ScriptComponent>(entity);
+        //    ImportLUA_ScriptData scriptData = srcScript.GetLuaScriptData();  // Obtener el script y sus datos
+
+        //    // Asignar el script al nuevo entity
+        //    auto& dstScript = AddComponent<ScriptComponent>(newEntity);
+        //    dstScript.SetLuaScript(scriptData);
+
+        //    // Copiar las exposedVars
+        //    auto srcExposedVars = srcScript.GetExposedVars();
+        //    dstScript.SetExposedVars(srcExposedVars);
+        //}
+
+
         return newEntity;
     }
     bool EntityManager::IsTagUsed(const std::string& tag)
@@ -381,6 +395,12 @@ namespace libCore
                 parentChildren.erase(std::remove(parentChildren.begin(), parentChildren.end(), entity), parentChildren.end());
             }
         }
+
+        if (HasComponent<ScriptComponent>(entity)) {
+            // Si tienes alguna limpieza especial para el script, hazla aquí
+            RemoveComponent<ScriptComponent>(entity);  // Elimina el ScriptComponent
+        }
+
 
         // Luego, eliminar la entidad actual
         DestroyEntity(entity);

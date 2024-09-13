@@ -1,7 +1,7 @@
 -- Tabla especial para las variables expuestas a ImGui
 exposedVars = {
-    width = 20,   -- Ancho de la matriz del suelo
-    height = 20,  -- Alto de la matriz del suelo
+    int_width = 20,   -- Ancho de la matriz del suelo
+    int_height = 20,  -- Alto de la matriz del suelo
     selectedModel = "assets/models/floor_tile.fbx"  -- Modelo de losa
 }
 
@@ -36,8 +36,8 @@ function Init()
     print("Lua Init function called for procedural floor generation MODIFIED")
 
     -- Iterar sobre la matriz para instanciar objetos según el valor de cada celda
-    for i = 1, exposedVars.height do
-        for j = 1, exposedVars.width do
+    for i = 1, exposedVars.int_height do
+        for j = 1, exposedVars.int_width do
             if floorMatrix[i][j] == 1 then
                 -- Crear entidad para losas en las posiciones donde hay un 1
                 local posX = i * 1.0  -- Escala de la posición X

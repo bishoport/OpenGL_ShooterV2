@@ -56,6 +56,7 @@ namespace libCore
         void DrawTexturesPanel();
 
         void DrawEditorCameraPanel();
+        void RenderLuaScriptPanel();
 
         void DrawModelHierarchy(const Ref<libCore::Model>& model);
         void DrawMeshWithThumbnail(const Ref<Mesh>& mesh, const std::string& modelPath);

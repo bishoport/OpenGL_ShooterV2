@@ -17,7 +17,7 @@ LUA_Scripts:
 Entities:
   - Entity: 0
     IDComponent:
-      ID: 3e70f07df3480c06
+      ID: 5c50f2af459ac54e
       MarkToDelete: false
     TagComponent:
       Tag: new_GameObject
@@ -39,3 +39,7 @@ Entities:
       ScriptData:
         filePath: assets\scripts\Tablero.lua
         name: Tablero
+      ExposedVars:
+        int_height: 10
+        selectedModel: assets\models\Turbina\turbina.fbx
+        int_width: 10

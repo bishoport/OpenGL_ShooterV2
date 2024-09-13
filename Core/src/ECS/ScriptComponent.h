@@ -24,6 +24,12 @@ namespace libCore
         const ImportLUA_ScriptData& GetLuaScriptData() const { return luaScriptData; }  // Getter para el struct completo
         void RemoveLuaScript() { this->luaScriptData.name.clear(); }
 
+        // Obtener los valores de exposedVars
+        std::unordered_map<std::string, sol::object> GetExposedVars() const;
+
+        // Establecer los valores de exposedVars
+        void SetExposedVars(const std::unordered_map<std::string, sol::object>& exposedVars);
+
         //--LIFE CYCLE
         void Init();
         void Update(float deltaTime);

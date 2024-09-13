@@ -189,6 +189,7 @@ namespace libCore
             DrawModelsPanel();
             DrawLogPanel();
             DrawEditorCameraPanel();
+            RenderLuaScriptPanel();
             //RenderCheckerMatrix(); //Panel para el editor de roofs
 
             Renderer::getInstance().ShowControlsGUI();
@@ -807,14 +808,13 @@ namespace libCore
             }
             //--SCRIPT_COMPONENT
             if (EntityManager::GetInstance().HasComponent<ScriptComponent>(selectedEntity)) {
-                
+
                 auto& scriptComponent = EntityManager::GetInstance().GetComponent<ScriptComponent>(selectedEntity);
 
                 if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen)) {
-                   
+
                     // Si ya tiene un script asignado, mostrar el nombre del script y el botón para eliminarlo
-                    if (scriptComponent.HasLuaScript())
-                    {
+                    if (scriptComponent.HasLuaScript()) {
                         ImGui::Text("Assigned Script: %s", scriptComponent.GetLuaScriptName().c_str());
 
                         if (ImGui::Button("Reload Script")) {
@@ -835,18 +835,19 @@ namespace libCore
                             std::string varName = kvp.first.as<std::string>();  // Nombre de la variable
                             sol::object varValue = kvp.second;                  // Valor de la variable
 
-                            // Soporte para tipo 'float'
-                            if (varValue.is<float>()) {
-                                float value = varValue.as<float>();
-                                if (ImGui::SliderFloat(varName.c_str(), &value, 0.0f, 10.0f)) { // Rango ajustable para floats
-                                    exposedVars[varName] = value;  // Actualizar el valor en Lua
+                            // Soporte para variables con prefijo "int_" que son enteros
+                            if (varName.rfind("int_", 0) == 0) {
+                                // Sin la verificación de tipo, asumimos que es un entero basado en el prefijo
+                                int value = static_cast<int>(varValue.as<float>());  // Cast float a int si Lua lo maneja como float
+                                if (ImGui::SliderInt(varName.c_str(), &value, 0, 100)) { // Ajustar el rango si es necesario
+                                    exposedVars[varName] = value;  // Actualizar el valor en Lua como entero
                                 }
                             }
 
-                            // Soporte para tipo 'int'
-                            else if (varValue.is<int>()) {
-                                int value = varValue.as<int>();
-                                if (ImGui::SliderInt(varName.c_str(), &value, 0, 100)) { // Rango ajustable para ints
+                            // Soporte para tipo 'float'
+                            else if (varValue.is<float>()) {
+                                float value = varValue.as<float>();
+                                if (ImGui::SliderFloat(varName.c_str(), &value, 0.0f, 10.0f)) { // Rango ajustable para floats
                                     exposedVars[varName] = value;  // Actualizar el valor en Lua
                                 }
                             }
@@ -880,15 +881,11 @@ namespace libCore
                                     {
                                         const char* droppedModelName = (const char*)payload->Data;
                                         strncpy_s(buffer, sizeof(buffer), droppedModelName, _TRUNCATE);  // Reemplazamos el valor con el nombre del modelo arrastrado
-                                        std::cout << "Model dropped: " << buffer << std::endl;
                                         exposedVars[varName] = std::string(buffer);  // Actualizar el valor en Lua con el modelo arrastrado
                                     }
                                     ImGui::EndDragDropTarget();
                                 }
                             }
-
-
-
 
                             // Soporte para tipo 'glm::vec3' representado como una tabla Lua
                             else if (varValue.is<sol::table>()) {
@@ -946,9 +943,7 @@ namespace libCore
 
                             selectedScript.clear();  // Limpia la selección después de asignar
                         }
-
                     }
-
                 }
             }
         }
@@ -1229,7 +1224,6 @@ namespace libCore
 
         ImGui::End();
     }
-
     //-----------------------------------------------------------------------------------------------------
 
 
@@ -1797,7 +1791,59 @@ namespace libCore
     }
     //-----------------------------------------------------------------------------------------------------
 
+    //--LUAS PANEL
+    void GuiLayer::RenderLuaScriptPanel() {
+        ImGui::Begin("Lua Script Manager");
 
+        // Obtener la lista de scripts cargados desde LuaManager
+        auto loadedScripts = LuaManager::GetInstance().GetLoadedScripts();
+
+        if (loadedScripts.empty()) {
+            ImGui::Text("No Lua scripts loaded.");
+        }
+        else {
+            ImGui::Text("Loaded Lua Scripts:");
+
+            // Crear una tabla con dos columnas: nombre y acciones
+            if (ImGui::BeginTable("LuaScriptsTable", 3)) {
+                ImGui::TableSetupColumn("Script Name");
+                ImGui::TableSetupColumn("Script Path");
+                ImGui::TableSetupColumn("Actions");
+                ImGui::TableHeadersRow();
+
+                // Iterar sobre los scripts cargados
+                for (const auto& scriptData : loadedScripts) {
+                    ImGui::TableNextRow();
+
+                    // Mostrar el nombre del script
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::Text(scriptData.name.c_str());
+
+                    // Mostrar el path del script
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::Text(scriptData.filePath.c_str());
+
+                    // Crear el botón "Run Script" para ejecutar el script
+                    ImGui::TableSetColumnIndex(2);
+                    if (ImGui::Button(("Run " + scriptData.name).c_str())) {
+                        // Ejecutar el script al presionar el botón
+                        try {
+                            LuaManager::GetInstance().GetLuaState(scriptData.name).script_file(scriptData.filePath);
+                            ImGui::Text("Script executed successfully!");
+                        }
+                        catch (const sol::error& e) {
+                            ImGui::TextColored(ImVec4(1, 0, 0, 1), "Error: %s", e.what());
+                        }
+                    }
+                }
+
+                ImGui::EndTable();
+            }
+        }
+
+        ImGui::End();
+    }
+    //-----------------------------------------------------------------------------------------------------
 
 
     //Especial para el editor de Roofs

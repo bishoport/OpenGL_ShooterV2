@@ -56,5 +56,6 @@
     <None Include="assets\shaders\frustum.frag" />
     <None Include="assets\scripts\TransformTest.lua" />
     <None Include="assets\scripts\Tablero.lua" />
+    <None Include="assets\scripts\HelloWorld.lua" />
   </ItemGroup>
 </Project>
