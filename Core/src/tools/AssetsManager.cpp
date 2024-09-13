@@ -65,7 +65,6 @@ namespace libCore
 			//std::string key = importModelData.filePath + importModelData.fileName;
 			std::string key = model->name;
 			loadedModels[key] = model;
-			model->key_stored = key;
 			ThumbnailGenerator::GenerateThumbnail(model);
 		}
 		else 

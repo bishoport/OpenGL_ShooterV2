@@ -68,7 +68,9 @@ namespace libCore {
             "GetRotation", &EntityManagerBridge::GetRotation,
             "SetRotation", &EntityManagerBridge::SetRotation,
             "GetScale", &EntityManagerBridge::GetScale,
-            "SetScale", &EntityManagerBridge::SetScale
+            "SetScale", &EntityManagerBridge::SetScale,
+
+            "AddChild", & EntityManagerBridge::AddChild
         );
 
         static EntityManagerBridge entityManagerBridge;

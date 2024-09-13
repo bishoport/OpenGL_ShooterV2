@@ -18,11 +18,8 @@ namespace libCore
 
         // Cargar múltiples scripts Lua usando ImportLUA_ScriptData
         void AddLuaScript(const ImportLUA_ScriptData& scriptData);
-
         bool HasLuaScripts() const { return !luaScriptsData.empty(); }
-
         const std::vector<ImportLUA_ScriptData>& GetLuaScriptsData() const { return luaScriptsData; }
-
         void RemoveLuaScript(const std::string& scriptName);
 
         // Obtener los valores de exposedVars de un script específico

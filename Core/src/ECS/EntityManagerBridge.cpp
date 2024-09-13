@@ -77,4 +77,10 @@ namespace libCore
     }
     //----------------------------------------------------------------------------------------------
 
+    //--
+    void libCore::EntityManagerBridge::AddChild(entt::entity parent, entt::entity child)
+    {
+        EntityManager::GetInstance().AddChild(parent, child);
+    }
+
 }

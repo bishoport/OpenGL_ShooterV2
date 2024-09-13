@@ -1,0 +1,43 @@
+Scene: Untitled
+Models:
+  - ModelName: Hero_kit_1.gltf
+    ImportModelData:
+      filePath: assets\models\Hero_Quest\
+      fileName: Hero_kit_1.gltf
+      modelID: 0
+      invertUV: false
+      rotate90: false
+      skeletal: false
+      useCustomTransform: true
+      processLights: false
+      globalScaleFactor: 1
+Entities:
+  - Entity: 0
+    IDComponent:
+      ID: f32aac805fb63287
+      MarkToDelete: false
+    TagComponent:
+      Tag: new_GameObject
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 0
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ScriptComponent:
+      Scripts:
+        - filePath: assets\scripts\Tablero.lua
+          name: Tablero
+      ExposedVars:
+        Tablero:
+          selectedModel: Tile_floor
+          int_width: 26
+          int_height: 19

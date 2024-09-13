@@ -28,5 +28,7 @@ namespace libCore {
         std::tuple<float, float, float> GetScale(entt::entity entity);
         void SetScale(entt::entity entity, float x, float y, float z);
         //----------------------------------------------------------------------------------------
+
+        void AddChild(entt::entity parent, entt::entity child);
     };
 }

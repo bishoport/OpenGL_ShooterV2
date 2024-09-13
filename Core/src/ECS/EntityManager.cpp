@@ -501,7 +501,9 @@ namespace libCore
             auto& material = view.get<MaterialComponent>(entity);
             auto& aabb = view.get<AABBComponent>(entity).aabb;
 
-            if (EngineOpenGL::GetInstance().CheckAABBInFrustum(aabb->minBounds, aabb->maxBounds))
+            DrawOneGameObject(transform, mesh, material, shader);
+
+            /*if (EngineOpenGL::GetInstance().CheckAABBInFrustum(aabb->minBounds, aabb->maxBounds))
             {
                 mesh.renderable = true;
                 DrawOneGameObject(transform, mesh, material, shader);
@@ -509,7 +511,7 @@ namespace libCore
             else
             {
                 mesh.renderable = false;
-            }
+            }*/
         }
     }
     void EntityManager::DrawOneGameObject(TransformComponent& transformComponent, MeshComponent& meshComponent, MaterialComponent& materialComponent, const std::string& shader)
