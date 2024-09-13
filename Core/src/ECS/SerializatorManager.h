@@ -10,13 +10,11 @@
 #include "../Core/Material.h"
 #include "../Core/Texture.h"
 #include "../Core/Mesh.h"
-//#include "../Core/Camera.h"
-#include "ECS.h"
+#include "../Scripting/LuaManager.h"
 
 // YAML Conversion Specializations
 namespace YAML 
 {
-
     //--Vector3
     template<>
     struct convert<glm::vec3> {
@@ -146,6 +144,8 @@ namespace YAML
     };
 
 
+
+    //--ImportModelData
     template<>
     struct convert<ImportModelData> {
         static Node encode(const ImportModelData& rhs) {
@@ -168,7 +168,7 @@ namespace YAML
             }
             rhs.filePath = node["filePath"].as<std::string>();
             rhs.fileName = node["fileName"].as<std::string>();
-            rhs.modelID = node["modelID"].as<int>();
+            rhs.modelID  = node["modelID"].as<int>();
             rhs.invertUV = node["invertUV"].as<bool>();
             rhs.rotate90 = node["rotate90"].as<bool>();
             rhs.skeletal = node["skeletal"].as<bool>();
@@ -178,6 +178,27 @@ namespace YAML
             return true;
         }
     };
+
+    //--ImportLUA_ScriptData YAML specialization
+    template<>
+    struct convert<ImportLUA_ScriptData> {
+        static Node encode(const ImportLUA_ScriptData& rhs) {
+            Node node;
+            node["filePath"] = rhs.filePath;
+            node["name"] = rhs.name;
+            return node;
+        }
+
+        static bool decode(const Node& node, ImportLUA_ScriptData& rhs) {
+            if (!node["filePath"] || !node["name"]) {
+                return false;
+            }
+            rhs.filePath = node["filePath"].as<std::string>();
+            rhs.name = node["name"].as<std::string>();
+            return true;
+        }
+    };
+    
 }
 
 
@@ -192,7 +213,6 @@ namespace libCore {
         node["Transform"] = *transformComponent.transform;
         return node;
     }
-
     TransformComponent DeserializeTransformComponent(const YAML::Node& node) {
         TransformComponent transformComponent;
         transformComponent.transform = CreateRef<Transform>(node["Transform"].as<Transform>());
@@ -200,7 +220,7 @@ namespace libCore {
         // La función 'as<Transform>()' ya maneja la actualización del cuaternión desde los ángulos de Euler.
         return transformComponent;
     }
-
+    //--------------------
 
     //--MaterialComponent
     YAML::Node SerializeMaterialComponent(const MaterialComponent& materialComponent) {
@@ -225,7 +245,6 @@ namespace libCore {
 
         return node;
     }
-
     MaterialComponent DeserializeMaterialComponent(const YAML::Node& node) {
         MaterialComponent materialComponent;
         materialComponent.material = CreateRef<Material>();
@@ -254,7 +273,7 @@ namespace libCore {
 
         return materialComponent;
     }
-
+    //--------------------
 
 
     //--MeshComponent
@@ -263,12 +282,12 @@ namespace libCore {
         node["MeshName"] = meshComponent.mesh->meshName;
         return node;
     }
-
     MeshComponent DeserializeMeshComponent(const YAML::Node& node) {
         MeshComponent meshComponent;
         meshComponent.mesh = AssetsManager::GetInstance().GetMesh(node["MeshName"].as<std::string>());
         return meshComponent;
     }
+    //--------------------
 
     //--AABBComponent
     YAML::Node SerializeAABBComponent(const AABBComponent& aabbComponent) {
@@ -277,14 +296,14 @@ namespace libCore {
         node["AABBMax"] = aabbComponent.aabb->maxBounds;
         return node;
     }
-
     AABBComponent DeserializeAABBComponent(const YAML::Node& node) {
         AABBComponent aabbComponent;
         aabbComponent.aabb->minBounds = node["AABBMin"].as<glm::vec3>();
         aabbComponent.aabb->maxBounds = node["AABBMax"].as<glm::vec3>();
         return aabbComponent;
     }
-    
+    //--------------------
+
     //--MODEL Component
     YAML::Node SerializeModel(const Ref<Model>& model) {
         YAML::Node node;
@@ -292,7 +311,6 @@ namespace libCore {
         node["ImportModelData"] = model->importModelData;
         return node;
     }
-
     YAML::Node SerializeAllModels() {
         YAML::Node node;
         for (const auto& pair : AssetsManager::GetInstance().GetAllModels()) {
@@ -300,8 +318,6 @@ namespace libCore {
         }
         return node;
     }
-
-
     Ref<Model> DeserializeModel(const YAML::Node& node) {
         std::string modelName = node["ModelName"].as<std::string>();
         ImportModelData importData = node["ImportModelData"].as<ImportModelData>();
@@ -313,13 +329,12 @@ namespace libCore {
 
         return AssetsManager::GetInstance().GetModel(modelName);
     }
-
     void DeserializeAllModels(const YAML::Node& node) {
         for (const auto& modelNode : node) {
             DeserializeModel(modelNode);
         }
     }
-
+    //--------------------
 
    
 
@@ -330,13 +345,13 @@ namespace libCore {
         node["MarkToDelete"] = idComponent.markToDelete;
         return node;
     }
-
     IDComponent DeserializeIDComponent(const YAML::Node& node) {
         IDComponent idComponent;
         idComponent.ID = node["ID"].as<UUID>();
         idComponent.markToDelete = node["MarkToDelete"].as<bool>();
         return idComponent;
     }
+    //--------------------
 
     //--TagComponent
     YAML::Node SerializeTagComponent(const TagComponent& tagComponent) {
@@ -344,30 +359,86 @@ namespace libCore {
         node["Tag"] = tagComponent.Tag;
         return node;
     }
-
     TagComponent DeserializeTagComponent(const YAML::Node& node) {
         TagComponent tagComponent;
         tagComponent.Tag = node["Tag"].as<std::string>();
         return tagComponent;
     }
+    //--------------------
+
+
+
 
     //--ScriptComponent
-    YAML::Node SerializeScriptComponent(const ScriptComponent& scriptComponent) {
+    YAML::Node SerializeLUA_Script(const ImportLUA_ScriptData& scriptData) {
         YAML::Node node;
-        node["ScriptName"] = scriptComponent.GetLuaScriptName();  // Serializar el nombre del script
+        node["filePath"] = scriptData.filePath;
+        node["name"] = scriptData.name;
         return node;
     }
 
+    YAML::Node SerializeAllLUAScripts() {
+        YAML::Node node;
+        auto loadedScripts = LuaManager::GetInstance().GetLoadedScripts();
+        for (const auto& scriptData : loadedScripts) {
+            node.push_back(SerializeLUA_Script(scriptData));
+        }
+        return node;
+    }
+
+    void DeserializeAllLUAScripts(const YAML::Node& node) {
+        for (const auto& scriptNode : node) {
+            ImportLUA_ScriptData scriptData;
+            scriptData.filePath = scriptNode["filePath"].as<std::string>();
+            scriptData.name = scriptNode["name"].as<std::string>();
+            LuaManager::GetInstance().LoadLuaFile(scriptData.name, scriptData.filePath);
+        }
+    }
+
+    YAML::Node SerializeScriptComponent(const ScriptComponent& scriptComponent) {
+        YAML::Node node;
+        ImportLUA_ScriptData scriptData = scriptComponent.GetLuaScriptData();  // Recuperamos el struct completo
+        node["ScriptData"] = scriptData;  // Serializamos usando la especialización de YAML para ImportLUA_ScriptData
+        return node;
+    }
 
     ScriptComponent DeserializeScriptComponent(const YAML::Node& node) {
         ScriptComponent scriptComponent;
 
-        // Recuperar el nombre del script y asignarlo al componente
-        std::string scriptName = node["ScriptName"].as<std::string>();
-        scriptComponent.SetLuaScript(scriptName);
+        // Recuperamos el struct completo desde el YAML
+        ImportLUA_ScriptData scriptData = node["ScriptData"].as<ImportLUA_ScriptData>();
+
+        // Asignamos el script deserializado al ScriptComponent
+        scriptComponent.SetLuaScript(scriptData);
 
         return scriptComponent;
     }
 
 
+
+    //YAML::Node SerializeScriptComponent(const ScriptComponent& scriptComponent) {
+    //    YAML::Node node;
+    //    node["ScriptName"] = scriptComponent.GetLuaScriptName();  // Serializar el nombre del script
+    //    return node;
+    //}
+    //ScriptComponent DeserializeScriptComponent(const YAML::Node& node) {
+    //    ScriptComponent scriptComponent;
+
+    //    // Recuperar el nombre del script y asignarlo al componente
+    //    std::string scriptName = node["ScriptName"].as<std::string>();
+    //    scriptComponent.SetLuaScript(scriptName);
+
+    //    return scriptComponent;
+    //}
+    //void DeserializeAllScripts(const YAML::Node& node) {
+    //    if (node["LUA_Scripts"]) {
+    //        for (const auto& scriptNode : node["LUA_Scripts"]) {
+    //            std::string fileName = scriptNode["ScriptName"].as<std::string>();
+    //            std::string filePath = scriptNode["FilePath"].as<std::string>();
+
+    //            LuaManager::GetInstance().LoadLuaFile(fileName, filePath);
+    //        }
+    //    }
+    //}
+    //--------------------
 }

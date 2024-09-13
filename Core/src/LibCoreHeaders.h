@@ -90,6 +90,11 @@ struct ImportModelData {
 	float globalScaleFactor = 1.0f; // Ajusta según tus necesidades
 };
 
+struct ImportLUA_ScriptData {
+	std::string filePath = "";
+	std::string name = "";
+};
+
 
 struct ImageData {
 	unsigned char* data;

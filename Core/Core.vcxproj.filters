@@ -105,9 +105,6 @@
     <ClInclude Include="src\tools\ModelLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\ECS.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\FBO.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

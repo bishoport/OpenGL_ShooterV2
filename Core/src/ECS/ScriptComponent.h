@@ -6,6 +6,7 @@
 #include <memory>
 #include <iostream>
 #include <sol/sol.hpp>
+#include "../Scripting/LuaManager.h"  // Incluir el struct ImportLUA_ScriptData
 
 namespace libCore
 {
@@ -14,12 +15,14 @@ namespace libCore
         ScriptComponent() = default;
         ScriptComponent(entt::entity entityRef) : entity(entityRef) {}
 
-        void SetLuaScript(const std::string& scriptName);
-        bool HasLuaScript() const { return scriptAssigned; }
-        const std::string& GetLuaScriptName() const { return luaScriptName; }
-        void RemoveLuaScript() { this->luaScriptName.clear(); }
+        // Cargar el script Lua usando ImportLUA_ScriptData
+        void SetLuaScript(const ImportLUA_ScriptData& scriptData);
 
-        void RegisterClasses();
+        bool HasLuaScript() const { return scriptAssigned; }
+        const std::string& GetLuaScriptName() const { return luaScriptData.name; }
+        const std::string& GetLuaScriptPath() const { return luaScriptData.filePath; }
+        const ImportLUA_ScriptData& GetLuaScriptData() const { return luaScriptData; }  // Getter para el struct completo
+        void RemoveLuaScript() { this->luaScriptData.name.clear(); }
 
         //--LIFE CYCLE
         void Init();
@@ -27,7 +30,7 @@ namespace libCore
 
     private:
         entt::entity entity;
-        std::string luaScriptName;
+        ImportLUA_ScriptData luaScriptData;  // Cambiado a ImportLUA_ScriptData para más control
         bool scriptAssigned = false;
     };
 }

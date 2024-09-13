@@ -8,7 +8,9 @@
 #include "../ECS/EntityManagerBridge.h" // Incluir el bridge
 
 namespace libCore {
+
     class LuaManager {
+
     public:
         // Singleton
         static LuaManager& GetInstance() {
@@ -29,13 +31,13 @@ namespace libCore {
         bool IsScriptLoaded(const std::string& scriptName) const;
 
         // Obtener lista de scripts cargados
-        std::vector<std::string> GetLoadedScripts() const;
+        std::vector<ImportLUA_ScriptData> GetLoadedScripts() const;
 
     private:
         LuaManager() {}
         ~LuaManager() {}
 
-        // Diccionario para almacenar los estados de los scripts Lua
-        std::unordered_map<std::string, std::unique_ptr<sol::state>> scripts;
+        // Diccionario para almacenar los estados de los scripts Lua junto con su información
+        std::unordered_map<std::string, std::pair<ImportLUA_ScriptData, std::unique_ptr<sol::state>>> scripts;
     };
 }

@@ -1,0 +1,41 @@
+Scene: Untitled
+Models:
+  - ModelName: turbina.fbx
+    ImportModelData:
+      filePath: assets\models\Turbina\
+      fileName: turbina.fbx
+      modelID: 0
+      invertUV: false
+      rotate90: false
+      skeletal: false
+      useCustomTransform: true
+      processLights: false
+      globalScaleFactor: 0.100000001
+LUA_Scripts:
+  - filePath: assets\scripts\Tablero.lua
+    name: Tablero
+Entities:
+  - Entity: 0
+    IDComponent:
+      ID: 3e70f07df3480c06
+      MarkToDelete: false
+    TagComponent:
+      Tag: new_GameObject
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 0
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ScriptComponent:
+      ScriptData:
+        filePath: assets\scripts\Tablero.lua
+        name: Tablero

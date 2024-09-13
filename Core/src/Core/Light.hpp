@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../LibCoreHeaders.h"
-#include "../ECS/ECS.h"
+
 
 namespace libCore
 {

@@ -45,7 +45,6 @@
     <ClInclude Include="src\Core\Viewport.hpp" />
     <ClInclude Include="src\Core\ViewportManager.hpp" />
     <ClInclude Include="src\ECS\Components.h" />
-    <ClInclude Include="src\ECS\ECS.h" />
     <ClInclude Include="src\ECS\EntityManager.h" />
     <ClInclude Include="src\ECS\EntityManagerBridge.h" />
     <ClInclude Include="src\ECS\ScriptComponent.h" />

@@ -906,22 +906,21 @@ namespace libCore
                             }
                         }
                     }
-
                     else {
                         // Si no tiene un script asignado, mostrar el combo box para asignar uno
                         const auto loadedScripts = LuaManager::GetInstance().GetLoadedScripts();
                         static std::string selectedScript;
-                        std::vector<std::string> scriptNames;
+                        std::vector<ImportLUA_ScriptData> scriptDataList;
 
-                        for (const auto& scriptName : loadedScripts) {
-                            scriptNames.push_back(scriptName);
+                        for (const auto& scriptData : loadedScripts) {
+                            scriptDataList.push_back(scriptData);
                         }
 
                         if (ImGui::BeginCombo("Scripts", selectedScript.c_str())) {
-                            for (const auto& scriptName : scriptNames) {
-                                bool isSelected = (selectedScript == scriptName);
-                                if (ImGui::Selectable(scriptName.c_str(), isSelected)) {
-                                    selectedScript = scriptName;
+                            for (const auto& scriptData : scriptDataList) {
+                                bool isSelected = (selectedScript == scriptData.name);
+                                if (ImGui::Selectable(scriptData.name.c_str(), isSelected)) {
+                                    selectedScript = scriptData.name;
                                 }
                                 if (isSelected) {
                                     ImGui::SetItemDefaultFocus();
@@ -932,11 +931,19 @@ namespace libCore
 
                         // Botón para asignar el script seleccionado
                         if (ImGui::Button("Assign Script")) {
-                            // Asigna el script seleccionado al ScriptComponent
-                            scriptComponent.SetLuaScript(selectedScript);
+                            // Buscar el script seleccionado en scriptDataList
+                            auto it = std::find_if(scriptDataList.begin(), scriptDataList.end(),
+                                [&](const ImportLUA_ScriptData& data) { return data.name == selectedScript; });
+
+                            if (it != scriptDataList.end()) {
+                                // Asignar el script seleccionado al ScriptComponent con ruta y nombre
+                                scriptComponent.SetLuaScript(*it);
+                            }
+
                             selectedScript.clear();  // Limpia la selección después de asignar
                         }
                     }
+
                 }
             }
         }

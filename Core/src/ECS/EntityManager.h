@@ -41,6 +41,7 @@ namespace libCore
         void MarkToDeleteRecursively(entt::entity entity);
         void DestroyEntity(entt::entity entity);
         void DestroyEntityRecursively(entt::entity entity);
+        void DestroyAllEntities();
 
         void InitScripts();
         void UpdateScripts(Timestep deltaTime);

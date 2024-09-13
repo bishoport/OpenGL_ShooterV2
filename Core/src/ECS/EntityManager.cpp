@@ -59,6 +59,37 @@ namespace libCore
     //------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------
 
+    //--ACCESOS
+    entt::entity EntityManager::GetEntityByUUID(const std::string& uuid) {
+        // Imprime el UUID que estás buscando
+        std::cout << "Buscando entidad con UUID: " << uuid << std::endl;
+
+        auto view = m_registry->view<IDComponent>();
+        for (auto entity : view) {
+            auto& idComponent = view.get<IDComponent>(entity);
+            std::string entityUUID = idComponent.ID.ToString();
+
+            // Imprime cada UUID que se está revisando
+            std::cout << "Revisando entidad con UUID: " << entityUUID << " (Entity ID: " << static_cast<uint32_t>(entity) << ")" << std::endl;
+
+            if (entityUUID == uuid) {
+                std::cout << "ENTITY_MANAGER -> Se encontró la entidad. Direccion de m_Entity: " << static_cast<uint32_t>(entity) << std::endl;
+                return entity;
+            }
+        }
+
+        // Si no se encontró la entidad, imprime un mensaje
+        std::cerr << "ENTITY_MANAGER -> No se encontró ninguna entidad con UUID: " << uuid << std::endl;
+
+        return entt::null; // Retorna null si no se encuentra la entidad
+    }
+    entt::registry* EntityManager::GetRegistry() {
+        assert(m_registry.get() != nullptr && "m_registry debe estar inicializado");
+        return m_registry.get();
+    }
+    //------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------
+
 
     //--CREADOR DE ENTITIES
     entt::entity EntityManager::CreateEmptyGameObject(const std::string& name) {
@@ -168,40 +199,6 @@ namespace libCore
     }
     //------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------
-
-
-    //--ACCESOS
-    entt::entity EntityManager::GetEntityByUUID(const std::string& uuid) {
-        // Imprime el UUID que estás buscando
-        std::cout << "Buscando entidad con UUID: " << uuid << std::endl;
-
-        auto view = m_registry->view<IDComponent>();
-        for (auto entity : view) {
-            auto& idComponent = view.get<IDComponent>(entity);
-            std::string entityUUID = idComponent.ID.ToString();
-
-            // Imprime cada UUID que se está revisando
-            std::cout << "Revisando entidad con UUID: " << entityUUID << " (Entity ID: " << static_cast<uint32_t>(entity) << ")" << std::endl;
-
-            if (entityUUID == uuid) {
-                std::cout << "ENTITY_MANAGER -> Se encontró la entidad. Direccion de m_Entity: " << static_cast<uint32_t>(entity) << std::endl;
-                return entity;
-            }
-        }
-
-        // Si no se encontró la entidad, imprime un mensaje
-        std::cerr << "ENTITY_MANAGER -> No se encontró ninguna entidad con UUID: " << uuid << std::endl;
-
-        return entt::null; // Retorna null si no se encuentra la entidad
-    }
-    entt::registry* EntityManager::GetRegistry() {
-        assert(m_registry.get() != nullptr && "m_registry debe estar inicializado");
-        return m_registry.get();
-    }
-
-    //------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------
-
 
     //--DUPLICATE
     void EntityManager::DuplicateEntity()
@@ -336,7 +333,6 @@ namespace libCore
     //------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------
 
-
     //--DESTROY
     void EntityManager::MarkToDeleteRecursively(entt::entity entity)
     {
@@ -389,6 +385,21 @@ namespace libCore
         // Luego, eliminar la entidad actual
         DestroyEntity(entity);
     }
+    void EntityManager::DestroyAllEntities()
+    {
+        // Primero, marcar todas las entidades para ser eliminadas
+        m_registry->each([this](auto entity) {
+            MarkToDeleteRecursively(entity);  // Marca todas las entidades para ser eliminadas
+            });
+
+        // Ahora eliminar recursivamente todas las entidades
+        m_registry->each([this](auto entity) {
+            DestroyEntityRecursively(entity);  // Elimina todas las entidades y sus hijos
+            });
+
+        // Después de eliminar las entidades, limpia el registro de cualquier entidad residual
+        m_registry->clear();
+    }
     //------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------
 
@@ -397,8 +408,6 @@ namespace libCore
     //--INIT SCRIPTS Components
     void EntityManager::RegisterScripts() 
     {
-        //ScriptFactory::GetInstance().RegisterScript<CameraControllerFPS>("CameraControllerFPS");
-        //ScriptFactory::GetInstance().RegisterScript<MyScript>("MyScript");
     }
     void EntityManager::InitScripts() 
     {

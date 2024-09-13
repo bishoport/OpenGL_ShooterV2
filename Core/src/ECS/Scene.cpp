@@ -4,7 +4,7 @@
 #include "../Core/Transform.h"
 #include "../Core/Material.h"
 #include "SerializatorManager.h"
-
+#include "../Scripting/LuaManager.h"
 
 namespace libCore
 {
@@ -33,7 +33,26 @@ namespace libCore
         out << YAML::Key << "Scene" << YAML::Value << "Untitled";
 
         // Serializar los modelos cargados en memoria
-        out << YAML::Key << "Models" << YAML::Value << SerializeAllModels();
+        auto models = SerializeAllModels();
+        if (models.size() > 0) {
+            out << YAML::Key << "Models" << YAML::Value << models;
+        }
+        else {
+            out << YAML::Key << "Models" << YAML::Value << YAML::BeginSeq << YAML::EndSeq; // Lista vacía
+        }
+
+
+        // Serializar los scripts LUA cargados
+        auto luaScripts = SerializeAllLUAScripts(); // Llamada similar a SerializeAllModels
+        if (luaScripts.size() > 0) {
+            out << YAML::Key << "LUA_Scripts" << YAML::Value << luaScripts;
+        }
+        else {
+            out << YAML::Key << "LUA_Scripts" << YAML::Value << YAML::BeginSeq << YAML::EndSeq; // Lista vacía
+        }
+
+
+
 
         out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 
@@ -106,9 +125,6 @@ namespace libCore
         std::ofstream fout("assets/Scenes/" + sceneName + ".yaml");
         fout << out.c_str();
     }
-
-
-
     void Scene::DeserializeScene(std::string _sceneName) {
 
         YAML::Node data = YAML::LoadFile("assets/Scenes/" + _sceneName + ".yaml");
@@ -119,6 +135,11 @@ namespace libCore
         // Deserializar los modelos cargados en memoria
         if (data["Models"]) {
             DeserializeAllModels(data["Models"]);
+        }
+
+        // Deserializar scripts Lua
+        if (data["LUA_Scripts"]) {
+            DeserializeAllLUAScripts(data["LUA_Scripts"]);
         }
 
         auto& entityManager = EntityManager::GetInstance();
@@ -198,6 +219,8 @@ namespace libCore
                     auto component = DeserializeScriptComponent(entityNode["ScriptComponent"]);
                     entityManager.m_registry->emplace_or_replace<ScriptComponent>(entity, component);
                 }
+
+
 
 
                 // Almacenar la correspondencia entre el ID de la entidad y la entidad creada
