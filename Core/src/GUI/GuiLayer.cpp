@@ -817,6 +817,10 @@ namespace libCore
                     {
                         ImGui::Text("Assigned Script: %s", scriptComponent.GetLuaScriptName().c_str());
 
+                        if (ImGui::Button("Reload Script")) {
+                            LuaManager::GetInstance().ReloadLuaFile(scriptComponent.GetLuaScriptName());
+                        }
+
                         sol::state& lua = LuaManager::GetInstance().GetLuaState(scriptComponent.GetLuaScriptName());
 
                         // Asegurarse de que la tabla 'exposedVars' existe en el script Lua
@@ -942,6 +946,7 @@ namespace libCore
 
                             selectedScript.clear();  // Limpia la selección después de asignar
                         }
+
                     }
 
                 }

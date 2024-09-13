@@ -1,3 +1,4 @@
+// LuaManager.cpp
 #include "LuaManager.h"
 #include "../ECS/EntityManagerBridge.h" // Incluir la clase de EntityManagerBridge
 
@@ -26,6 +27,32 @@ namespace libCore {
         }
         catch (const sol::error& e) {
             std::cerr << "Error loading Lua script: " << e.what() << std::endl;
+        }
+    }
+
+    // Función para recargar un script Lua en tiempo de ejecución
+    void LuaManager::ReloadLuaFile(const std::string& scriptName)
+    {
+        auto it = scripts.find(scriptName);
+        if (it != scripts.end()) {
+            const std::string& path = it->second.first.filePath;
+
+            auto luaState = std::make_unique<sol::state>();
+            luaState->open_libraries(sol::lib::base);
+            RegisterCommonFunctions(*luaState); // Registrar funciones comunes nuevamente
+
+            try {
+                luaState->script_file(path);  // Vuelve a cargar el archivo Lua
+                it->second.second = std::move(luaState);  // Reemplaza el estado Lua con el nuevo
+
+                std::cout << "Reloaded Lua script: " << scriptName << " from path: " << path << std::endl;
+            }
+            catch (const sol::error& e) {
+                std::cerr << "Error reloading Lua script: " << e.what() << std::endl;
+            }
+        }
+        else {
+            std::cerr << "Script not found to reload: " << scriptName << std::endl;
         }
     }
 

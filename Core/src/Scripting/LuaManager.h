@@ -1,3 +1,4 @@
+// LuaManager.h
 #pragma once
 #include "../LibCoreHeaders.h"
 #include <sol/sol.hpp>
@@ -5,7 +6,7 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include "../ECS/EntityManagerBridge.h" // Incluir el bridge
+#include "../ECS/EntityManagerBridge.h"
 
 namespace libCore {
 
@@ -20,6 +21,9 @@ namespace libCore {
 
         // Cargar un archivo Lua y almacenar su estado
         void LoadLuaFile(const std::string& scriptName, const std::string& path);
+
+        // Recargar un archivo Lua
+        void ReloadLuaFile(const std::string& scriptName);
 
         // Obtener el estado Lua por nombre de script
         sol::state& GetLuaState(const std::string& scriptName) const;

@@ -33,7 +33,7 @@ local floorMatrix = {
 
 -- Inicializar el suelo en función de la matriz
 function Init()
-    print("Lua Init function called for procedural floor generation")
+    print("Lua Init function called for procedural floor generation MODIFIED")
 
     -- Iterar sobre la matriz para instanciar objetos según el valor de cada celda
     for i = 1, exposedVars.height do
@@ -44,7 +44,7 @@ function Init()
                 local posZ = j * 1.0  -- Escala de la posición Z
 
                 local tileEntity = EntityManager:CreateEntityFromModel(exposedVars.selectedModel)
-                EntityManager:SetPosition(tileEntity, posX, 0.0, posZ)
+                EntityManager:SetPosition(tileEntity, posX, 3.0, posZ)
 
                 -- Almacenar cada entidad en una tabla si necesitas rastrearlas más tarde
                 --table.insert(modelEntities, tileEntity)
