@@ -11,13 +11,21 @@ Models:
       useCustomTransform: true
       processLights: false
       globalScaleFactor: 0.100000001
-LUA_Scripts:
-  - filePath: assets\scripts\Tablero.lua
-    name: Tablero
+  - ModelName: Robot.fbx
+    ImportModelData:
+      filePath: assets\models\Robot\
+      fileName: Robot.fbx
+      modelID: 0
+      invertUV: false
+      rotate90: false
+      skeletal: false
+      useCustomTransform: true
+      processLights: false
+      globalScaleFactor: 0.400000006
 Entities:
   - Entity: 0
     IDComponent:
-      ID: 5c50f2af459ac54e
+      ID: 34b1cd6092d9fad4
       MarkToDelete: false
     TagComponent:
       Tag: new_GameObject
@@ -36,10 +44,18 @@ Entities:
           - 1
           - 1
     ScriptComponent:
-      ScriptData:
-        filePath: assets\scripts\Tablero.lua
-        name: Tablero
+      Scripts:
+        - filePath: assets\scripts\Tablero.lua
+          name: Tablero
+        - filePath: assets\scripts\TransformTest.lua
+          name: TransformTest
       ExposedVars:
-        int_height: 10
-        selectedModel: assets\models\Turbina\turbina.fbx
-        int_width: 10
+        Tablero:
+          int_height: 2
+          int_width: 2
+          selectedModel: assets\models\Turbina\turbina.fbx
+        TransformTest:
+          scale: 1
+          selectedModel: assets\models\Robot\Robot.fbx
+          speed: 0
+          rotationSpeed: 30

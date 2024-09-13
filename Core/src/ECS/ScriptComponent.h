@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sol/sol.hpp>
 #include "../Scripting/LuaManager.h"  // Incluir el struct ImportLUA_ScriptData
+#include <vector>
 
 namespace libCore
 {
@@ -15,20 +16,23 @@ namespace libCore
         ScriptComponent() = default;
         ScriptComponent(entt::entity entityRef) : entity(entityRef) {}
 
-        // Cargar el script Lua usando ImportLUA_ScriptData
-        void SetLuaScript(const ImportLUA_ScriptData& scriptData);
+        // Cargar múltiples scripts Lua usando ImportLUA_ScriptData
+        void AddLuaScript(const ImportLUA_ScriptData& scriptData);
 
-        bool HasLuaScript() const { return scriptAssigned; }
-        const std::string& GetLuaScriptName() const { return luaScriptData.name; }
-        const std::string& GetLuaScriptPath() const { return luaScriptData.filePath; }
-        const ImportLUA_ScriptData& GetLuaScriptData() const { return luaScriptData; }  // Getter para el struct completo
-        void RemoveLuaScript() { this->luaScriptData.name.clear(); }
+        bool HasLuaScripts() const { return !luaScriptsData.empty(); }
 
-        // Obtener los valores de exposedVars
-        std::unordered_map<std::string, sol::object> GetExposedVars() const;
+        const std::vector<ImportLUA_ScriptData>& GetLuaScriptsData() const { return luaScriptsData; }
 
-        // Establecer los valores de exposedVars
-        void SetExposedVars(const std::unordered_map<std::string, sol::object>& exposedVars);
+        void RemoveLuaScript(const std::string& scriptName);
+
+        // Obtener los valores de exposedVars de un script específico
+        std::unordered_map<std::string, sol::object> GetExposedVars(const std::string& scriptName) const;
+
+        // Establecer los valores de exposedVars de un script específico
+        void SetExposedVars(const std::string& scriptName, const std::unordered_map<std::string, sol::object>& exposedVars);
+
+        // Establecer las variables expuestas para un script específico
+        void SetExposedVarsForScript(const std::string& scriptName, const std::unordered_map<std::string, sol::object>& vars);
 
         //--LIFE CYCLE
         void Init();
@@ -36,7 +40,6 @@ namespace libCore
 
     private:
         entt::entity entity;
-        ImportLUA_ScriptData luaScriptData;  // Cambiado a ImportLUA_ScriptData para más control
-        bool scriptAssigned = false;
+        std::vector<ImportLUA_ScriptData> luaScriptsData;  // Cambiado a lista para múltiples scripts
     };
 }

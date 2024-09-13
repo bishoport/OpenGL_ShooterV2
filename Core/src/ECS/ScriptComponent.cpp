@@ -6,36 +6,45 @@
 
 namespace libCore
 {
-    void ScriptComponent::SetLuaScript(const ImportLUA_ScriptData& scriptData) {
-        luaScriptData = scriptData;
-        scriptAssigned = true;
+    void ScriptComponent::AddLuaScript(const ImportLUA_ScriptData& scriptData) {
+        luaScriptsData.push_back(scriptData);  // Agregar un nuevo script
     }
+
+    void ScriptComponent::RemoveLuaScript(const std::string& scriptName) {
+        luaScriptsData.erase(std::remove_if(luaScriptsData.begin(), luaScriptsData.end(),
+            [&](const ImportLUA_ScriptData& data) { return data.name == scriptName; }), luaScriptsData.end());
+    }
+
     //-------------------------------------------------------------------------------------------------------------------------
-
-
     //--LIFE CYCLE
     void ScriptComponent::Init() {
-        sol::state& lua = LuaManager::GetInstance().GetLuaState(luaScriptData.name);
-        sol::function initFunc = lua["Init"];
-        if (initFunc.valid()) {
-            initFunc();
+        for (const auto& scriptData : luaScriptsData) {
+            sol::state& lua = LuaManager::GetInstance().GetLuaState(scriptData.name);
+            sol::function initFunc = lua["Init"];
+            if (initFunc.valid()) {
+                initFunc();  // Ejecutar Init en cada script
+            }
         }
     }
+
     void ScriptComponent::Update(float deltaTime) {
-        sol::state& lua = LuaManager::GetInstance().GetLuaState(luaScriptData.name);
-        sol::function updateFunc = lua["Update"];
-        if (updateFunc.valid()) {
-            updateFunc(deltaTime);
-        }
-        else {
-            std::cerr << "Lua Update function not found" << std::endl;
+        for (const auto& scriptData : luaScriptsData) {
+            sol::state& lua = LuaManager::GetInstance().GetLuaState(scriptData.name);
+            sol::function updateFunc = lua["Update"];
+            if (updateFunc.valid()) {
+                updateFunc(deltaTime);  // Ejecutar Update en cada script
+            }
+            else {
+                std::cerr << "Lua Update function not found in script: " << scriptData.name << std::endl;
+            }
         }
     }
+
     //-------------------------------------------------------------------------------------------------------------------------
 
-    // Obtener los valores de exposedVars
-    std::unordered_map<std::string, sol::object> ScriptComponent::GetExposedVars() const {
-        sol::state& lua = LuaManager::GetInstance().GetLuaState(luaScriptData.name);
+    // Obtener los valores de exposedVars de un script específico
+    std::unordered_map<std::string, sol::object> ScriptComponent::GetExposedVars(const std::string& scriptName) const {
+        sol::state& lua = LuaManager::GetInstance().GetLuaState(scriptName);
         sol::table exposedVars = lua["exposedVars"];
 
         std::unordered_map<std::string, sol::object> vars;
@@ -50,8 +59,9 @@ namespace libCore
         return vars;
     }
 
-    void ScriptComponent::SetExposedVars(const std::unordered_map<std::string, sol::object>& vars) {
-        sol::state& lua = LuaManager::GetInstance().GetLuaState(luaScriptData.name);
+    // Establecer los valores de exposedVars de un script específico
+    void ScriptComponent::SetExposedVars(const std::string& scriptName, const std::unordered_map<std::string, sol::object>& vars) {
+        sol::state& lua = LuaManager::GetInstance().GetLuaState(scriptName);
         sol::table exposedVars = lua["exposedVars"];
 
         if (exposedVars.valid()) {
@@ -73,4 +83,9 @@ namespace libCore
         }
     }
 
+    // Esta función es lo mismo que SetExposedVars, por lo que no es necesario tenerla duplicada.
+    // Puedes simplemente llamar a SetExposedVars en lugar de SetExposedVarsForScript.
+    void ScriptComponent::SetExposedVarsForScript(const std::string& scriptName, const std::unordered_map<std::string, sol::object>& vars) {
+        SetExposedVars(scriptName, vars);
+    }
 }

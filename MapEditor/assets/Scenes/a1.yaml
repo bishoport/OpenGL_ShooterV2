@@ -1,0 +1,451 @@
+Scene: Untitled
+Models:
+  - ModelName: turbina.fbx
+    ImportModelData:
+      filePath: assets\models\Turbina\
+      fileName: turbina.fbx
+      modelID: 0
+      invertUV: false
+      rotate90: false
+      skeletal: false
+      useCustomTransform: true
+      processLights: false
+      globalScaleFactor: 0.100000001
+  - ModelName: Robot.fbx
+    ImportModelData:
+      filePath: assets\models\Robot\
+      fileName: Robot.fbx
+      modelID: 0
+      invertUV: false
+      rotate90: false
+      skeletal: false
+      useCustomTransform: true
+      processLights: false
+      globalScaleFactor: 0.400000006
+Entities:
+  - Entity: 10
+    IDComponent:
+      ID: 61082054b6ff6810
+      MarkToDelete: false
+    TagComponent:
+      Tag: Bot
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 0
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 9
+    MeshComponent:
+      MeshName: mesh_bot
+    MaterialComponent:
+      Material:
+        MaterialName: Material.001
+        ShaderName: default
+        AlbedoColor:
+          - 0.800000012
+          - 0.800000012
+          - 0.800000012
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Robot\base.png
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: assets\models\Robot\normal.png
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: assets\models\Robot\metallic.png
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: C:/Users/bisho/OneDrive/Escritorio/OPENGL_GAME/OpenGL_ShooterV2/Core/assets/textures/default_roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Users/bisho/OneDrive/Escritorio/OPENGL_GAME/OpenGL_ShooterV2/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+  - Entity: 9
+    IDComponent:
+      ID: 9b581cc808253b8c
+      MarkToDelete: false
+    TagComponent:
+      Tag: Robot.fbx
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 0
+        Rotation:
+          - 0
+          - 123.046211
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ChildComponent:
+      - 10
+  - Entity: 8
+    IDComponent:
+      ID: 1556be6f082bde9c
+      MarkToDelete: false
+    TagComponent:
+      Tag: turbina
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 0
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 7
+    MeshComponent:
+      MeshName: Circle.001
+    MaterialComponent:
+      Material:
+        MaterialName: turbina
+        ShaderName: default
+        AlbedoColor:
+          - 0.800000012
+          - 0.800000012
+          - 0.800000012
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_BaseColor.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_OpenGL_Normal.png
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_Metallic.png
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_Roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Users/bisho/OneDrive/Escritorio/OPENGL_GAME/OpenGL_ShooterV2/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+  - Entity: 7
+    IDComponent:
+      ID: 1b023dfe20248d8d
+      MarkToDelete: false
+    TagComponent:
+      Tag: turbina.fbx
+    TransformComponent:
+      Transform:
+        Position:
+          - 2
+          - 3
+          - 2
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ChildComponent:
+      - 8
+  - Entity: 6
+    IDComponent:
+      ID: 51856b8a27d0b02f
+      MarkToDelete: false
+    TagComponent:
+      Tag: turbina
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 0
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 5
+    MeshComponent:
+      MeshName: Circle.001
+    MaterialComponent:
+      Material:
+        MaterialName: turbina
+        ShaderName: default
+        AlbedoColor:
+          - 0.800000012
+          - 0.800000012
+          - 0.800000012
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_BaseColor.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_OpenGL_Normal.png
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_Metallic.png
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_Roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Users/bisho/OneDrive/Escritorio/OPENGL_GAME/OpenGL_ShooterV2/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+  - Entity: 5
+    IDComponent:
+      ID: fe361917dfab3f28
+      MarkToDelete: false
+    TagComponent:
+      Tag: turbina.fbx
+    TransformComponent:
+      Transform:
+        Position:
+          - 2
+          - 3
+          - 1
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ChildComponent:
+      - 6
+  - Entity: 4
+    IDComponent:
+      ID: 3c27acc0895a4890
+      MarkToDelete: false
+    TagComponent:
+      Tag: turbina
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 0
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 3
+    MeshComponent:
+      MeshName: Circle.001
+    MaterialComponent:
+      Material:
+        MaterialName: turbina
+        ShaderName: default
+        AlbedoColor:
+          - 0.800000012
+          - 0.800000012
+          - 0.800000012
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_BaseColor.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_OpenGL_Normal.png
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_Metallic.png
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_Roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Users/bisho/OneDrive/Escritorio/OPENGL_GAME/OpenGL_ShooterV2/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+  - Entity: 3
+    IDComponent:
+      ID: 1acb06b0cb8dff58
+      MarkToDelete: false
+    TagComponent:
+      Tag: turbina.fbx
+    TransformComponent:
+      Transform:
+        Position:
+          - 1
+          - 3
+          - 2
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ChildComponent:
+      - 4
+  - Entity: 2
+    IDComponent:
+      ID: af59f52d51de2776
+      MarkToDelete: false
+    TagComponent:
+      Tag: turbina
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 0
+        Rotation:
+          - 0
+          - -0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ParentComponent:
+      Parent: 1
+    MeshComponent:
+      MeshName: Circle.001
+    MaterialComponent:
+      Material:
+        MaterialName: turbina
+        ShaderName: default
+        AlbedoColor:
+          - 0.800000012
+          - 0.800000012
+          - 0.800000012
+        NormalStrength: 1
+        MetallicValue: 0
+        RoughnessValue: 0.699999988
+        AoValue: 1
+      AlbedoMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_BaseColor.jpg
+        TextureType: 0
+        TextureUnit: 0
+      NormalMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_OpenGL_Normal.png
+        TextureType: 1
+        TextureUnit: 1
+      MetallicMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_Metallic.png
+        TextureType: 2
+        TextureUnit: 2
+      RoughnessMap:
+        TexturePath: assets\models\Turbina\turbina.fbm\Material_Roughness.jpg
+        TextureType: 3
+        TextureUnit: 3
+      AOMap:
+        TexturePath: C:/Users/bisho/OneDrive/Escritorio/OPENGL_GAME/OpenGL_ShooterV2/Core/assets/textures/default_ao.jpg
+        TextureType: 4
+        TextureUnit: 4
+  - Entity: 1
+    IDComponent:
+      ID: 6ef317cb9c85f8a0
+      MarkToDelete: false
+    TagComponent:
+      Tag: turbina.fbx
+    TransformComponent:
+      Transform:
+        Position:
+          - 1
+          - 3
+          - 1
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ChildComponent:
+      - 2
+  - Entity: 0
+    IDComponent:
+      ID: 34b1cd6092d9fad4
+      MarkToDelete: false
+    TagComponent:
+      Tag: new_GameObject
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 0
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ScriptComponent:
+      Scripts:
+        - filePath: assets\scripts\Tablero.lua
+          name: Tablero
+        - filePath: assets\scripts\TransformTest.lua
+          name: TransformTest
+      ExposedVars:
+        Tablero:
+          int_height: 2
+          int_width: 2
+          selectedModel: assets\models\Turbina\turbina.fbx
+        TransformTest:
+          scale: 1
+          selectedModel: assets\models\Robot\Robot.fbx
+          speed: 0
+          rotationSpeed: 2.41700006

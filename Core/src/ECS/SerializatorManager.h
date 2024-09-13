@@ -369,87 +369,104 @@ namespace libCore {
         node["name"] = scriptData.name;
         return node;
     }
-    YAML::Node SerializeAllLUAScripts() {
+
+    YAML::Node SerializeAllLUAScripts(const std::vector<ImportLUA_ScriptData>& scripts) {
         YAML::Node node;
-        auto loadedScripts = LuaManager::GetInstance().GetLoadedScripts();
-        for (const auto& scriptData : loadedScripts) {
+        for (const auto& scriptData : scripts) {
             node.push_back(SerializeLUA_Script(scriptData));
         }
         return node;
     }
-    void DeserializeAllLUAScripts(const YAML::Node& node) {
+
+    void DeserializeAllLUAScripts(const YAML::Node& node, ScriptComponent& scriptComponent) {
         for (const auto& scriptNode : node) {
             ImportLUA_ScriptData scriptData;
             scriptData.filePath = scriptNode["filePath"].as<std::string>();
             scriptData.name = scriptNode["name"].as<std::string>();
+
+            // Cargar el script en LuaManager y agregarlo al componente de script
             LuaManager::GetInstance().LoadLuaFile(scriptData.name, scriptData.filePath);
+            scriptComponent.AddLuaScript(scriptData);
         }
     }
+
     YAML::Node SerializeScriptComponent(const ScriptComponent& scriptComponent) {
         YAML::Node node;
 
-        // Serializar los datos del script (nombre y ruta)
-        node["ScriptData"] = scriptComponent.GetLuaScriptData();
+        // Serializar los datos de todos los scripts
+        auto luaScripts = scriptComponent.GetLuaScriptsData();
+        node["Scripts"] = SerializeAllLUAScripts(luaScripts);
 
-        // Serializar los valores de exposedVars
-        YAML::Node exposedVarsNode;
-        auto exposedVars = scriptComponent.GetExposedVars();
-        for (const auto& [varName, varValue] : exposedVars) {
-            if (varValue.is<float>()) {
-                exposedVarsNode[varName] = varValue.as<float>();
+        // Serializar los valores de exposedVars para cada script
+        YAML::Node scriptsVarsNode;
+        for (const auto& scriptData : luaScripts) {
+            YAML::Node exposedVarsNode;
+            auto exposedVars = scriptComponent.GetExposedVars(scriptData.name);
+            for (const auto& [varName, varValue] : exposedVars) {
+                if (varValue.is<float>()) {
+                    exposedVarsNode[varName] = varValue.as<float>();
+                }
+                else if (varValue.is<int>()) {
+                    exposedVarsNode[varName] = varValue.as<int>();
+                }
+                else if (varValue.is<bool>()) {
+                    exposedVarsNode[varName] = varValue.as<bool>();
+                }
+                else if (varValue.is<std::string>()) {
+                    exposedVarsNode[varName] = varValue.as<std::string>();
+                }
             }
-            else if (varValue.is<int>()) {
-                exposedVarsNode[varName] = varValue.as<int>();
-            }
-            else if (varValue.is<bool>()) {
-                exposedVarsNode[varName] = varValue.as<bool>();
-            }
-            else if (varValue.is<std::string>()) {
-                exposedVarsNode[varName] = varValue.as<std::string>();
-            }
+            scriptsVarsNode[scriptData.name] = exposedVarsNode;
         }
-        node["ExposedVars"] = exposedVarsNode;
+        node["ExposedVars"] = scriptsVarsNode;
 
         return node;
     }
+
     ScriptComponent DeserializeScriptComponent(const YAML::Node& node) {
         ScriptComponent scriptComponent;
 
-        // Deserializar los datos del script (nombre y ruta)
-        ImportLUA_ScriptData scriptData = node["ScriptData"].as<ImportLUA_ScriptData>();
-        scriptComponent.SetLuaScript(scriptData);
+        // Deserializar todos los scripts
+        if (node["Scripts"]) {
+            DeserializeAllLUAScripts(node["Scripts"], scriptComponent);
+        }
 
-        // Verificar si existen las variables exposedVars
+        // Verificar si existen las variables exposedVars para cada script
         if (node["ExposedVars"]) {
-            sol::state& lua = LuaManager::GetInstance().GetLuaState(scriptData.name);
-            sol::table exposedVars = lua["exposedVars"];
+            const auto& scriptsVarsNode = node["ExposedVars"];
+            for (const auto& scriptNode : scriptsVarsNode) {
+                std::string scriptName = scriptNode.first.as<std::string>();
+                sol::state& lua = LuaManager::GetInstance().GetLuaState(scriptName);
+                sol::table exposedVars = lua["exposedVars"];
 
-            std::unordered_map<std::string, sol::object> vars;
+                std::unordered_map<std::string, sol::object> vars;
 
-            const auto& exposedVarsNode = node["ExposedVars"];
-            for (const auto& varNode : exposedVarsNode) {
-                std::string varName = varNode.first.as<std::string>();
+                const auto& exposedVarsNode = scriptNode.second;
+                for (const auto& varNode : exposedVarsNode) {
+                    std::string varName = varNode.first.as<std::string>();
 
-                // Detectar el tipo basado en el prefijo del nombre de la variable
-                if (varName.rfind("int_", 0) == 0) {  // Si el nombre tiene el prefijo "int_"
-                    vars[varName] = sol::make_object(lua, varNode.second.as<int>());
+                    // Detectar el tipo basado en el prefijo del nombre de la variable
+                    if (varName.rfind("int_", 0) == 0) {  // Si el nombre tiene el prefijo "int_"
+                        vars[varName] = sol::make_object(lua, varNode.second.as<int>());
+                    }
+                    else if (varNode.second.IsScalar() && varNode.second.Tag() == "!!float") {
+                        vars[varName] = sol::make_object(lua, varNode.second.as<float>());
+                    }
+                    else if (varNode.second.IsScalar() && varNode.second.Tag() == "!!bool") {
+                        vars[varName] = sol::make_object(lua, varNode.second.as<bool>());
+                    }
+                    else if (varNode.second.IsScalar()) {
+                        vars[varName] = sol::make_object(lua, varNode.second.as<std::string>());
+                    }
                 }
-                else if (varNode.second.IsScalar() && varNode.second.Tag() == "!!float") {
-                    vars[varName] = sol::make_object(lua, varNode.second.as<float>());
-                }
-                else if (varNode.second.IsScalar() && varNode.second.Tag() == "!!bool") {
-                    vars[varName] = sol::make_object(lua, varNode.second.as<bool>());
-                }
-                else if (varNode.second.IsScalar()) {
-                    vars[varName] = sol::make_object(lua, varNode.second.as<std::string>());
-                }
+
+                // Actualiza los valores de exposedVars en ScriptComponent con un unordered_map
+                scriptComponent.SetExposedVarsForScript(scriptName, vars);
             }
-
-            // Actualiza los valores de exposedVars en ScriptComponent con un unordered_map
-            scriptComponent.SetExposedVars(vars);
         }
 
         return scriptComponent;
     }
+
     //--------------------
 }

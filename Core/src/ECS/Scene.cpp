@@ -25,7 +25,6 @@ namespace libCore
 
 
     void Scene::SerializeScene(std::string _sceneName) {
-
         sceneName = _sceneName;
 
         YAML::Emitter out;
@@ -41,25 +40,9 @@ namespace libCore
             out << YAML::Key << "Models" << YAML::Value << YAML::BeginSeq << YAML::EndSeq; // Lista vacía
         }
 
-
-        // Serializar los scripts LUA cargados
-        auto luaScripts = SerializeAllLUAScripts(); // Llamada similar a SerializeAllModels
-        if (luaScripts.size() > 0) {
-            out << YAML::Key << "LUA_Scripts" << YAML::Value << luaScripts;
-        }
-        else {
-            out << YAML::Key << "LUA_Scripts" << YAML::Value << YAML::BeginSeq << YAML::EndSeq; // Lista vacía
-        }
-
-
-
-
+        // Serializar las entidades
         out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
-
         auto& entityManager = EntityManager::GetInstance();
-
-        entityManager.DebugPrintAllEntityHierarchies();
-
         entityManager.m_registry->each([&](auto entity) {
 
             out << YAML::BeginMap; // Entity
@@ -75,7 +58,7 @@ namespace libCore
                 out << YAML::Value << SerializeTagComponent(entityManager.GetComponent<TagComponent>(entity));
             }
 
-            // Serialize components
+            // Serializar TransformComponent
             if (entityManager.HasComponent<TransformComponent>(entity)) {
                 out << YAML::Key << "TransformComponent";
                 out << YAML::Value << SerializeTransformComponent(entityManager.GetComponent<TransformComponent>(entity));
@@ -101,32 +84,34 @@ namespace libCore
                 out << YAML::EndSeq;
             }
 
+            // Serializar MeshComponent
             if (entityManager.HasComponent<MeshComponent>(entity)) {
                 out << YAML::Key << "MeshComponent";
                 out << YAML::Value << SerializeMeshComponent(entityManager.GetComponent<MeshComponent>(entity));
             }
 
+            // Serializar MaterialComponent
             if (entityManager.HasComponent<MaterialComponent>(entity)) {
                 out << YAML::Key << "MaterialComponent";
                 out << YAML::Value << SerializeMaterialComponent(entityManager.GetComponent<MaterialComponent>(entity));
             }
 
+            // Serializar ScriptComponent con múltiples scripts
             if (entityManager.HasComponent<ScriptComponent>(entity)) {
                 out << YAML::Key << "ScriptComponent";
                 out << YAML::Value << SerializeScriptComponent(entityManager.GetComponent<ScriptComponent>(entity));
             }
 
             out << YAML::EndMap; // Entity
-        });
-
+            });
         out << YAML::EndSeq;
         out << YAML::EndMap;
 
         std::ofstream fout("assets/Scenes/" + sceneName + ".yaml");
         fout << out.c_str();
     }
-    void Scene::DeserializeScene(std::string _sceneName) {
 
+    void Scene::DeserializeScene(std::string _sceneName) {
         YAML::Node data = YAML::LoadFile("assets/Scenes/" + _sceneName + ".yaml");
         if (!data["Scene"]) {
             return;
@@ -137,11 +122,6 @@ namespace libCore
             DeserializeAllModels(data["Models"]);
         }
 
-        // Deserializar scripts Lua
-        if (data["LUA_Scripts"]) {
-            DeserializeAllLUAScripts(data["LUA_Scripts"]);
-        }
-
         auto& entityManager = EntityManager::GetInstance();
         auto entities = data["Entities"];
 
@@ -149,13 +129,11 @@ namespace libCore
         std::unordered_map<uint32_t, entt::entity> entityMap;
 
         if (entities) {
-            
             // Primer pase: Crear todas las entidades y deserializar los componentes básicos
             for (auto entityNode : entities) {
                 uint32_t entityID = entityNode["Entity"].as<uint32_t>();
 
                 entt::entity entity = entityManager.CreateEmptyGameObject();
-
 
                 if (entityNode["TagComponent"]) {
                     auto tag_component = DeserializeTagComponent(entityNode["TagComponent"]);
@@ -167,29 +145,20 @@ namespace libCore
                     entityManager.m_registry->emplace_or_replace<IDComponent>(entity, id_component);
                 }
 
-                //std::cout << "Procesando Entity YALM_ID: " << entityID << std::endl;
-                //std::cout << "Procesando Entity TAG: " << entityManager.GetComponent<TagComponent>(entity).Tag.c_str() << std::endl;
-                //std::cout << "Procesando Entity UUID: " << entityManager.GetComponent<IDComponent>(entity).ID.ToString() << std::endl;
-
-
                 if (entityNode["TransformComponent"]) {
                     auto transform_component = DeserializeTransformComponent(entityNode["TransformComponent"]);
                     entityManager.m_registry->emplace_or_replace<TransformComponent>(entity, transform_component);
                 }
 
-                if (entityNode["MeshComponent"]) 
-                {
+                if (entityNode["MeshComponent"]) {
                     std::string meshModelName = entityNode["MeshComponent"]["MeshName"].as<std::string>();
-                    
                     Ref<Model> model = AssetsManager::GetInstance().GetModelByMeshName(meshModelName);
-                    
+
                     if (model != nullptr) {
                         // Asignar los componentes de MeshComponent si el modelo tiene mallas
-                        if (!model->meshes.empty()) 
-                        {
+                        if (!model->meshes.empty()) {
                             for (auto& mesh : model->meshes) {
                                 auto& meshComponent = entityManager.m_registry->emplace<MeshComponent>(entity, mesh, model, true);
-                                // Agregar matriz de instancia
                                 glm::mat4 instanceMatrix = glm::translate(glm::mat4(1.0f), model->transform->position);
                                 meshComponent.instanceMatrices.push_back(instanceMatrix);
                                 auto& abbComponent = entityManager.m_registry->emplace<AABBComponent>(entity);
@@ -197,37 +166,30 @@ namespace libCore
                             }
                         }
                     }
-                    else 
-                    {
+                    else {
                         std::cout << "ERROR AL CARGAR EL MODELO con la mesh " << meshModelName << std::endl;
                         continue;
                     }
                 }
 
-                if (entityNode["MaterialComponent"])
-                {
+                if (entityNode["MaterialComponent"]) {
                     auto component = DeserializeMaterialComponent(entityNode["MaterialComponent"]);
                     Ref<Material> mat = AssetsManager::GetInstance().getMaterial(component.material->materialName);
-                    if (mat != nullptr)
-                    {
+                    if (mat != nullptr) {
                         component.material = mat;
                     }
                     entityManager.m_registry->emplace_or_replace<MaterialComponent>(entity, component);
                 }
 
+                // Deserializar ScriptComponent con múltiples scripts
                 if (entityNode["ScriptComponent"]) {
                     auto component = DeserializeScriptComponent(entityNode["ScriptComponent"]);
                     entityManager.m_registry->emplace_or_replace<ScriptComponent>(entity, component);
                 }
 
-
-
-
                 // Almacenar la correspondencia entre el ID de la entidad y la entidad creada
                 entityMap[entityID] = entity;
             }
-
-
 
             // Segundo pase: Configurar las relaciones de jerarquía (padres e hijos)
             for (auto entityNode : entities) {
@@ -257,4 +219,5 @@ namespace libCore
             }
         }
     }
+
 }

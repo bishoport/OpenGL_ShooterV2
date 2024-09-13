@@ -811,26 +811,28 @@ namespace libCore
 
                 auto& scriptComponent = EntityManager::GetInstance().GetComponent<ScriptComponent>(selectedEntity);
 
-                if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen)) {
+                if (ImGui::CollapsingHeader("Scripts", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-                    // Si ya tiene un script asignado, mostrar el nombre del script y el botón para eliminarlo
-                    if (scriptComponent.HasLuaScript()) {
-                        ImGui::Text("Assigned Script: %s", scriptComponent.GetLuaScriptName().c_str());
+                    // Mostrar todos los scripts asignados
+                    const auto& luaScripts = scriptComponent.GetLuaScriptsData();
+                    for (const auto& scriptData : luaScripts) {
 
-                        if (ImGui::Button("Reload Script")) {
-                            LuaManager::GetInstance().ReloadLuaFile(scriptComponent.GetLuaScriptName());
+                        ImGui::Text("Assigned Script: %s", scriptData.name.c_str());
+
+                        if (ImGui::Button(("Reload " + scriptData.name).c_str())) {
+                            LuaManager::GetInstance().ReloadLuaFile(scriptData.name);
                         }
 
-                        sol::state& lua = LuaManager::GetInstance().GetLuaState(scriptComponent.GetLuaScriptName());
+                        sol::state& lua = LuaManager::GetInstance().GetLuaState(scriptData.name);
 
                         // Asegurarse de que la tabla 'exposedVars' existe en el script Lua
                         sol::table exposedVars = lua["exposedVars"];
                         if (!exposedVars.valid()) {
                             ImGui::Text("No exposed variables found");
-                            return;
+                            continue;  // Saltar al siguiente script
                         }
 
-                        // Iterar sobre los pares de la tabla exposedVars
+                        // Mostrar las variables de exposedVars para este script específico
                         for (auto& kvp : exposedVars) {
                             std::string varName = kvp.first.as<std::string>();  // Nombre de la variable
                             sol::object varValue = kvp.second;                  // Valor de la variable
@@ -875,10 +877,8 @@ namespace libCore
                                 }
 
                                 // Comprobar si hay un drop de un modelo en este campo
-                                if (ImGui::BeginDragDropTarget())
-                                {
-                                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("MODEL_PAYLOAD"))
-                                    {
+                                if (ImGui::BeginDragDropTarget()) {
+                                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("MODEL_PAYLOAD")) {
                                         const char* droppedModelName = (const char*)payload->Data;
                                         strncpy_s(buffer, sizeof(buffer), droppedModelName, _TRUNCATE);  // Reemplazamos el valor con el nombre del modelo arrastrado
                                         exposedVars[varName] = std::string(buffer);  // Actualizar el valor en Lua con el modelo arrastrado
@@ -906,46 +906,50 @@ namespace libCore
                                 }
                             }
                         }
+
+                        if (ImGui::Button(("Remove " + scriptData.name).c_str())) {
+                            scriptComponent.RemoveLuaScript(scriptData.name);  // Eliminar el script del componente
+                        }
                     }
-                    else {
-                        // Si no tiene un script asignado, mostrar el combo box para asignar uno
-                        const auto loadedScripts = LuaManager::GetInstance().GetLoadedScripts();
-                        static std::string selectedScript;
-                        std::vector<ImportLUA_ScriptData> scriptDataList;
 
-                        for (const auto& scriptData : loadedScripts) {
-                            scriptDataList.push_back(scriptData);
-                        }
+                    // Si no tiene scripts asignados o quieres agregar más, mostrar el combo box para asignar uno
+                    const auto loadedScripts = LuaManager::GetInstance().GetLoadedScripts();
+                    static std::string selectedScript;
+                    std::vector<ImportLUA_ScriptData> scriptDataList;
 
-                        if (ImGui::BeginCombo("Scripts", selectedScript.c_str())) {
-                            for (const auto& scriptData : scriptDataList) {
-                                bool isSelected = (selectedScript == scriptData.name);
-                                if (ImGui::Selectable(scriptData.name.c_str(), isSelected)) {
-                                    selectedScript = scriptData.name;
-                                }
-                                if (isSelected) {
-                                    ImGui::SetItemDefaultFocus();
-                                }
+                    for (const auto& scriptData : loadedScripts) {
+                        scriptDataList.push_back(scriptData);
+                    }
+
+                    if (ImGui::BeginCombo("Add Script", selectedScript.c_str())) {
+                        for (const auto& scriptData : scriptDataList) {
+                            bool isSelected = (selectedScript == scriptData.name);
+                            if (ImGui::Selectable(scriptData.name.c_str(), isSelected)) {
+                                selectedScript = scriptData.name;
                             }
-                            ImGui::EndCombo();
-                        }
-
-                        // Botón para asignar el script seleccionado
-                        if (ImGui::Button("Assign Script")) {
-                            // Buscar el script seleccionado en scriptDataList
-                            auto it = std::find_if(scriptDataList.begin(), scriptDataList.end(),
-                                [&](const ImportLUA_ScriptData& data) { return data.name == selectedScript; });
-
-                            if (it != scriptDataList.end()) {
-                                // Asignar el script seleccionado al ScriptComponent con ruta y nombre
-                                scriptComponent.SetLuaScript(*it);
+                            if (isSelected) {
+                                ImGui::SetItemDefaultFocus();
                             }
-
-                            selectedScript.clear();  // Limpia la selección después de asignar
                         }
+                        ImGui::EndCombo();
+                    }
+
+                    // Botón para agregar el script seleccionado
+                    if (ImGui::Button("Assign Script")) {
+                        // Buscar el script seleccionado en scriptDataList
+                        auto it = std::find_if(scriptDataList.begin(), scriptDataList.end(),
+                            [&](const ImportLUA_ScriptData& data) { return data.name == selectedScript; });
+
+                        if (it != scriptDataList.end()) {
+                            // Asignar el script seleccionado al ScriptComponent con ruta y nombre
+                            scriptComponent.AddLuaScript(*it);
+                        }
+
+                        selectedScript.clear();  // Limpia la selección después de asignar
                     }
                 }
             }
+
         }
         else {
             ImGui::Text("No entity selected.");
