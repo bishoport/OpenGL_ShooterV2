@@ -38,6 +38,7 @@ namespace libCore
 		void LoadModelAsset(ImportModelData importModelData);
 		void LoadModelAssetAsync(ImportModelData importModelData);
 		Ref<Model> GetModel(const std::string& name);
+		Ref<Model> FindModelRecursive(const Ref<Model>& model, const std::string& name);
 		Ref<Model> GetModelByMeshName(const std::string& meshName);
 		const std::unordered_map<std::string, Ref<Model>>& GetAllModels() const;
 		//---------------------------------------------------------------------------------------------------------------------------

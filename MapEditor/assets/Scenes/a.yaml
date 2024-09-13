@@ -1,31 +1,20 @@
 Scene: Untitled
 Models:
-  - ModelName: turbina.fbx
+  - ModelName: Kit_1.fbx
     ImportModelData:
-      filePath: assets\models\Turbina\
-      fileName: turbina.fbx
+      filePath: assets\models\Collections\Kit_1\
+      fileName: Kit_1.fbx
       modelID: 0
       invertUV: false
       rotate90: false
       skeletal: false
       useCustomTransform: true
       processLights: false
-      globalScaleFactor: 0.100000001
-  - ModelName: Robot.fbx
-    ImportModelData:
-      filePath: assets\models\Robot\
-      fileName: Robot.fbx
-      modelID: 0
-      invertUV: false
-      rotate90: false
-      skeletal: false
-      useCustomTransform: true
-      processLights: false
-      globalScaleFactor: 0.400000006
+      globalScaleFactor: 0.23
 Entities:
   - Entity: 0
     IDComponent:
-      ID: 34b1cd6092d9fad4
+      ID: 8908427a393eea76
       MarkToDelete: false
     TagComponent:
       Tag: new_GameObject
@@ -47,15 +36,8 @@ Entities:
       Scripts:
         - filePath: assets\scripts\Tablero.lua
           name: Tablero
-        - filePath: assets\scripts\TransformTest.lua
-          name: TransformTest
       ExposedVars:
         Tablero:
-          int_height: 2
-          int_width: 2
-          selectedModel: assets\models\Turbina\turbina.fbx
-        TransformTest:
-          scale: 1
-          selectedModel: assets\models\Robot\Robot.fbx
-          speed: 0
-          rotationSpeed: 30
+          int_width: 20
+          int_height: 20
+          selectedModel: Base_el_53

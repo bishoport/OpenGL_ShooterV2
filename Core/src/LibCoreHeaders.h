@@ -45,6 +45,7 @@ constexpr Ref<T> CreateRef(Args&& ... args)
 #define M_PI 3.14159265358979323846
 
 
+
 //GLOBAL STRUCTS
 enum TEXTURE_TYPES {
 	ALBEDO,
@@ -53,14 +54,12 @@ enum TEXTURE_TYPES {
 	ROUGHNESS,
 	AO
 };
-
 enum DRAW_GEOM_LIKE
 {
 	DOT,
 	LINE,
 	TRIANGLE
 };
-
 enum PRIMITIVES_3D
 {
     PRIMITIVE_DOT,
@@ -70,14 +69,11 @@ enum PRIMITIVES_3D
     PRIMIVITE_CUBE,
     PRIMIVITE_SPHERE
 };
-
 enum CAMERA_CONTROLLERS
 {
     EDITOR,
 	GAME
 };
-
-// Struct para las opciones de importación
 struct ImportModelData {
 	std::string filePath = "";
 	std::string fileName = "";
@@ -89,21 +85,16 @@ struct ImportModelData {
 	bool processLights = false;
 	float globalScaleFactor = 1.0f; // Ajusta según tus necesidades
 };
-
 struct ImportLUA_ScriptData {
 	std::string filePath = "";
 	std::string name = "";
 };
-
-
 struct ImageData {
 	unsigned char* data;
 	int width;
 	int height;
 	int numChannels;
 };
-
-
 enum class GizmoOperation
 {
 	Translate,

@@ -29,8 +29,6 @@ namespace libCore {
             std::cerr << "Error loading Lua script: " << e.what() << std::endl;
         }
     }
-
-    // Función para recargar un script Lua en tiempo de ejecución
     void LuaManager::ReloadLuaFile(const std::string& scriptName)
     {
         auto it = scripts.find(scriptName);
@@ -84,11 +82,9 @@ namespace libCore {
         }
         throw std::runtime_error("Lua state not found for script: " + scriptName);
     }
-
     bool LuaManager::IsScriptLoaded(const std::string& scriptName) const {
         return scripts.find(scriptName) != scripts.end();
     }
-
     std::vector<ImportLUA_ScriptData> LuaManager::GetLoadedScripts() const {
         std::vector<ImportLUA_ScriptData> scriptDataList;
         for (const auto& pair : scripts) {

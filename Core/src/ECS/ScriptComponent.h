@@ -31,9 +31,6 @@ namespace libCore
         // Establecer los valores de exposedVars de un script específico
         void SetExposedVars(const std::string& scriptName, const std::unordered_map<std::string, sol::object>& exposedVars);
 
-        // Establecer las variables expuestas para un script específico
-        void SetExposedVarsForScript(const std::string& scriptName, const std::unordered_map<std::string, sol::object>& vars);
-
         //--LIFE CYCLE
         void Init();
         void Update(float deltaTime);

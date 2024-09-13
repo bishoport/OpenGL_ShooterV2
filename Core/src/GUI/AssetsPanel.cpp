@@ -4,8 +4,8 @@
 #include <iostream>
 #include "../Scripting/LuaManager.h"
 
-namespace libCore {
-
+namespace libCore 
+{
 	AssetsPanel::AssetsPanel()
 		: m_BaseDirectory{},     // Inicialización predeterminada
 		  m_CurrentDirectory{},  // Inicialización predeterminada
@@ -24,9 +24,6 @@ namespace libCore {
 		//iconModel = GLCore::Utils::ImageLoader::loadIcon("assets/default/icons/model_icon.png");
 		//iconImage = GLCore::Utils::ImageLoader::loadIcon("assets/default/icons/picture_icon.png");
 	}
-
-
-
 	void AssetsPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Assets", nullptr);
@@ -64,6 +61,7 @@ namespace libCore {
 
 			GLuint iconTexture = 0; // Reemplazar con la ID de tu textura real
 
+			//--Icons
 			if (directoryEntry.is_directory())
 			{
 				iconTexture = iconFolder; // Asumiendo que folderTexture es la ID de tu textura para carpetas
@@ -110,7 +108,7 @@ namespace libCore {
 					std::string scriptName = path.stem().string();
 					LuaManager::GetInstance().LoadLuaFile(scriptName, path.string());
 				}
-				else
+				else if (path.extension() == ".fbx" || path.extension() == ".obj" || path.extension() == ".gltf")
 				{
 					isDialogOpen = true;  // Abre el diálogo
 					m_DirectoryEntry = directoryEntry;
@@ -143,9 +141,16 @@ namespace libCore {
 		}
 
 
+
+
+
+
 		if (isDialogOpen) {
 			ImGui::OpenPopup("Import Options");
 		}
+
+
+
 
 
 		if (ImGui::BeginPopupModal("Import Options", &isDialogOpen)) 

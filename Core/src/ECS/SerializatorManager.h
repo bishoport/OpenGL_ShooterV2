@@ -369,7 +369,6 @@ namespace libCore {
         node["name"] = scriptData.name;
         return node;
     }
-
     YAML::Node SerializeAllLUAScripts(const std::vector<ImportLUA_ScriptData>& scripts) {
         YAML::Node node;
         for (const auto& scriptData : scripts) {
@@ -377,7 +376,6 @@ namespace libCore {
         }
         return node;
     }
-
     void DeserializeAllLUAScripts(const YAML::Node& node, ScriptComponent& scriptComponent) {
         for (const auto& scriptNode : node) {
             ImportLUA_ScriptData scriptData;
@@ -389,7 +387,6 @@ namespace libCore {
             scriptComponent.AddLuaScript(scriptData);
         }
     }
-
     YAML::Node SerializeScriptComponent(const ScriptComponent& scriptComponent) {
         YAML::Node node;
 
@@ -422,7 +419,6 @@ namespace libCore {
 
         return node;
     }
-
     ScriptComponent DeserializeScriptComponent(const YAML::Node& node) {
         ScriptComponent scriptComponent;
 
@@ -461,12 +457,11 @@ namespace libCore {
                 }
 
                 // Actualiza los valores de exposedVars en ScriptComponent con un unordered_map
-                scriptComponent.SetExposedVarsForScript(scriptName, vars);
+                scriptComponent.SetExposedVars(scriptName, vars);
             }
         }
 
         return scriptComponent;
     }
-
     //--------------------
 }

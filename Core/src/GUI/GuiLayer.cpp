@@ -1108,8 +1108,7 @@ namespace libCore
     }
     //-----------------------------------------------------------------------------------------------------
 
-    //--GLOBAL MODELS PANEL  
-    // Renderiza el árbol de jerarquía de modelos y sus meshes
+    //--GLOBAL MODELS PANEL 
     void GuiLayer::DrawModelHierarchy(const Ref<libCore::Model>& model)
     {
         if (!model) return;
@@ -1133,8 +1132,8 @@ namespace libCore
                 if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
                 {
                     // Enviar el nombre del modelo como payload
-                    ImGui::SetDragDropPayload("MODEL_PAYLOAD", model->key_stored.c_str(), model->key_stored.size() + 1);
-                    ImGui::Text("Dragging: %s", model->key_stored.c_str());
+                    ImGui::SetDragDropPayload("MODEL_PAYLOAD", model->name.c_str(), model->name.size() + 1);
+                    ImGui::Text("Dragging: %s", model->name.c_str());
                     ImGui::EndDragDropSource();
                 }
             }
@@ -1212,8 +1211,8 @@ namespace libCore
                 if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
                 {
                     // Enviar el nombre del modelo como payload
-                    ImGui::SetDragDropPayload("MODEL_PAYLOAD", model->key_stored.c_str(), model->key_stored.size() + 1);
-                    ImGui::Text("Dragging: %s", model->key_stored.c_str());
+                    ImGui::SetDragDropPayload("MODEL_PAYLOAD", model->name.c_str(), model->name.size() + 1);
+                    ImGui::Text("Dragging: %s", model->name.c_str());
                     ImGui::EndDragDropSource();
                 }
 

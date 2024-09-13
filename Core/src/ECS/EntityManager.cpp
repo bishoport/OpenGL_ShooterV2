@@ -255,26 +255,10 @@ namespace libCore
             auto& srcTransform = GetComponent<TransformComponent>(entity);
             auto& dstTransform = GetComponent<TransformComponent>(newEntity);
 
-            dstTransform.transform->position = srcTransform.transform->position;
-            dstTransform.transform->scale = srcTransform.transform->scale;
-            dstTransform.transform->rotation = srcTransform.transform->rotation;
+            dstTransform.transform->position =    srcTransform.transform->position;
+            dstTransform.transform->scale =       srcTransform.transform->scale;
+            dstTransform.transform->rotation =    srcTransform.transform->rotation;
             dstTransform.transform->eulerAngles = srcTransform.transform->eulerAngles;
-
-            //// Si la entidad tiene un padre, calcular la transformación local con respecto al padre original
-            //if (parentEntity != entt::null) {
-            //    glm::mat4 parentGlobalTransform = GetComponent<TransformComponent>(parentEntity).accumulatedTransform;
-            //    glm::mat4 localTransform = glm::inverse(parentGlobalTransform) * srcTransform.accumulatedTransform;
-
-            //    // Aplicar la transformación local al nuevo hijo
-            //    dstTransform.transform->setMatrix(localTransform);
-            //}
-            //else {
-            //    // Si no tiene padre, simplemente copia la transformación global
-            //    dstTransform.transform->position = srcTransform.transform->position;
-            //    dstTransform.transform->scale = srcTransform.transform->scale;
-            //    dstTransform.transform->rotation = srcTransform.transform->rotation;
-            //    dstTransform.transform->eulerAngles = srcTransform.transform->eulerAngles;
-            //}
         }
 
         if (HasComponent<MeshComponent>(entity)) {
@@ -298,6 +282,7 @@ namespace libCore
             dstAABB.aabb->CalculateAABB(srcMesh.mesh->vertices);
         }
 
+        //--todo
         //if (HasComponent<ScriptComponent>(entity)) {
         //    auto& srcScript = GetComponent<ScriptComponent>(entity);
         //    ImportLUA_ScriptData scriptData = srcScript.GetLuaScriptData();  // Obtener el script y sus datos
@@ -310,7 +295,6 @@ namespace libCore
         //    auto srcExposedVars = srcScript.GetExposedVars();
         //    dstScript.SetExposedVars(srcExposedVars);
         //}
-
 
         return newEntity;
     }

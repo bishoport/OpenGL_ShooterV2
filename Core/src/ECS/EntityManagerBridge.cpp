@@ -2,17 +2,12 @@
 #include "../tools/AssetsManager.h"
 #include "Components.h"  // Para los componentes como TagComponent
 
-
-
 namespace libCore
 {
-
     //--ENTITY MANAGER
-    // Crear una nueva entidad vacía
     entt::entity EntityManagerBridge::CreateEntity(const std::string& name) {
         return EntityManager::GetInstance().CreateEmptyGameObject(name);
     }
-    // Crear una entidad desde un modelo
     entt::entity EntityManagerBridge::CreateEntityFromModel(const std::string& modelName) {
         auto model = AssetsManager::GetInstance().GetModel(modelName);
         if (!model) {
@@ -21,23 +16,23 @@ namespace libCore
         }
         return EntityManager::GetInstance().CreateGameObjectFromModel(model, entt::null);
     }
-    // Obtener el nombre de una entidad
+    void EntityManagerBridge::DestroyEntity(entt::entity entity) {
+        EntityManager::GetInstance().DestroyEntity(entity);
+    }
     std::string EntityManagerBridge::GetEntityName(entt::entity entity) {
         if (EntityManager::GetInstance().HasComponent<TagComponent>(entity)) {
             return EntityManager::GetInstance().GetComponent<TagComponent>(entity).Tag;
         }
         return "Unnamed";
     }
-    // Verificar si una entidad tiene un componente específico
+    //----------------------------------------------------------------------------------------------
+
+
+    //--CHECK COMPONENTS
     template<typename T>
     bool EntityManagerBridge::HasComponent(entt::entity entity) {
         return EntityManager::GetInstance().HasComponent<T>(entity);
     }
-    // Destruir una entidad
-    void EntityManagerBridge::DestroyEntity(entt::entity entity) {
-        EntityManager::GetInstance().DestroyEntity(entity);
-    }
-    //----------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------
 
 
@@ -49,14 +44,12 @@ namespace libCore
         }
         return { 0.0f, 0.0f, 0.0f };  // Valor por defecto si no tiene el componente
     }
-
     void EntityManagerBridge::SetPosition(entt::entity entity, float x, float y, float z) {
         if (EntityManager::GetInstance().HasComponent<TransformComponent>(entity)) {
             auto& transform = EntityManager::GetInstance().GetComponent<TransformComponent>(entity);
             transform.transform->position = { x, y, z };
         }
     }
-
     std::tuple<float, float, float> EntityManagerBridge::GetRotation(entt::entity entity) {
         if (EntityManager::GetInstance().HasComponent<TransformComponent>(entity)) {
             glm::vec3 eulerAngles = EntityManager::GetInstance().GetComponent<TransformComponent>(entity).GetEulerAngles();
@@ -64,13 +57,11 @@ namespace libCore
         }
         return std::make_tuple(0.0f, 0.0f, 0.0f);
     }
-
     void EntityManagerBridge::SetRotation(entt::entity entity, float x, float y, float z) {
         if (EntityManager::GetInstance().HasComponent<TransformComponent>(entity)) {
             EntityManager::GetInstance().GetComponent<TransformComponent>(entity).SetRotationEuler(glm::vec3(x, y, z));
         }
     }
-
     std::tuple<float, float, float> EntityManagerBridge::GetScale(entt::entity entity) {
         if (EntityManager::GetInstance().HasComponent<TransformComponent>(entity)) {
             auto& transform = EntityManager::GetInstance().GetComponent<TransformComponent>(entity);
@@ -78,7 +69,6 @@ namespace libCore
         }
         return { 1.0f, 1.0f, 1.0f };  // Escala por defecto si no tiene el componente
     }
-
     void EntityManagerBridge::SetScale(entt::entity entity, float x, float y, float z) {
         if (EntityManager::GetInstance().HasComponent<TransformComponent>(entity)) {
             auto& transform = EntityManager::GetInstance().GetComponent<TransformComponent>(entity);
@@ -86,5 +76,5 @@ namespace libCore
         }
     }
     //----------------------------------------------------------------------------------------------
-    //----------------------------------------------------------------------------------------------
+
 }

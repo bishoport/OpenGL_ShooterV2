@@ -62,7 +62,8 @@ namespace libCore
 	
 		if (model != nullptr)
 		{
-			std::string key = importModelData.filePath + importModelData.fileName;
+			//std::string key = importModelData.filePath + importModelData.fileName;
+			std::string key = model->name;
 			loadedModels[key] = model;
 			model->key_stored = key;
 			ThumbnailGenerator::GenerateThumbnail(model);
@@ -79,13 +80,40 @@ namespace libCore
 			}).detach();
 	}
 	Ref<Model> AssetsManager::GetModel(const std::string& name) {
+		// Primero, buscamos en el unordered_map de modelos cargados
 		auto it = loadedModels.find(name);
 		if (it != loadedModels.end()) {
 			return it->second;
 		}
-		else {
-			return nullptr;
+
+		// Si no se encuentra en el mapa, buscamos de manera recursiva en los modelos cargados
+		for (const auto& pair : loadedModels) {
+			Ref<Model> foundModel = FindModelRecursive(pair.second, name);
+			if (foundModel) {
+				return foundModel;
+			}
 		}
+
+		// Si no se encuentra en ninguna parte, devolvemos nullptr
+		return nullptr;
+	}
+	Ref<Model> AssetsManager::FindModelRecursive(const Ref<Model>& model, const std::string& name)
+	{
+		// Si el modelo actual tiene el nombre buscado, lo devolvemos
+		if (model->name == name) {
+			return model;
+		}
+
+		// Si no, recorremos los hijos del modelo
+		for (const auto& child : model->children) {
+			Ref<Model> foundModel = FindModelRecursive(child, name);
+			if (foundModel) {
+				return foundModel;
+			}
+		}
+
+		// Si no se encuentra en este modelo ni en sus hijos, devolvemos nullptr
+		return nullptr;
 	}
 	Ref<Model> AssetsManager::GetModelByMeshName(const std::string& meshName) {
 		// Función lambda recursiva para buscar en la jerarquía de modelos
@@ -121,6 +149,18 @@ namespace libCore
 	}
 	const std::unordered_map<std::string, Ref<Model>>& AssetsManager::GetAllModels() const {
 		return loadedModels;
+	}
+	Ref<Mesh> AssetsManager::GetMesh(const std::string& name) {
+		// Buscar el modelo por su nombre en los modelos cargados
+		auto model = GetModel(name);
+		if (model) {
+			// Si el modelo existe y tiene al menos un mesh, devolver el primer mesh
+			if (!model->meshes.empty()) {
+				return model->meshes[0];
+			}
+		}
+		std::cout << "Mesh " << name << " not found" << std::endl;
+		return nullptr;
 	}
 	//---------------------------------------------------------------------------------------------------------------------------
 
@@ -169,17 +209,6 @@ namespace libCore
 	//---------------------------------------------------------------------------------------------------------------------------
 
 
-	Ref<Mesh> AssetsManager::GetMesh(const std::string& name) {
-		// Buscar el modelo por su nombre en los modelos cargados
-		auto model = GetModel(name);
-		if (model) {
-			// Si el modelo existe y tiene al menos un mesh, devolver el primer mesh
-			if (!model->meshes.empty()) {
-				return model->meshes[0];
-			}
-		}
-		std::cout << "Mesh " << name << " not found" << std::endl;
-		return nullptr;
-	}
+	
 
 }

@@ -6,16 +6,16 @@
 
 namespace libCore
 {
+    //--LUA FILE MANAGMENT
     void ScriptComponent::AddLuaScript(const ImportLUA_ScriptData& scriptData) {
         luaScriptsData.push_back(scriptData);  // Agregar un nuevo script
     }
-
     void ScriptComponent::RemoveLuaScript(const std::string& scriptName) {
         luaScriptsData.erase(std::remove_if(luaScriptsData.begin(), luaScriptsData.end(),
             [&](const ImportLUA_ScriptData& data) { return data.name == scriptName; }), luaScriptsData.end());
     }
-
     //-------------------------------------------------------------------------------------------------------------------------
+    
     //--LIFE CYCLE
     void ScriptComponent::Init() {
         for (const auto& scriptData : luaScriptsData) {
@@ -26,7 +26,6 @@ namespace libCore
             }
         }
     }
-
     void ScriptComponent::Update(float deltaTime) {
         for (const auto& scriptData : luaScriptsData) {
             sol::state& lua = LuaManager::GetInstance().GetLuaState(scriptData.name);
@@ -39,10 +38,10 @@ namespace libCore
             }
         }
     }
-
     //-------------------------------------------------------------------------------------------------------------------------
 
-    // Obtener los valores de exposedVars de un script específico
+
+    //--CUSTOM VARIABLES
     std::unordered_map<std::string, sol::object> ScriptComponent::GetExposedVars(const std::string& scriptName) const {
         sol::state& lua = LuaManager::GetInstance().GetLuaState(scriptName);
         sol::table exposedVars = lua["exposedVars"];
@@ -58,8 +57,6 @@ namespace libCore
         }
         return vars;
     }
-
-    // Establecer los valores de exposedVars de un script específico
     void ScriptComponent::SetExposedVars(const std::string& scriptName, const std::unordered_map<std::string, sol::object>& vars) {
         sol::state& lua = LuaManager::GetInstance().GetLuaState(scriptName);
         sol::table exposedVars = lua["exposedVars"];
@@ -82,10 +79,5 @@ namespace libCore
             }
         }
     }
-
-    // Esta función es lo mismo que SetExposedVars, por lo que no es necesario tenerla duplicada.
-    // Puedes simplemente llamar a SetExposedVars en lugar de SetExposedVarsForScript.
-    void ScriptComponent::SetExposedVarsForScript(const std::string& scriptName, const std::unordered_map<std::string, sol::object>& vars) {
-        SetExposedVars(scriptName, vars);
-    }
+    //-------------------------------------------------------------------------------------------------------------------------
 }

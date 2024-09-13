@@ -21,9 +21,11 @@ namespace libCore
     }
     void Scene::Render(Timestep m_deltaTime) {}
     //---------------------------------------------------------------------------------------------
-    //---------------------------------------------------------------------------------------------
 
 
+
+
+    //--SAVE/LOAD PROJECT
     void Scene::SerializeScene(std::string _sceneName) {
         sceneName = _sceneName;
 
@@ -110,7 +112,6 @@ namespace libCore
         std::ofstream fout("assets/Scenes/" + sceneName + ".yaml");
         fout << out.c_str();
     }
-
     void Scene::DeserializeScene(std::string _sceneName) {
         YAML::Node data = YAML::LoadFile("assets/Scenes/" + _sceneName + ".yaml");
         if (!data["Scene"]) {
@@ -219,5 +220,6 @@ namespace libCore
             }
         }
     }
+    //---------------------------------------------------------------------------------------------
 
 }
