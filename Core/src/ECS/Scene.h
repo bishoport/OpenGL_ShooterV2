@@ -24,8 +24,7 @@ namespace libCore {
         void Render(Timestep m_deltaTime);
 
         //--SERIALIZATION
-        void SerializeScene(std::string _sceneName);
-        void DeserializeScene(std::string _sceneName);
-
+        void SerializeScene(std::string _sceneName , bool saveResource = true);
+        void DeserializeScene(std::string _sceneName, bool loadResource = true);
     };
 }

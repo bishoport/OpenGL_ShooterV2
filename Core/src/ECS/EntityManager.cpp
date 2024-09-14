@@ -98,6 +98,13 @@ namespace libCore
         auto& tag = m_registry->emplace<TagComponent>(entity);
         tag.Tag = name.empty() ? "Entity" : name;
         m_registry->emplace<TransformComponent>(entity);
+
+
+        if(EngineOpenGL::GetInstance().engineState == EDITOR_PLAY || EngineOpenGL::GetInstance().engineState == PLAY)
+        {
+            m_registry->emplace<CreatedInRunTimeComponent>(entity);
+        }
+
         return entity;
     }
     entt::entity EntityManager::CreateGameObjectFromModel(Ref<Model> model, entt::entity parent)
@@ -408,7 +415,6 @@ namespace libCore
     //------------------------------------------------------------------------------------
 
 
-
     //--INIT SCRIPTS Components
     void EntityManager::RegisterScripts() 
     {
@@ -603,6 +609,19 @@ namespace libCore
     //------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------
 
+
+    //--ESPECIALES
+    void libCore::EntityManager::CheckInstancesInRunTime()
+    {
+        auto viewCreatedInRunTimeComponent = m_registry->view<CreatedInRunTimeComponent>();
+        for (auto entity : viewCreatedInRunTimeComponent) {
+            if (HasComponent<IDComponent>(entity)) {
+                GetComponent<IDComponent>(entity).markToDelete = true;
+            }
+        }
+    }
+
+    
 
     //DEBUG ENTITIES
     void EntityManager::PrintEntityInfo(entt::entity entity, const Ref<entt::registry>& registry)

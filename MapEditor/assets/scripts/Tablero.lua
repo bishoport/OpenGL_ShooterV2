@@ -2,7 +2,7 @@
 exposedVars = {
     int_width = 26,   -- Ancho de la matriz del suelo
     int_height = 19,  -- Alto de la matriz del suelo
-    selectedModel = "assets/models/floor_tile.fbx"  -- Modelo de losa
+    selectedModel = ""  -- Modelo de losa
 }
 
 local modelEntities = {}

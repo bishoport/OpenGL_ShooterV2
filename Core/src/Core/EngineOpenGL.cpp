@@ -293,7 +293,7 @@ namespace libCore
 		glfwTerminate();
 	}
 	// -------------------------------------------------
-	// -------------------------------------------------
+
 
 
 	//--VIEWPORTS
@@ -309,7 +309,7 @@ namespace libCore
 		//-------------------------------------------
 	}
 	// -------------------------------------------------
-	// -------------------------------------------------
+
 
 	//--ENGINE CONTROL STATES
 	void libCore::EngineOpenGL::ChangeEngineState(EngineStates newState)
@@ -318,7 +318,7 @@ namespace libCore
 
 		if (EngineOpenGL::GetInstance().engineState == EDITOR)
 		{
-
+			EntityManager::GetInstance().CheckInstancesInRunTime();
 		}
 		else if (EngineOpenGL::GetInstance().engineState == EDITOR_PLAY)
 		{
@@ -330,8 +330,6 @@ namespace libCore
 		}
 	}
 	// -------------------------------------------------
-	// -------------------------------------------------
-
 
 
 	bool libCore::EngineOpenGL::CheckAABBInFrustum(const glm::vec3& min, const glm::vec3& max)

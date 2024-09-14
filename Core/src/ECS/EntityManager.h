@@ -50,6 +50,7 @@ namespace libCore
         void DrawOneGameObject(TransformComponent& transformComponent, MeshComponent& meshComponent, MaterialComponent& materialComponent, const std::string& shader);
         void DrawABBGameObjectMeshComponent(const std::string& shader);
         void CheckRayModelIntersection(const glm::vec3& rayOrigin, const glm::vec3& rayDirection);
+        void CheckInstancesInRunTime();
         bool rayIntersectsBoundingBox(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, glm::vec3 boxMin, glm::vec3 boxMax);
 
         template<typename T>

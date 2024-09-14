@@ -36,15 +36,12 @@ constexpr Ref<T> CreateRef(Args&& ... args)
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "Core/ConsoleLog.h"
 
 #define M_PI 3.14159265358979323846
-
-
 
 //GLOBAL STRUCTS
 enum TEXTURE_TYPES {
@@ -101,3 +98,4 @@ enum class GizmoOperation
 	Rotate2D, Rotate3D,
 	Scale
 };
+

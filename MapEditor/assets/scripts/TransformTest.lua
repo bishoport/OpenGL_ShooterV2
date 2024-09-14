@@ -23,6 +23,7 @@ function Update(deltaTime)
     local x, y, z = EntityManager:GetPosition(modelEntity)
     -- Modificar la posición en el eje Y según la velocidad
     y = y + (exposedVars.speed * deltaTime)
+    
     -- Establecer la nueva posición
     EntityManager:SetPosition(modelEntity, x, y, z)
 

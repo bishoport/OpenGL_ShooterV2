@@ -1,5 +1,5 @@
-// LuaManager.h
 #pragma once
+
 #include "../LibCoreHeaders.h"
 #include <sol/sol.hpp>
 #include <unordered_map>

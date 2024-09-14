@@ -26,21 +26,28 @@ namespace libCore
 
 
     //--SAVE/LOAD PROJECT
-    void Scene::SerializeScene(std::string _sceneName) {
+    void Scene::SerializeScene(std::string _sceneName, bool saveResource) {
         sceneName = _sceneName;
 
         YAML::Emitter out;
         out << YAML::BeginMap;
         out << YAML::Key << "Scene" << YAML::Value << "Untitled";
 
-        // Serializar los modelos cargados en memoria
-        auto models = SerializeAllModels();
-        if (models.size() > 0) {
-            out << YAML::Key << "Models" << YAML::Value << models;
+        if (saveResource)
+        {
+            // Serializar los modelos cargados en memoria
+            auto models = SerializeAllModels();
+            if (models.size() > 0) {
+                out << YAML::Key << "Models" << YAML::Value << models;
+            }
+            else {
+                out << YAML::Key << "Models" << YAML::Value << YAML::BeginSeq << YAML::EndSeq; // Lista vacía
+            }
         }
         else {
             out << YAML::Key << "Models" << YAML::Value << YAML::BeginSeq << YAML::EndSeq; // Lista vacía
         }
+
 
         // Serializar las entidades
         out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
@@ -112,15 +119,19 @@ namespace libCore
         std::ofstream fout("assets/Scenes/" + sceneName + ".yaml");
         fout << out.c_str();
     }
-    void Scene::DeserializeScene(std::string _sceneName) {
+
+    void Scene::DeserializeScene(std::string _sceneName, bool loadResource) {
         YAML::Node data = YAML::LoadFile("assets/Scenes/" + _sceneName + ".yaml");
         if (!data["Scene"]) {
             return;
         }
 
-        // Deserializar los modelos cargados en memoria
-        if (data["Models"]) {
-            DeserializeAllModels(data["Models"]);
+        if (loadResource)
+        {
+            // Deserializar los modelos cargados en memoria
+            if (data["Models"]) {
+                DeserializeAllModels(data["Models"]);
+            }
         }
 
         auto& entityManager = EntityManager::GetInstance();
