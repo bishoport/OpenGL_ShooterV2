@@ -123,8 +123,6 @@ namespace libCore
     {
         Ref<Camera> camera = nullptr;
     };
-
-
     struct CreatedInRunTimeComponent
     {
         std::string prueba = "";

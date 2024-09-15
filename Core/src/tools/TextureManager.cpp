@@ -57,6 +57,9 @@ namespace libCore
 
         return texture;
     }
+    
+
+
 
     GLuint TextureManager::LoadImagesForCubemap(std::vector<const char*> faces)
     {

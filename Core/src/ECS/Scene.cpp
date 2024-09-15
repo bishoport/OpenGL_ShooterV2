@@ -119,7 +119,6 @@ namespace libCore
         std::ofstream fout("assets/Scenes/" + sceneName + ".yaml");
         fout << out.c_str();
     }
-
     void Scene::DeserializeScene(std::string _sceneName, bool loadResource) {
         YAML::Node data = YAML::LoadFile("assets/Scenes/" + _sceneName + ".yaml");
         if (!data["Scene"]) {
@@ -227,6 +226,118 @@ namespace libCore
                             entityManager.AddChild(entity, childEntity); // Usar la función AddChild del EntityManager
                         }
                     }
+                }
+            }
+        }
+    }
+    //---------------------------------------------------------------------------------------------
+
+
+
+    //--SERIALIZAR COMPONENTES
+    void Scene::SerializeComponents() {
+        YAML::Emitter out;
+        out << YAML::BeginMap;
+        out << YAML::Key << "Scene" << YAML::Value << sceneName + "_temp";
+
+        // Serializar solo los componentes de las entidades
+        out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
+        auto& entityManager = EntityManager::GetInstance();
+        entityManager.m_registry->each([&](auto entity) {
+
+            out << YAML::BeginMap; // Entity
+            out << YAML::Key << "Entity" << YAML::Value << (uint32_t)entity; // Serialize entity ID
+
+            if (entityManager.HasComponent<IDComponent>(entity)) {
+                out << YAML::Key << "IDComponent";
+                out << YAML::Value << SerializeIDComponent(entityManager.GetComponent<IDComponent>(entity));
+            }
+
+            if (entityManager.HasComponent<TagComponent>(entity)) {
+                out << YAML::Key << "TagComponent";
+                out << YAML::Value << SerializeTagComponent(entityManager.GetComponent<TagComponent>(entity));
+            }
+
+            // Serializar solo los componentes
+            if (entityManager.HasComponent<TransformComponent>(entity)) {
+                out << YAML::Key << "TransformComponent";
+                out << YAML::Value << SerializeTransformComponent(entityManager.GetComponent<TransformComponent>(entity));
+            }
+
+            if (entityManager.HasComponent<MeshComponent>(entity)) {
+                out << YAML::Key << "MeshComponent";
+                out << YAML::Value << SerializeMeshComponent(entityManager.GetComponent<MeshComponent>(entity));
+            }
+
+            if (entityManager.HasComponent<MaterialComponent>(entity)) {
+                out << YAML::Key << "MaterialComponent";
+                out << YAML::Value << SerializeMaterialComponent(entityManager.GetComponent<MaterialComponent>(entity));
+            }
+
+            if (entityManager.HasComponent<ScriptComponent>(entity)) {
+                out << YAML::Key << "ScriptComponent";
+                out << YAML::Value << SerializeScriptComponent(entityManager.GetComponent<ScriptComponent>(entity));
+            }
+
+            out << YAML::EndMap; // Entity
+            });
+
+        out << YAML::EndSeq;
+        out << YAML::EndMap;
+
+        // Guardar en archivo temporal
+        std::ofstream fout("assets/Scenes/" + sceneName + "_temp.yaml");
+        fout << out.c_str();
+    }
+
+    //--DESERIALIZAR COMPONENTES
+    void Scene::DeserializeComponents() {
+        YAML::Node data = YAML::LoadFile("assets/Scenes/" + sceneName + "_temp.yaml");
+        if (!data["Scene"]) {
+            return;
+        }
+
+        auto& entityManager = EntityManager::GetInstance();
+        auto entities = data["Entities"];
+
+        // Mapa para mantener la correspondencia entre los IDs de las entidades y las entidades deserializadas
+        std::unordered_map<uint32_t, entt::entity> entityMap;
+
+        if (entities) {
+            // Deserializar los componentes básicos
+            for (auto entityNode : entities) {
+                uint32_t entityID = entityNode["Entity"].as<uint32_t>();
+
+                if (entityNode["IDComponent"]) {
+                    auto id_component = DeserializeIDComponent(entityNode["IDComponent"]);
+                    
+                    entt::entity entity = entityManager.GetEntityByUUID(id_component.ID.ToString());
+
+                    if (entityNode["TagComponent"]) {
+                        auto tag_component = DeserializeTagComponent(entityNode["TagComponent"]);
+                        entityManager.m_registry->emplace_or_replace<TagComponent>(entity, tag_component);
+                    }
+                    if (entityNode["TransformComponent"]) {
+                        auto transform_component = DeserializeTransformComponent(entityNode["TransformComponent"]);
+                        entityManager.m_registry->emplace_or_replace<TransformComponent>(entity, transform_component);
+                    }
+
+                    if (entityNode["MeshComponent"]) {
+                        auto mesh_component = DeserializeMeshComponent(entityNode["MeshComponent"]);
+                        entityManager.m_registry->emplace_or_replace<MeshComponent>(entity, mesh_component);
+                    }
+
+                    if (entityNode["MaterialComponent"]) {
+                        auto material_component = DeserializeMaterialComponent(entityNode["MaterialComponent"]);
+                        entityManager.m_registry->emplace_or_replace<MaterialComponent>(entity, material_component);
+                    }
+
+                    if (entityNode["ScriptComponent"]) {
+                        auto script_component = DeserializeScriptComponent(entityNode["ScriptComponent"]);
+                        entityManager.m_registry->emplace_or_replace<ScriptComponent>(entity, script_component);
+                    }
+
+                    entityMap[entityID] = entity;
                 }
             }
         }

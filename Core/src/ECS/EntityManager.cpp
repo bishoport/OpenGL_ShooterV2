@@ -57,12 +57,11 @@ namespace libCore
         }*/
     }
     //------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------
 
     //--ACCESOS
     entt::entity EntityManager::GetEntityByUUID(const std::string& uuid) {
         // Imprime el UUID que estás buscando
-        std::cout << "Buscando entidad con UUID: " << uuid << std::endl;
+        //std::cout << "Buscando entidad con UUID: " << uuid << std::endl;
 
         auto view = m_registry->view<IDComponent>();
         for (auto entity : view) {
@@ -70,10 +69,10 @@ namespace libCore
             std::string entityUUID = idComponent.ID.ToString();
 
             // Imprime cada UUID que se está revisando
-            std::cout << "Revisando entidad con UUID: " << entityUUID << " (Entity ID: " << static_cast<uint32_t>(entity) << ")" << std::endl;
+            //std::cout << "Revisando entidad con UUID: " << entityUUID << " (Entity ID: " << static_cast<uint32_t>(entity) << ")" << std::endl;
 
             if (entityUUID == uuid) {
-                std::cout << "ENTITY_MANAGER -> Se encontró la entidad. Direccion de m_Entity: " << static_cast<uint32_t>(entity) << std::endl;
+                //std::cout << "ENTITY_MANAGER -> Se encontró la entidad. Direccion de m_Entity: " << static_cast<uint32_t>(entity) << std::endl;
                 return entity;
             }
         }
@@ -87,7 +86,6 @@ namespace libCore
         assert(m_registry.get() != nullptr && "m_registry debe estar inicializado");
         return m_registry.get();
     }
-    //------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------
 
 
@@ -204,7 +202,6 @@ namespace libCore
         // Actualizar la transformación local del hijo para mantener la transformación global
         childTransformComponent.setTransformFromGlobal(childGlobalTransform, child, *m_registry);
     }
-    //------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------
 
     //--DUPLICATE
@@ -336,7 +333,6 @@ namespace libCore
         }
     }
     //------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------
 
     //--DESTROY
     void EntityManager::MarkToDeleteRecursively(entt::entity entity)
@@ -412,7 +408,6 @@ namespace libCore
         m_registry->clear();
     }
     //------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------
 
 
     //--INIT SCRIPTS Components
@@ -436,7 +431,6 @@ namespace libCore
             scriptComponent.Update(deltaTime);
         }
     }
-    //------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------
 
 
@@ -495,7 +489,6 @@ namespace libCore
         }
     }
     //------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------
 
     //--DRAW MESH Component (Son llamadas desde el Renderer cuando le toque)
     void EntityManager::DrawGameObjects(const std::string& shader)
@@ -544,7 +537,6 @@ namespace libCore
         }
     }
     //------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------
 
 
     //--DRAW AABB Component (Son llamadas desde el Renderer cuando le toque)
@@ -566,7 +558,6 @@ namespace libCore
             }
         }
     }
-    //------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------
 
     //--AABB Component MOUSE CHECKER
@@ -606,7 +597,6 @@ namespace libCore
         if (tzMax < tMax) tMax = tzMax;
         return true;
     }
-    //------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------
 
 
@@ -691,6 +681,5 @@ namespace libCore
             std::cout << "Entity: " << static_cast<uint32_t>(entity) << " UUID: " << idComponent.ID.ToString() << std::endl;
         }
     }
-    //------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------
 }

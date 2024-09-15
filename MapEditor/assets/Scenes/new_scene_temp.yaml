@@ -1,0 +1,31 @@
+Scene: new_scene_temp
+Entities:
+  - Entity: 0
+    IDComponent:
+      ID: 7313306b0b4a46c7
+      MarkToDelete: false
+    TagComponent:
+      Tag: new_GameObject
+    TransformComponent:
+      Transform:
+        Position:
+          - 0
+          - 0
+          - 0
+        Rotation:
+          - 0
+          - 0
+          - 0
+        Scale:
+          - 1
+          - 1
+          - 1
+    ScriptComponent:
+      Scripts:
+        - filePath: assets\scripts\Tablero.lua
+          name: Tablero
+      ExposedVars:
+        Tablero:
+          int_width: 26
+          int_height: 19
+          selectedModel: Tile_floor

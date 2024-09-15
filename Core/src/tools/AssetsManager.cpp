@@ -151,7 +151,7 @@ namespace libCore
 	}
 	Ref<Mesh> AssetsManager::GetMesh(const std::string& name) {
 		// Buscar el modelo por su nombre en los modelos cargados
-		auto model = GetModel(name);
+		auto model = GetModelByMeshName(name);
 		if (model) {
 			// Si el modelo existe y tiene al menos un mesh, devolver el primer mesh
 			if (!model->meshes.empty()) {

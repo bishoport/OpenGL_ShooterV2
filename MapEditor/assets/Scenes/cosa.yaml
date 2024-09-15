@@ -12,12 +12,12 @@ Models:
       processLights: false
       globalScaleFactor: 1
 Entities:
-  - Entity: 1048576
+  - Entity: 0
     IDComponent:
-      ID: 005d89e870e0b315
+      ID: 7313306b0b4a46c7
       MarkToDelete: false
     TagComponent:
-      Tag: BoardManager
+      Tag: new_GameObject
     TransformComponent:
       Transform:
         Position:
@@ -39,5 +39,5 @@ Entities:
       ExposedVars:
         Tablero:
           int_height: 19
-          int_width: 26
           selectedModel: Tile_floor
+          int_width: 26

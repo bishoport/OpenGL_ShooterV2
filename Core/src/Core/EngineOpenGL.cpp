@@ -25,7 +25,6 @@ namespace libCore
 		EventManager::OnWindowResizeEvent().trigger(width, height);
 	}
 	// -------------------------------------------------
-	// -------------------------------------------------
 
 
 	// Message callback function
@@ -53,7 +52,6 @@ namespace libCore
 			std::cout << "GL NOTIFICATION: " << message << std::endl;
 		}
 	}
-	// -------------------------------------------------
 	// -------------------------------------------------
 
 
@@ -319,13 +317,16 @@ namespace libCore
 		if (EngineOpenGL::GetInstance().engineState == EDITOR)
 		{
 			EntityManager::GetInstance().CheckInstancesInRunTime();
+			Scene::GetInstance().DeserializeComponents();
 		}
 		else if (EngineOpenGL::GetInstance().engineState == EDITOR_PLAY)
 		{
+			Scene::GetInstance().SerializeComponents();
 			EntityManager::GetInstance().InitScripts();
 		}
 		else if (EngineOpenGL::GetInstance().engineState == PLAY)
 		{
+			Scene::GetInstance().SerializeComponents();
 			EntityManager::GetInstance().InitScripts();
 		}
 	}
